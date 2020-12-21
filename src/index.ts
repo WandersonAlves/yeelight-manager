@@ -1,13 +1,13 @@
 import 'reflect-metadata';
+import { GetBindingFromContainer } from './infra/container';
 import { logger } from './shared/Logger';
+import Discovery from './infra/yeelight/discovery';
 import server from './server';
 
-
-
-server.listen(3000, () => {
-  logger.info('yeelight-manager-backend listening on 3000');
-});
-
-// export const handler = (event: APIGatewayEvent, context: Context) => {
-//   proxy(createServer(server), event, context);
-// };
+void (async () => {
+  const discovery = GetBindingFromContainer(Discovery);
+  await discovery.discoverDevices();
+  server.listen(3000, () => {
+    logger.info('yeelight-manager-backend listening on 3000');
+  });
+})();
