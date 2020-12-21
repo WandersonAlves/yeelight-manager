@@ -10,3 +10,10 @@ export enum ColorFlowAction {
   STAY = 1,
   TURN_OFF = 2
 }
+
+export enum CommandList {
+  TOGGLE = 'toggle',
+  RGB = 'rgb',
+  CT = 'color-temperature',
+  BRIGHT = 'bright',
+}

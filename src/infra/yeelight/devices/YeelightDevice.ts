@@ -24,6 +24,19 @@ export interface YeelightDeviceJSON {
 }
 
 export default class YeelightDevice {
+  /**
+   * Checks if given device is connected.
+   * If not, then returns a promise that attempts to connect
+   *
+   * @param device A [YeelightDevice] type
+   */
+  static async ConnectDevice(device: YeelightDevice) {
+    if (device.isConnected) {
+      return;
+    }
+    return device.connect();
+  }
+
   static CreateDevice(message: string) {
     const colorMode = parseInt(GetValueFromString(message, 'color_mode'));
     const host = GetValueFromString(message, 'Location').substr(11);
