@@ -1,5 +1,5 @@
 {
-  "name": "yeelight-manager",
+  "name": "yeelight-manager-backend",
   "version": "0.0.1",
   "description": "Change me pls",
   "main": "index.ts",
@@ -13,8 +13,8 @@
     "test:watch": "nodemon --watch ./src/**/*.ts --ext ts --exec \"mocha -r ts-node/register src/**/*.test.ts\"",
     "lint": "eslint -c .eslintrc.js --ext .ts ./src/**/*.ts",
     "lint:fix": "yarn lint --fix",
-    "start:dev": "SLS_DEBUG=* && node --inspect ./node_modules/.bin/sls offline --watch --config serverless-dev.yml -s dev",
-    "dev": "yarn start:dev",
+    "start:dev": "node --inspect=0.0.0.0:9229 -r ts-node/register ./src/index.ts",
+    "dev": "nodemon",
     "release": "npx standard-version --release-as",
     "clean": "rm -rf dist/",
     "build": "tsc"
@@ -39,6 +39,7 @@
     "eslint-plugin-sort-imports-es6-autofix": "^0.5.0",
     "husky": "^4.2.5",
     "lint-staged": "^10.4.0",
+    "nodemon": "^2.0.6",
     "prettier-quick": "^0.0.5",
     "serverless": "^2.11.1",
     "serverless-dotenv-plugin": "^3.0.0",
@@ -67,6 +68,8 @@
     }
   },
   "lint-staged": {
-    "*.ts": ["yarn lint:fix"]
+    "*.ts": [
+      "yarn lint:fix"
+    ]
   }
 }

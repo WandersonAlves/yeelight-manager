@@ -1,13 +1,10 @@
 import { Container } from 'inversify';
-import AxiosHttpHandle from '../http/AxiosHttpHandler';
-import RandomNumberContainer from '../../modules/RandomNumber/RandomNumberContainer';
-
+import Discovery from '../yeelight/discovery';
+import DiscoveryContainer from '../../modules/Discovery/DiscoveryContainer';
 // Merge container modules
 const container = new Container({ defaultScope: 'Singleton' });
 
-container.load(RandomNumberContainer);
-
-// Infra
-container.bind<AxiosHttpHandle>(AxiosHttpHandle).toSelf();
+container.bind<Discovery>(Discovery).toSelf();
+container.load(DiscoveryContainer);
 
 export default container;

@@ -7,9 +7,9 @@ export default class ExpressRouterAdapter {
     return async (req: Request, res: Response) => {
       const httpRequest: IHttpRequest = {
         body: req.body,
-        params: req.apiGateway.event.pathParameters,
-        query: req.apiGateway.event.queryStringParameters,
-        headers: req.apiGateway.event.headers,
+        params: req.params,
+        query: req.query,
+        headers: req.headers,
       };
       const httpResponse: HttpResponse<any> = await router.route(httpRequest);
       return res.status(httpResponse.statusCode).json(httpResponse);

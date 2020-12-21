@@ -1,8 +1,13 @@
 import 'reflect-metadata';
-import { APIGatewayEvent, Context } from 'aws-lambda';
-import { createServer, proxy } from 'aws-serverless-express';
+import { logger } from './shared/Logger';
 import server from './server';
 
-export const handler = (event: APIGatewayEvent, context: Context) => {
-  proxy(createServer(server), event, context);
-};
+
+
+server.listen(3000, () => {
+  logger.info('yeelight-manager-backend listening on 3000');
+});
+
+// export const handler = (event: APIGatewayEvent, context: Context) => {
+//   proxy(createServer(server), event, context);
+// };

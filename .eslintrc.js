@@ -169,7 +169,7 @@ module.exports = {
     'prefer-arrow/prefer-arrow-functions': 'error',
     'prefer-const': 'error',
     'quote-props': 'off',
-    radix: 'error',
+    radix: 'off',
     'space-before-function-paren': 'off',
     'space-in-parens': ['off', 'never'],
     'spaced-comment': [
