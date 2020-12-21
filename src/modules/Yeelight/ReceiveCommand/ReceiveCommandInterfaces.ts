@@ -6,4 +6,5 @@ export interface ReceiveCommandCaseHeaders {
   name?: string;
   brightLevel?: number;
   hex?: string;
+  ip?: string;
 }

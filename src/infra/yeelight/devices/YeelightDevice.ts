@@ -5,7 +5,7 @@ import { GetValueFromString, HexToInteger } from '../../../utils';
 import { logger } from '../../../shared/Logger';
 import ColorFlowExpression from './Flow';
 import Command, { ColorFlowCommand, EffectTypes, MusicModeCommand, NameCommand, RGBCommand, ToggleCommand } from './Commands';
-
+import Screenshot from '../screenshot';
 
 export interface YeelightDeviceJSON {
   id: string;
@@ -80,6 +80,7 @@ export default class YeelightDevice {
   isConnected = false;
   readonly events = new EventEmitter();
   private commandId = 1;
+  private interval;
 
   private constructor({
     id,
@@ -171,6 +172,24 @@ export default class YeelightDevice {
     this.socket = null;
     this.server.close();
     return this.sendCommand(new MusicModeCommand(false, currentIpAddress, this.localPort));
+  }
+
+  async ambiLight({ width, height, interval = 300, ip }: { width: number; height: number; interval?: number; ip: string }) {
+    await this.startMusicMode(ip);
+    this.interval = setInterval(async () => {
+      try {
+        const color = await Screenshot.GetProeminentColor(width, height);
+        return this.setHex(color, 'smooth', 300);
+      } catch (e) {
+        logger.error(e);
+        void this.cancelAmbiLight(ip);
+      }
+    }, interval);
+  }
+
+  cancelAmbiLight(ip: string) {
+    clearInterval(this.interval);
+    return this.finishMusicMode(ip);
   }
 
   toggle() {

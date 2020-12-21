@@ -1,10 +1,10 @@
 import * as bodyParser from 'body-parser';
-import * as express from 'express';
 import * as expressWinston from 'express-winston';
 import { logger } from '../shared/Logger';
 import DiscoveryRoutes from '../modules/Discovery/DiscoveryRoutes';
 import ExpressRouteNotFoundAdapter from '../shared/adapters/ExpressRouteNotFoundAdapter';
 import YeelightRoutes from '../modules/Yeelight/YeelightRoutes';
+import express from 'express';
 
 const server = express();
 

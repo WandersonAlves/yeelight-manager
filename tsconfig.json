@@ -7,6 +7,7 @@
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
     "inlineSourceMap": true,
     "lib": ["es2017"]
   },

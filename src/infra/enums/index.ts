@@ -17,4 +17,6 @@ export enum CommandList {
   CT = 'color-temperature',
   BRIGHT = 'bright',
   NAME = 'name',
+  AMBILIGHT = 'ambilight',
+  CANCEL_AMBILIGHT = 'cancel_ambilight'
 }
