@@ -20,6 +20,11 @@ export default class Command {
   }
 }
 
+export class NameCommand extends Command {
+  constructor(name: string, id = 1) {
+    super(id, "set_name", [name]);
+  }
+}
 export class RGBCommand extends Command {
   constructor(rgbInteger: number, effect: EffectTypes, duration?: number, id = 1) {
     super(id, "set_rgb", [rgbInteger, effect, duration ?? 300]);

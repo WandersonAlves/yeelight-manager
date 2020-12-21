@@ -1,8 +1,9 @@
-import { CommandList } from "../../../infra/enums";
-import Command from "../../../infra/yeelight/devices/Commands";
+import { CommandList } from '../../../infra/enums';
 
 export interface ReceiveCommandCaseHeaders {
   deviceid: string;
   kind: CommandList;
-  command: Command;
+  name?: string;
+  brightLevel?: number;
+  hex?: string;
 }

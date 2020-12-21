@@ -15,7 +15,7 @@ export default class ReceiveCommandCase implements UseCase<any, IHttpError> {
 
   @ExceptionHandler()
   async execute({ headers }: UseCaseParams<ReceiveCommandCaseHeaders>) {
-    const { deviceid, kind, command } = headers;
+    const { deviceid, kind, name, hex } = headers;
     const device = this.discovery.findDevice(deviceid);
     if (!device) {
       return HttpResponse.error(new DeviceNotFoundException(deviceid));
@@ -24,6 +24,14 @@ export default class ReceiveCommandCase implements UseCase<any, IHttpError> {
     switch (kind) {
       case CommandList.TOGGLE: {
         await device.toggle();
+        break;
+      }
+      case CommandList.NAME: {
+        await device.setName(name);
+        break;
+      }
+      case CommandList.RGB: {
+        await device.setHex(hex);
         break;
       }
       default: {

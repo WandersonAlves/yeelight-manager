@@ -4,7 +4,7 @@ import { EventEmitter } from 'events';
 import { GetValueFromString, HexToInteger } from '../../../utils';
 import { logger } from '../../../shared/Logger';
 import ColorFlowExpression from './Flow';
-import Command, { ColorFlowCommand, EffectTypes, MusicModeCommand, RGBCommand, ToggleCommand } from './Commands';
+import Command, { ColorFlowCommand, EffectTypes, MusicModeCommand, NameCommand, RGBCommand, ToggleCommand } from './Commands';
 
 
 export interface YeelightDeviceJSON {
@@ -63,22 +63,22 @@ export default class YeelightDevice {
   readonly host: string;
   readonly model: 'color';
   readonly support: string[];
-  power: boolean;
-  bright: number;
+  readonly power: boolean;
+  readonly bright: number;
   // 1-RGB, 2-CT, 3-HSV
-  colorMode: 'RGB' | 'CT' | 'HSV';
-  colorTemperatureValue: number;
-  rgbValue: number;
-  hueValue: number;
-  saturationValue: number;
-  name: string;
+  readonly colorMode: 'RGB' | 'CT' | 'HSV';
+  readonly colorTemperatureValue: number;
+  readonly rgbValue: number;
+  readonly hueValue: number;
+  readonly saturationValue: number;
+  readonly name: string;
   private client: TCPSocket;
   private localAddress: string;
   private localPort: number;
   private server = createServer();
   private socket: TCPSocket;
   isConnected = false;
-  events = new EventEmitter();
+  readonly events = new EventEmitter();
   private commandId = 1;
 
   private constructor({
@@ -183,6 +183,10 @@ export default class YeelightDevice {
 
   setFlow(repeat: number, action: ColorFlowAction, flows: ColorFlowExpression[]) {
     return this.sendCommand(new ColorFlowCommand(repeat, action, flows));
+  }
+
+  setName(name: string) {
+    return this.sendCommand(new NameCommand(name));
   }
 
   blinkDevice() {

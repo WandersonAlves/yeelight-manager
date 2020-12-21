@@ -16,4 +16,5 @@ export enum CommandList {
   RGB = 'rgb',
   CT = 'color-temperature',
   BRIGHT = 'bright',
+  NAME = 'name',
 }
