@@ -4,8 +4,18 @@ import { EventEmitter } from 'events';
 import { GetValueFromString, HexToInteger } from '../../../utils';
 import { logger } from '../../../shared/Logger';
 import ColorFlowExpression from './Flow';
-import Command, { ColorFlowCommand, EffectTypes, MusicModeCommand, NameCommand, RGBCommand, ToggleCommand } from './Commands';
+import Command, {
+  ColorFlowCommand,
+  ColorTemperatureCommand,
+  EffectTypes,
+  MusicModeCommand,
+  NameCommand,
+  RGBCommand,
+  ToggleCommand,
+} from './Commands';
 import Screenshot from '../screenshot';
+
+type Resolve = (value: void | PromiseLike<void>) => void;
 
 export interface YeelightDeviceJSON {
   id: string;
@@ -115,20 +125,28 @@ export default class YeelightDevice {
   connect(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.client = new TCPSocket();
-      logger.info(`Trying to connect into ${this.name || 'Yeelight'} in ${this.host}:${this.port}`);
+      logger.info(`Trying to connect into ${this.name || 'Yeelight'} in ${this.host}:${this.port}`, {
+        label: this.name || 'Yeelight',
+      });
 
       this.client.connect(this.port, this.host, () => {
         this.events.emit('connected');
         this.isConnected = true;
-        logger.info(`Connected into ${this.name || 'Yeelight'}`);
+        logger.info(`Connected into ${this.name || 'Yeelight'}`, {
+          label: this.name || 'Yeelight',
+        });
         resolve();
       });
 
       this.client.on('data', data => {
+        logger.debug(`Data received: ${data}`, {
+          label: this.name || 'Yeelight',
+        });
         this.events.emit('data', data);
       });
 
       this.client.on('close', () => {
+        this.isConnected = false;
         this.events.emit('close_connection');
       });
 
@@ -144,11 +162,15 @@ export default class YeelightDevice {
     return new Promise((resolve, reject) => {
       try {
         this.server.listen(() => {
-          logger.info('Server Created!');
+          logger.info('Server Created!', {
+            label: this.name || 'Yeelight',
+          });
           const ad = this.server.address() as AddressInfo;
           this.localAddress = ad.address;
           this.localPort = ad.port;
-          logger.info(`TCP Server Info: ${this.localAddress}:${this.localPort}`);
+          logger.info(`TCP Server Info: ${this.localAddress}:${this.localPort}`, {
+            label: this.name || 'Yeelight',
+          });
           // Tell the lightbulb to try to connect to our server
           void this.sendCommand(new MusicModeCommand(true, currentIpAddress, this.localPort));
         });
@@ -208,6 +230,10 @@ export default class YeelightDevice {
     return this.sendCommand(new NameCommand(name));
   }
 
+  setColorTemperature(ct: number) {
+    return this.sendCommand(new ColorTemperatureCommand(ct));
+  }
+
   blinkDevice() {
     return this.setFlow(2, ColorFlowAction.RECOVER_STATE, [
       new ColorFlowExpression(350, ColorFlowExpressionMode.TEMPERATURE, 6500, 100),
@@ -237,7 +263,10 @@ export default class YeelightDevice {
   private sendCommand(command: Command): Promise<void> {
     const cmdName = command.name;
     const cmdJSON = command.toString();
-    const sharedCb = (resolve: () => void, reject: (e: Error) => void) => (err: Error) => {
+    logger.debug(`Command sent: ${cmdJSON}`, {
+      label: this.name || 'Yeelight',
+    });
+    const sharedCb = (resolve: Resolve, reject: (e: Error) => void) => (err: Error) => {
       if (err) {
         this.events.emit('command_failure', cmdJSON);
         return reject(err);

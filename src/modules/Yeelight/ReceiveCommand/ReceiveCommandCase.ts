@@ -15,7 +15,7 @@ export default class ReceiveCommandCase implements UseCase<any, IHttpError> {
 
   @ExceptionHandler()
   async execute({ headers }: UseCaseParams<ReceiveCommandCaseHeaders>) {
-    const { deviceid, kind, name, hex, ip } = headers;
+    const { deviceid, kind, name, hex, ip, ct } = headers;
     const device = this.discovery.findDevice(deviceid);
     if (!device) {
       return HttpResponse.error(new DeviceNotFoundException(deviceid));
@@ -40,6 +40,10 @@ export default class ReceiveCommandCase implements UseCase<any, IHttpError> {
       }
       case CommandList.CANCEL_AMBILIGHT: {
         await device.cancelAmbiLight(ip);
+        break;
+      }
+      case CommandList.CT: {
+        await device.setColorTemperature(ct);
         break;
       }
       default: {
