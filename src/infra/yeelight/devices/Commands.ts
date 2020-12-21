@@ -1,18 +1,14 @@
 /* eslint-disable max-classes-per-file */
-import { ColorFlowAction } from "../../enums";
-import ColorFlowExpression from "./Flow";
+import { ColorFlowAction } from '../../enums';
+import ColorFlowExpression from './Flow';
 
-export type EffectTypes = "smooth" | "sudden";
+export type EffectTypes = 'smooth' | 'sudden';
 
 export default class Command {
-  constructor(
-    private id: number,
-    private method: string,
-    private params: any[]
-  ) {}
+  constructor(private id: number, private method: string, private params: any[]) {}
 
   toString() {
-    return JSON.stringify(this) + "\r\n";
+    return JSON.stringify(this) + '\r\n';
   }
 
   get name() {
@@ -22,64 +18,41 @@ export default class Command {
 
 export class NameCommand extends Command {
   constructor(name: string, id = 1) {
-    super(id, "set_name", [name]);
+    super(id, 'set_name', [name]);
   }
 }
 export class RGBCommand extends Command {
-  constructor(rgbInteger: number, effect: EffectTypes, duration?: number, id = 1) {
-    super(id, "set_rgb", [rgbInteger, effect, duration ?? 300]);
+  constructor(rgbInteger: number, effect: EffectTypes = 'smooth', duration = 300, id = 1) {
+    super(id, 'set_rgb', [rgbInteger, effect, duration ?? 300]);
   }
 }
 
 export class MusicModeCommand extends Command {
   constructor(toggle: boolean, localIpAddress: string, tcpServerPort: number) {
-    super(9999, "set_music", [toggle ? 1 : 0, localIpAddress, tcpServerPort]);
+    super(9999, 'set_music', [toggle ? 1 : 0, localIpAddress, tcpServerPort]);
   }
 }
 
 export class ToggleCommand extends Command {
   constructor(id = 1) {
-    super(id, "toggle", []);
+    super(id, 'toggle', []);
   }
 }
 
 export class BrightCommand extends Command {
-  constructor(
-    value: number,
-    effect: EffectTypes,
-    duration?: number,
-    id = 1
-  ) {
-    super(id, "set_bright", [
-      value < 1 ? 1 : value > 100 ? 100 : value,
-      effect,
-      duration,
-    ]);
+  constructor(value: number, effect: EffectTypes = 'smooth', duration = 300, id = 1) {
+    super(id, 'set_bright', [value < 1 ? 1 : value > 100 ? 100 : value, effect, duration]);
   }
 }
 
 export class ColorTemperatureCommand extends Command {
-  constructor(
-    value: number,
-    effect: EffectTypes,
-    duration?: number,
-    id = 1
-  ) {
-    super(id, "set_ct_abx", [
-      value < 1700 ? 1700 : value > 6500 ? 6500 : value,
-      effect,
-      duration,
-    ]);
+  constructor(value: number, effect: EffectTypes = 'smooth', duration = 300, id = 1) {
+    super(id, 'set_ct_abx', [value < 1700 ? 1700 : value > 6500 ? 6500 : value, effect, duration]);
   }
 }
 
 export class ColorFlowCommand extends Command {
-  constructor(
-    repeat: number,
-    action: ColorFlowAction,
-    flows: ColorFlowExpression[],
-    id = 1
-  ) {
-    super(id, "start_cf", [repeat, action, flows.join(",")]);
+  constructor(repeat: number, action: ColorFlowAction, flows: ColorFlowExpression[], id = 1) {
+    super(id, 'start_cf', [repeat, action, flows.join(',')]);
   }
 }
