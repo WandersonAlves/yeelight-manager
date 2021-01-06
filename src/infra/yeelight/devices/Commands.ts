@@ -41,7 +41,7 @@ export class ToggleCommand extends Command {
 
 export class BrightCommand extends Command {
   constructor(value: number, effect: EffectTypes = 'smooth', duration = 300, id = 1) {
-    super(id, 'set_bright', [value < 1 ? 1 : value > 100 ? 100 : value, effect, duration]);
+    super(id, 'set_bright', [value < 1 ? 1 : value > 100 ? 100 : Number(value), effect, duration]);
   }
 }
 

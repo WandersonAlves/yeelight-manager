@@ -5,6 +5,7 @@ import { GetValueFromString, HexToInteger } from '../../../utils';
 import { logger } from '../../../shared/Logger';
 import ColorFlowExpression from './Flow';
 import Command, {
+  BrightCommand,
   ColorFlowCommand,
   ColorTemperatureCommand,
   EffectTypes,
@@ -224,6 +225,10 @@ export default class YeelightDevice {
 
   setFlow(repeat: number, action: ColorFlowAction, flows: ColorFlowExpression[]) {
     return this.sendCommand(new ColorFlowCommand(repeat, action, flows));
+  }
+
+  setBright(level: number, effect: EffectTypes = 'smooth', duration = 300) {
+    return this.sendCommand(new BrightCommand(level, effect, duration, this.commandId++));
   }
 
   setName(name: string) {

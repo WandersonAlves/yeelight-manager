@@ -1,6 +1,6 @@
 import { CommandList } from '../../../infra/enums';
+import { CommandSignal } from './ReceiveCommandInterfaces';
 import { IHttpError, UseCase, UseCaseParams } from '../../../shared/contracts';
-import { ReceiveCommandCaseHeaders } from './ReceiveCommandInterfaces';
 import { inject, injectable } from 'inversify';
 import DeviceNotFoundException from '../../../shared/exceptions/DeviceNotFoundException';
 import Discovery from '../../../infra/yeelight/discovery';
@@ -14,8 +14,8 @@ export default class ReceiveCommandCase implements UseCase<any, IHttpError> {
   @inject(Discovery) private discovery: Discovery;
 
   @ExceptionHandler()
-  async execute({ headers }: UseCaseParams<ReceiveCommandCaseHeaders>) {
-    const { deviceid, kind, name, hex, ip, ct } = headers;
+  async execute({ headers }: UseCaseParams<CommandSignal>) {
+    const { deviceid, kind, name, hex, ip, ct, brightlevel } = headers;
     const device = this.discovery.findDevice(deviceid);
     if (!device) {
       return HttpResponse.error(new DeviceNotFoundException(deviceid));
@@ -44,6 +44,10 @@ export default class ReceiveCommandCase implements UseCase<any, IHttpError> {
       }
       case CommandList.CT: {
         await device.setColorTemperature(ct);
+        break;
+      }
+      case CommandList.BRIGHT: {
+        await device.setBright(brightlevel);
         break;
       }
       default: {

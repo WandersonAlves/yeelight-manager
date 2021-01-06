@@ -1,10 +1,10 @@
 import { CommandList } from '../../../infra/enums';
 
-export interface ReceiveCommandCaseHeaders {
+export interface CommandSignal {
   deviceid: string;
   kind: CommandList;
   name?: string;
-  brightLevel?: number;
+  brightlevel?: number;
   hex?: string;
   ct?: number;
   ip?: string;
