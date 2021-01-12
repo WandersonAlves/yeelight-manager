@@ -29,11 +29,11 @@ export interface DatabaseConnection {
   disconnect(): Promise<void>;
 }
 
-export interface IHttpRequest<BODY = any, QUERY = any, PARAMS = any> {
-  body?: BODY;
-  query?: QUERY;
-  params?: PARAMS;
-  headers?: any;
+export interface IHttpRequest<B = any, Q = any, P = any, H = any> {
+  body?: B;
+  query?: Q;
+  params?: P;
+  headers?: H;
 }
 
 export interface IHttpError {
