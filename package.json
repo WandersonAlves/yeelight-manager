@@ -43,7 +43,6 @@
   },
   "dependencies": {
     "express": "^4.17.1",
-    "express-winston": "^4.0.5",
     "ffmpeg-static": "^4.2.7",
     "http-status": "^1.4.2",
     "inversify": "^5.0.1",
