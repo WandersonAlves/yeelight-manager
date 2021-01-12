@@ -2,7 +2,7 @@ import { AddressInfo, Socket as TCPSocket, createServer } from 'net';
 import { ColorFlowAction, ColorFlowExpressionMode } from '../../enums';
 import { EventEmitter } from 'events';
 import { GetValueFromString, HexToInteger } from '../../../utils';
-import { logger } from '../../../shared/Logger';
+import { jsonString, logger } from '../../../shared/Logger';
 import ColorFlowExpression from './Flow';
 import Command, {
   BrightCommand,
@@ -24,14 +24,23 @@ export interface YeelightDeviceJSON {
   bright: number;
   rgbValue: number;
   colorTemperatureValue: number;
-  hueValue: number;
-  saturationValue: number;
+  hueValue?: number;
+  saturationValue?: number;
   name: string;
   colorMode: 'RGB' | 'CT' | 'HSV';
   support: string[];
   power: boolean;
   host: string;
   port: number;
+}
+
+interface DataReceived {
+  method: string;
+  params: Params;
+}
+
+interface Params {
+  power: string;
 }
 
 export default class YeelightDevice {
@@ -58,8 +67,6 @@ export default class YeelightDevice {
       bright: parseInt(GetValueFromString(message, 'bright')),
       rgbValue: parseInt(GetValueFromString(message, 'rgb')),
       colorTemperatureValue: parseInt(GetValueFromString(message, 'ct')),
-      hueValue: parseInt(GetValueFromString(message, 'hue')),
-      saturationValue: parseInt(GetValueFromString(message, 'sat')),
       name: GetValueFromString(message, 'name'),
       colorMode: colorMode === 1 ? 'RGB' : colorMode === 2 ? 'CT' : 'HSV',
       support: GetValueFromString(message, 'support').split(' '),
@@ -70,44 +77,28 @@ export default class YeelightDevice {
   }
 
   readonly id: string;
-  readonly port: number;
-  readonly host: string;
-  readonly model: 'color';
-  readonly support: string[];
-  readonly power: boolean;
-  readonly bright: number;
+  private port: number;
+  private host: string;
+  private model: 'color';
+  private support: string[];
+  private power: boolean;
+  private bright: number;
   // 1-RGB, 2-CT, 3-HSV
-  readonly colorMode: 'RGB' | 'CT' | 'HSV';
-  readonly colorTemperatureValue: number;
-  readonly rgbValue: number;
-  readonly hueValue: number;
-  readonly saturationValue: number;
-  readonly name: string;
+  private colorMode: 'RGB' | 'CT' | 'HSV';
+  private colorTemperatureValue: number;
+  private rgb: number;
+  private name: string;
   private client: TCPSocket;
   private localAddress: string;
   private localPort: number;
   private server = createServer();
   private socket: TCPSocket;
   isConnected = false;
-  readonly events = new EventEmitter();
+  private events = new EventEmitter();
   private commandId = 1;
   private interval;
 
-  private constructor({
-    id,
-    port,
-    host,
-    model,
-    support,
-    power,
-    bright,
-    colorMode,
-    colorTemperatureValue,
-    rgbValue,
-    hueValue,
-    saturationValue,
-    name,
-  }) {
+  private constructor({ id, port, host, model, support, power, bright, colorMode, colorTemperatureValue, rgbValue, name }) {
     this.id = id;
     this.port = port;
     this.host = host;
@@ -117,9 +108,7 @@ export default class YeelightDevice {
     this.bright = bright;
     this.colorMode = colorMode;
     this.colorTemperatureValue = colorTemperatureValue;
-    this.rgbValue = rgbValue;
-    this.hueValue = hueValue;
-    this.saturationValue = saturationValue;
+    this.rgb = rgbValue;
     this.name = name;
   }
 
@@ -140,9 +129,7 @@ export default class YeelightDevice {
       });
 
       this.client.on('data', data => {
-        logger.debug(`Data received: ${data}`, {
-          label: this.name || 'Yeelight',
-        });
+        this.changeEvent(JSON.parse(data.toString()));
         this.events.emit('data', data);
       });
 
@@ -252,10 +239,8 @@ export default class YeelightDevice {
       id: this.id,
       model: this.model,
       bright: this.bright,
-      rgbValue: this.rgbValue,
+      rgbValue: this.rgb,
       colorTemperatureValue: this.colorTemperatureValue,
-      hueValue: this.hueValue,
-      saturationValue: this.saturationValue,
       name: this.name,
       colorMode: this.colorMode,
       support: this.support,
@@ -263,6 +248,38 @@ export default class YeelightDevice {
       host: this.host,
       port: this.port,
     };
+  }
+
+  private changeEvent(dataObj: DataReceived) {
+    logger.debug(`Data received: ${jsonString(dataObj)}`, {
+      label: this.name || 'Yeelight',
+    });
+    if (dataObj?.method === 'props') {
+      const key = Object.keys(dataObj.params)[0];
+      const value = dataObj.params[key];
+      logger.verbose(`${key} changed to ${value}`, {
+        label: this.name || 'Yeelight',
+      });
+      switch (key) {
+        case 'color_mode': {
+          this.colorMode = value === 1 ? 'RGB' : value === 2 ? 'CT' : 'HSV';
+          break;
+        }
+        case 'power': {
+          this.power = value === 'on' ? true : false;
+          break;
+        }
+        default: {
+          if (!Object.hasOwnProperty.call(this, key)) {
+            logger.warn(`DataEvent updating unmapped ${key} key`, { label: this.name || 'Yeelight' });
+          }
+          this[key] = value;
+          break;
+        }
+      }
+    } else {
+      logger.warn('Unmapped Event', { label: this.name || 'Yeelight' });
+    }
   }
 
   private sendCommand(command: Command): Promise<void> {
