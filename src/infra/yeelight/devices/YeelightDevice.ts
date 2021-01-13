@@ -242,6 +242,7 @@ export default class YeelightDevice {
   }
 
   setHex(hex: string, effect: EffectTypes = 'smooth', duration = 300) {
+    console.log(hex)
     return this.sendCommand(new RGBCommand(HexToInteger(hex), effect, duration, this.commandId++));
   }
 
