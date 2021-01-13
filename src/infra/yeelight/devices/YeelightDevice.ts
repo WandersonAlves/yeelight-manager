@@ -38,8 +38,10 @@ export interface YeelightDeviceJSON {
 }
 
 interface DataReceived {
-  method: string;
-  params: Params;
+  method?: string;
+  params?: Params;
+  id?: number;
+  result?: [any];
 }
 
 interface Params {
@@ -60,7 +62,10 @@ export default class YeelightDevice {
     return device.connect();
   }
 
-  static ExecCommand(device: YeelightDevice, { kind, name, hex, ip, ct, brightlevel, deviceid }: CommandSignal): Either<Promise<void>> {
+  static ExecCommand(
+    device: YeelightDevice,
+    { kind, name, hex, ip, ct, brightlevel, deviceid }: CommandSignal,
+  ): Either<Promise<void>> {
     switch (kind) {
       case CommandList.TOGGLE: {
         return [null, device.toggle()];
@@ -238,16 +243,15 @@ export default class YeelightDevice {
   }
 
   toggle() {
-    return this.sendCommand(new ToggleCommand());
+    return this.sendCommand(new ToggleCommand(this.commandId++));
   }
 
   setHex(hex: string, effect: EffectTypes = 'smooth', duration = 300) {
-    console.log(hex)
     return this.sendCommand(new RGBCommand(HexToInteger(hex), effect, duration, this.commandId++));
   }
 
   setFlow(repeat: number, action: ColorFlowAction, flows: ColorFlowExpression[]) {
-    return this.sendCommand(new ColorFlowCommand(repeat, action, flows));
+    return this.sendCommand(new ColorFlowCommand(repeat, action, flows, this.commandId++));
   }
 
   setBright(level: number, effect: EffectTypes = 'smooth', duration = 300) {
@@ -255,11 +259,11 @@ export default class YeelightDevice {
   }
 
   setName(name: string) {
-    return this.sendCommand(new NameCommand(name));
+    return this.sendCommand(new NameCommand(name, this.commandId++));
   }
 
-  setColorTemperature(ct: number) {
-    return this.sendCommand(new ColorTemperatureCommand(ct));
+  setColorTemperature(ct: number, effect: EffectTypes = 'smooth', duration = 300) {
+    return this.sendCommand(new ColorTemperatureCommand(ct, effect, duration, this.commandId++));
   }
 
   blinkDevice() {
@@ -286,9 +290,6 @@ export default class YeelightDevice {
   }
 
   private changeEvent(dataObj: DataReceived) {
-    logger.debug(`Data received: ${jsonString(dataObj)}`, {
-      label: this.name || 'Yeelight',
-    });
     if (dataObj?.method === 'props') {
       const key = Object.keys(dataObj.params)[0];
       const value = dataObj.params[key];
@@ -312,8 +313,12 @@ export default class YeelightDevice {
           break;
         }
       }
+    } else if (dataObj?.id && dataObj?.result[0] === 'ok') {
+      logger.info(`Command with id ${dataObj.id} ran successfully`, { label: this.name || 'Yeelight' });
     } else {
-      logger.warn('Unmapped Event', { label: this.name || 'Yeelight' });
+      logger.warn(`Unmapped Event: ${jsonString(dataObj)}`, {
+        label: this.name || 'Yeelight',
+      });
     }
   }
 
