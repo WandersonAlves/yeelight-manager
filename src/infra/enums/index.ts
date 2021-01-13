@@ -18,5 +18,6 @@ export enum CommandList {
   BRIGHT = 'bright',
   NAME = 'name',
   AMBILIGHT = 'ambilight',
-  CANCEL_AMBILIGHT = 'cancel_ambilight'
+  CANCEL_AMBILIGHT = 'cancel_ambilight',
+  BLINK = 'blink'
 }

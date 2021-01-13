@@ -1,5 +1,10 @@
 import { TRestParameters } from '../types';
+import GenericException from '../exceptions/GenericException';
 import HttpResponse from '../responses/HttpResponse';
+
+type Left = GenericException;
+type Right<T> = T;
+export type Either<T> = [Left, Right<T>];
 
 export interface IPaginationRequestParams {
   skip?: number;

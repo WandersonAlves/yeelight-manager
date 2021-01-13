@@ -1,5 +1,7 @@
 import { AddressInfo, Socket as TCPSocket, createServer } from 'net';
-import { ColorFlowAction, ColorFlowExpressionMode } from '../../enums';
+import { ColorFlowAction, ColorFlowExpressionMode, CommandList } from '../../enums';
+import { CommandSignal } from '../../../modules/Yeelight/ReceiveCommand/ReceiveCommandInterfaces';
+import { Either } from '../../../shared/contracts';
 import { EventEmitter } from 'events';
 import { GetValueFromString, HexToInteger } from '../../../utils';
 import { jsonString, logger } from '../../../shared/Logger';
@@ -15,6 +17,7 @@ import Command, {
   ToggleCommand,
 } from './Commands';
 import Screenshot from '../screenshot';
+import UnsuportedCommandException from '../../../shared/exceptions/UnsuportedCommandException';
 
 type Resolve = (value: void | PromiseLike<void>) => void;
 
@@ -55,6 +58,38 @@ export default class YeelightDevice {
       return;
     }
     return device.connect();
+  }
+
+  static ExecCommand(device: YeelightDevice, { kind, name, hex, ip, ct, brightlevel, deviceid }: CommandSignal): Either<Promise<void>> {
+    switch (kind) {
+      case CommandList.TOGGLE: {
+        return [null, device.toggle()];
+      }
+      case CommandList.NAME: {
+        return [null, device.setName(name)];
+      }
+      case CommandList.RGB: {
+        return [null, device.setHex(hex)];
+      }
+      case CommandList.AMBILIGHT: {
+        return [null, device.ambiLight({ width: 2560, height: 1080, ip })];
+      }
+      case CommandList.CANCEL_AMBILIGHT: {
+        return [null, device.cancelAmbiLight(ip)];
+      }
+      case CommandList.CT: {
+        return [null, device.setColorTemperature(ct)];
+      }
+      case CommandList.BRIGHT: {
+        return [null, device.setBright(brightlevel)];
+      }
+      case CommandList.BLINK: {
+        return [null, device.blinkDevice()];
+      }
+      default: {
+        return [new UnsuportedCommandException(deviceid), null];
+      }
+    }
   }
 
   static CreateDevice(message: string) {
@@ -228,9 +263,8 @@ export default class YeelightDevice {
 
   blinkDevice() {
     return this.setFlow(2, ColorFlowAction.RECOVER_STATE, [
-      new ColorFlowExpression(350, ColorFlowExpressionMode.TEMPERATURE, 6500, 100),
-      new ColorFlowExpression(200, ColorFlowExpressionMode.TEMPERATURE, 6500, 1),
-      new ColorFlowExpression(1000, ColorFlowExpressionMode.SLEEP, 0, 0),
+      new ColorFlowExpression(1000, ColorFlowExpressionMode.TEMPERATURE, 4500, 100),
+      new ColorFlowExpression(500, ColorFlowExpressionMode.TEMPERATURE, 4500, 1),
     ]);
   }
 
