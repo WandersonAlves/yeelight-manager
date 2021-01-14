@@ -1,0 +1,351 @@
+{
+	"info": {
+		"_postman_id": "87214edc-2e50-4a13-95b2-9fec097be01c",
+		"name": "yeelight",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "NameCommand",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "deviceId",
+						"value": "0x00000000112c0549",
+						"type": "text"
+					},
+					{
+						"key": "kind",
+						"value": "name",
+						"type": "text"
+					},
+					{
+						"key": "name",
+						"value": "Kitchen",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:3000/yeelight/command",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"yeelight",
+						"command"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ToggleCommand",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "deviceId",
+						"type": "text",
+						"value": "0x00000000112c0549"
+					},
+					{
+						"key": "kind",
+						"type": "text",
+						"value": "toggle"
+					}
+				],
+				"url": {
+					"raw": "localhost:3000/yeelight/command",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"yeelight",
+						"command"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Scene",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"commands\": [\n        {\n            \"deviceid\": \"0x0000000011301d41\",\n            \"hex\": \"3D1466\",\n            \"kind\": \"rgb\"\n        },\n        {\n            \"deviceid\": \"0x00000000112c0549\",\n            \"hex\": \"14663D\",\n            \"kind\": \"rgb\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/yeelight/scene",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"yeelight",
+						"scene"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CTCommand",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "deviceId",
+						"type": "text",
+						"value": "0x0000000011301d41"
+					},
+					{
+						"key": "kind",
+						"type": "text",
+						"value": "color-temperature"
+					},
+					{
+						"key": "ct",
+						"type": "text",
+						"value": "9999"
+					}
+				],
+				"url": {
+					"raw": "localhost:3000/yeelight/command",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"yeelight",
+						"command"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "BrightCommand",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "deviceId",
+						"type": "text",
+						"value": "0x0000000011301d41"
+					},
+					{
+						"key": "kind",
+						"type": "text",
+						"value": "bright"
+					},
+					{
+						"key": "brightLevel",
+						"type": "text",
+						"value": "100"
+					}
+				],
+				"url": {
+					"raw": "localhost:3000/yeelight/command",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"yeelight",
+						"command"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RGBCommand",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "deviceId",
+						"type": "text",
+						"value": "0x00000000112c0549"
+					},
+					{
+						"key": "kind",
+						"type": "text",
+						"value": "rgb"
+					},
+					{
+						"key": "hex",
+						"type": "text",
+						"value": "55FF22"
+					}
+				],
+				"url": {
+					"raw": "localhost:3000/yeelight/command",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"yeelight",
+						"command"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AmbiLightCommand",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "deviceId",
+						"type": "text",
+						"value": "0x00000000112c0549"
+					},
+					{
+						"key": "kind",
+						"type": "text",
+						"value": "ambilight"
+					},
+					{
+						"key": "ip",
+						"type": "text",
+						"value": "192.168.15.17"
+					}
+				],
+				"url": {
+					"raw": "localhost:3000/yeelight/command",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"yeelight",
+						"command"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "BlinkCommand",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "deviceId",
+						"type": "text",
+						"value": "0x00000000112c0549"
+					},
+					{
+						"key": "kind",
+						"type": "text",
+						"value": "ambilight"
+					},
+					{
+						"key": "ip",
+						"type": "text",
+						"value": "192.168.15.17"
+					}
+				],
+				"url": {
+					"raw": "localhost:3000/yeelight/command",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"yeelight",
+						"command"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CancelAmbiLightCommand",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "deviceId",
+						"type": "text",
+						"value": "0x00000000112c0549"
+					},
+					{
+						"key": "kind",
+						"type": "text",
+						"value": "cancel_ambilight"
+					},
+					{
+						"key": "name",
+						"type": "text",
+						"value": "Kitchen",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "localhost:3000/yeelight/command",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"yeelight",
+						"command"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Discovery",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/discovery/devices",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"discovery",
+						"devices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Device",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/discovery/devices",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"discovery",
+						"devices"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
