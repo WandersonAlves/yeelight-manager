@@ -27,30 +27,53 @@ You can get the postman collection of endpoints in `postman/` folder
 
 
 ### Set name
-```
+```bash
 curl --location --request POST 'localhost:3000/yeelight/command' \
 --header 'deviceId: {{deviceId}}' \
 --header 'kind: name' \
 --header 'name: Kitchen'
 ```
 ### Toggle device
-```
+```bash
 curl --location --request POST 'localhost:3000/yeelight/command' \
 --header 'deviceId: {{deviceId}}' \
 --header 'kind: toggle'
 ```
 ### Start Ambilight
-Set the color of a device based on what's happening on your screen
-```
+Set the color of a device based on what's happening on your screen:
+```bash
 curl --location --request POST 'localhost:3000/yeelight/command' \
 --header 'deviceId: {{deviceId}}' \
 --header 'kind: ambilight' \
 --header 'ip: 192.168.15.17'
 ```
 ### Stop Ambilight
-Turns of ambilight feature
-```
+Turns of ambilight feature:
+```bash
 curl --location --request POST 'localhost:3000/yeelight/command' \
 --header 'deviceId: {{deviceId}}' \
 --header 'kind: cancel_ambilight'
 ```
+### Run Scene
+Execute many commands at the same time:
+```bash
+curl --location --request POST 'localhost:3000/yeelight/scene' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "commands": [
+        {
+            "deviceid": "{{deviceId_1}}",
+            "hex": "3D1466",
+            "kind": "rgb"
+        },
+        {
+            "deviceid": "{{deviceId_2}}",
+            "hex": "14663D",
+            "kind": "rgb"
+        }
+    ]
+}'
+```
+On the above command, device1 will change color to #3D1466 and device2 to #14663D.
+
+See `src/modules/Yeelight/RunScene/RunSceneInterface` for the request body (`RunSceneBody` interface)
