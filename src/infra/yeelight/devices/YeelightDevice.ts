@@ -293,6 +293,10 @@ export default class YeelightDevice {
           this.power = value === 'on' ? true : false;
           break;
         }
+        case 'ct': {
+          this.colorTemperatureValue = Number(value);
+          break;
+        }
         default: {
           if (!Object.hasOwnProperty.call(this, key)) {
             this.log(`DataEvent updating unmapped ${key} key`).warn();
@@ -301,7 +305,7 @@ export default class YeelightDevice {
           break;
         }
       }
-    } else if (dataObj?.id && dataObj?.result[0] === 'ok') {
+    } else if (dataObj?.id && dataObj?.result?.[0] === 'ok') {
       this.log(`Command with id ${dataObj.id} ran successfully`).info();
     } else {
       this.log(`Unmapped Event: ${jsonString(dataObj)}`).warn();
