@@ -8,4 +8,5 @@ export interface CommandSignal {
   hex?: string;
   ct?: number;
   ip?: string;
+  power?: 'on' | 'off';
 }

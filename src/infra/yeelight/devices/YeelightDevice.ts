@@ -13,6 +13,7 @@ import Command, {
   EffectTypes,
   MusicModeCommand,
   NameCommand,
+  PowerCommand,
   RGBCommand,
   ToggleCommand,
 } from './Commands';
@@ -64,11 +65,14 @@ export default class YeelightDevice {
 
   static ExecCommand(
     device: YeelightDevice,
-    { kind, name, hex, ip, ct, brightlevel, deviceid }: CommandSignal,
+    { kind, name, hex, ip, ct, brightlevel, deviceid, power }: CommandSignal,
   ): Either<Promise<void>> {
     switch (kind) {
       case CommandList.TOGGLE: {
         return [null, device.toggle()];
+      }
+      case CommandList.POWER: {
+        return [null, device.setPower(power)];
       }
       case CommandList.NAME: {
         return [null, device.setName(name)];
@@ -165,8 +169,13 @@ export default class YeelightDevice {
       });
 
       this.client.on('data', data => {
-        this.changeEvent(JSON.parse(data.toString()));
-        this.events.emit('data', data);
+        const responses = data.toString().split('\n');
+        responses.forEach(r => {
+          if (r) {
+            this.changeEvent(JSON.parse(r));
+            this.events.emit('data', r);
+          }
+        })
       });
 
       this.client.on('close', () => {
@@ -254,6 +263,10 @@ export default class YeelightDevice {
 
   setColorTemperature(ct: number, effect: EffectTypes = 'smooth', duration = 300) {
     return this.sendCommand(new ColorTemperatureCommand(ct, effect, duration, this.commandId++));
+  }
+
+  setPower(power: 'on' | 'off', effect: EffectTypes = 'smooth', duration = 300) {
+    return this.sendCommand(new PowerCommand(power, effect, duration));
   }
 
   blinkDevice() {

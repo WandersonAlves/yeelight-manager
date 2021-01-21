@@ -56,3 +56,9 @@ export class ColorFlowCommand extends Command {
     super(id, 'start_cf', [repeat, action, flows.join(',')]);
   }
 }
+
+export class PowerCommand extends Command {
+  constructor(power: 'on' | 'off', effect: EffectTypes = 'smooth', duration = 300, id = 1) {
+    super(id, 'set_power', [power, effect, duration]);
+  }
+}
