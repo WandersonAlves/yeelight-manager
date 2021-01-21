@@ -155,16 +155,12 @@ export default class YeelightDevice {
   connect(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.client = new TCPSocket();
-      logger.info(`Trying to connect into ${this.name || 'Yeelight'} in ${this.host}:${this.port}`, {
-        label: this.name || 'Yeelight',
-      });
+      this.log(`Trying to connect into ${this._name} in ${this.host}:${this.port}`).info();
 
       this.client.connect(this.port, this.host, () => {
         this.events.emit('connected');
         this.isConnected = true;
-        logger.info(`Connected into ${this.name || 'Yeelight'}`, {
-          label: this.name || 'Yeelight',
-        });
+        this.log(`Connected into ${this._name}`).info();
         resolve();
       });
 
@@ -186,27 +182,21 @@ export default class YeelightDevice {
   }
 
   startMusicMode(currentIpAddress: string): Promise<void> {
-    logger.info('Starting music mode');
+    this.log('Starting music mode').info();
     return new Promise((resolve, reject) => {
       try {
         this.server.listen(() => {
-          logger.info('Server Created!', {
-            label: this.name || 'Yeelight',
-          });
+          this.log('Server Created!').info();
           const ad = this.server.address() as AddressInfo;
           this.localAddress = ad.address;
           this.localPort = ad.port;
-          logger.info(`TCP Server Info: ${this.localAddress}:${this.localPort}`, {
-            label: this.name || 'Yeelight',
-          });
+          this.log(`TCP Server Info: ${this.localAddress}:${this.localPort}`).info();
           // Tell the lightbulb to try to connect to our server
           void this.sendCommand(new MusicModeCommand(true, currentIpAddress, this.localPort));
         });
 
         this.server.on('connection', sock => {
-          logger.info('Device connected to server', {
-            label: this.name || 'Yeelight',
-          });
+          this.log('Device connected to server').info();
           // If the lightbulb connect succefully, it will be here on sock
           // Else it will print something like {"method":"props","params":{"music_on":0}} on client
           this.socket = sock;
@@ -231,7 +221,7 @@ export default class YeelightDevice {
         const color = await Screenshot.GetProeminentColor(width, height);
         return this.setHex(color, 'smooth', 300);
       } catch (e) {
-        logger.error(e);
+        this.log(e).error();
         void this.cancelAmbiLight(ip);
       }
     }, interval);
@@ -293,9 +283,7 @@ export default class YeelightDevice {
     if (dataObj?.method === 'props') {
       const key = Object.keys(dataObj.params)[0];
       const value = dataObj.params[key];
-      logger.verbose(`${key} changed to ${value}`, {
-        label: this.name || 'Yeelight',
-      });
+      this.log(`${key} changed to ${value}`).verbose();
       switch (key) {
         case 'color_mode': {
           this.colorMode = value === 1 ? 'RGB' : value === 2 ? 'CT' : 'HSV';
@@ -307,27 +295,23 @@ export default class YeelightDevice {
         }
         default: {
           if (!Object.hasOwnProperty.call(this, key)) {
-            logger.warn(`DataEvent updating unmapped ${key} key`, { label: this.name || 'Yeelight' });
+            this.log(`DataEvent updating unmapped ${key} key`).warn();
           }
           this[key] = value;
           break;
         }
       }
     } else if (dataObj?.id && dataObj?.result[0] === 'ok') {
-      logger.info(`Command with id ${dataObj.id} ran successfully`, { label: this.name || 'Yeelight' });
+      this.log(`Command with id ${dataObj.id} ran successfully`).info();
     } else {
-      logger.warn(`Unmapped Event: ${jsonString(dataObj)}`, {
-        label: this.name || 'Yeelight',
-      });
+      this.log(`Unmapped Event: ${jsonString(dataObj)}`).warn();
     }
   }
 
   private sendCommand(command: Command): Promise<void> {
     const cmdName = command.name;
     const cmdJSON = command.toString();
-    logger.debug(`Command sent: ${cmdJSON}`, {
-      label: this.name || 'Yeelight',
-    });
+    this.log(`Command sent: ${cmdJSON}`).debug();
     const sharedCb = (resolve: Resolve, reject: (e: Error) => void) => (err: Error) => {
       if (err) {
         this.events.emit('command_failure', cmdJSON);
@@ -345,5 +329,30 @@ export default class YeelightDevice {
         ? this.socket.write(cmdJSON, sharedCb(resolve, reject))
         : this.client.write(cmdJSON, sharedCb(resolve, reject));
     });
+  }
+
+  private get _name() {
+    return this.name || 'UnamedYeelight';
+  }
+
+  private log(str: string) {
+    const logLabel = `${this.id}:${this._name}`;
+    return {
+      info: () => {
+        logger.info(str, { label: logLabel });
+      },
+      warn: () => {
+        logger.warn(str, { label: logLabel });
+      },
+      error: () => {
+        logger.error(str, { label: logLabel });
+      },
+      debug: () => {
+        logger.debug(str, { label: logLabel });
+      },
+      verbose: () => {
+        logger.verbose(str, { label: logLabel });
+      },
+    };
   }
 }
