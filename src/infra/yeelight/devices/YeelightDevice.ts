@@ -46,7 +46,7 @@ interface DataReceived {
 }
 
 interface Params {
-  power: string;
+  [k: string]: string | number;
 }
 
 export default class YeelightDevice {
@@ -159,12 +159,12 @@ export default class YeelightDevice {
   connect(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.client = new TCPSocket();
-      this.log(`Trying to connect into ${this._name} in ${this.host}:${this.port}`).info();
+      this.log('info', `Trying to connect into ${this._name} in ${this.host}:${this.port}`);
 
       this.client.connect(this.port, this.host, () => {
         this.events.emit('connected');
         this.isConnected = true;
-        this.log(`Connected into ${this._name}`).info();
+        this.log('info', `Connected into ${this._name}`);
         resolve();
       });
 
@@ -191,21 +191,21 @@ export default class YeelightDevice {
   }
 
   startMusicMode(currentIpAddress: string): Promise<void> {
-    this.log('Starting music mode').info();
+    this.log('info', 'Starting music mode');
     return new Promise((resolve, reject) => {
       try {
         this.server.listen(() => {
-          this.log('Server Created!').info();
+          this.log('info', 'Server Created!');
           const ad = this.server.address() as AddressInfo;
           this.localAddress = ad.address;
           this.localPort = ad.port;
-          this.log(`TCP Server Info: ${this.localAddress}:${this.localPort}`).info();
+          this.log('info', `TCP Server Info: ${this.localAddress}:${this.localPort}`);
           // Tell the lightbulb to try to connect to our server
           void this.sendCommand(new MusicModeCommand(true, currentIpAddress, this.localPort));
         });
 
         this.server.on('connection', sock => {
-          this.log('Device connected to server').info();
+          this.log('info', 'Device connected to server');
           // If the lightbulb connect succefully, it will be here on sock
           // Else it will print something like {"method":"props","params":{"music_on":0}} on client
           this.socket = sock;
@@ -230,7 +230,7 @@ export default class YeelightDevice {
         const color = await Screenshot.GetProeminentColor(width, height);
         return this.setHex(color, 'smooth', 300);
       } catch (e) {
-        this.log(e).error();
+        this.log('error', e);
         void this.cancelAmbiLight(ip);
       }
     }, interval);
@@ -296,7 +296,7 @@ export default class YeelightDevice {
     if (dataObj?.method === 'props') {
       const key = Object.keys(dataObj.params)[0];
       const value = dataObj.params[key];
-      this.log(`${key} changed to ${value}`).verbose();
+      this.log('verbose', `${key} changed to ${value}`);
       switch (key) {
         case 'color_mode': {
           this.colorMode = value === 1 ? 'RGB' : value === 2 ? 'CT' : 'HSV';
@@ -312,23 +312,23 @@ export default class YeelightDevice {
         }
         default: {
           if (!Object.hasOwnProperty.call(this, key)) {
-            this.log(`DataEvent updating unmapped ${key} key`).warn();
+            this.log('warn', `Event updating unmapped ${key} key`);
           }
           this[key] = value;
           break;
         }
       }
     } else if (dataObj?.id && dataObj?.result?.[0] === 'ok') {
-      this.log(`Command with id ${dataObj.id} ran successfully`).info();
+      this.log('info', `Command with id ${dataObj.id} ran successfully`);
     } else {
-      this.log(`Unmapped Event: ${jsonString(dataObj)}`).warn();
+      this.log('warn', `Unmapped Event: ${jsonString(dataObj)}`);
     }
   }
 
   private sendCommand(command: Command): Promise<void> {
     const cmdName = command.name;
     const cmdJSON = command.toString();
-    this.log(`Command sent: ${cmdJSON}`).debug();
+    this.log('debug', `Command sent: ${cmdJSON}`);
     const sharedCb = (resolve: Resolve, reject: (e: Error) => void) => (err: Error) => {
       if (err) {
         this.events.emit('command_failure', cmdJSON);
@@ -352,24 +352,8 @@ export default class YeelightDevice {
     return this.name || 'UnamedYeelight';
   }
 
-  private log(str: string) {
-    const logLabel = `${this.id}:${this._name}`;
-    return {
-      info: () => {
-        logger.info(str, { label: logLabel });
-      },
-      warn: () => {
-        logger.warn(str, { label: logLabel });
-      },
-      error: () => {
-        logger.error(str, { label: logLabel });
-      },
-      debug: () => {
-        logger.debug(str, { label: logLabel });
-      },
-      verbose: () => {
-        logger.verbose(str, { label: logLabel });
-      },
-    };
+  private log(type: 'info'| 'warn'| 'error'| 'debug'| 'verbose', str: string) {
+    const label = `${this.id}:${this._name}`;
+    logger[type](str, { label });
   }
 }
