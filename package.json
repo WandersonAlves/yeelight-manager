@@ -6,11 +6,15 @@
   "engines": {
     "node": ">=10.22.0"
   },
+  "bin": {
+    "yeelight-manager": "./lib/index.js"
+  },
   "scripts": {
     "test": "mocha -r ts-node/register tests/cases/**/*.spec.ts",
     "lint": "eslint -c .eslintrc.js --ext .ts ./src/**/*.ts --fix",
     "start:dev": "node --inspect=0.0.0.0:9229 -r ts-node/register ./src/index.ts",
     "dev": "nodemon",
+    "dev:cli": "node -r ts-node/register ./src/index.ts",
     "release": "npx standard-version --release-as",
     "clean": "rm -rf dist/",
     "build": "tsc"
@@ -42,6 +46,7 @@
     "typescript": "^4.0.2"
   },
   "dependencies": {
+    "commander": "^7.0.0",
     "express": "^4.17.1",
     "ffmpeg-static": "^4.2.7",
     "http-status": "^1.4.2",
