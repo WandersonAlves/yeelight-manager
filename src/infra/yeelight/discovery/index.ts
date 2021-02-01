@@ -12,8 +12,8 @@ export default class Discovery {
     return null;
   }
 
-  findDevice(id: string): YeelightDevice {
-    return this.devices.find(d => d.id === id);
+  findDevice(idOrName: string): YeelightDevice {
+    return this.devices.find(d => d.id === idOrName || d.name === idOrName);
   }
 
   getDevices(): YeelightDevice[] {
