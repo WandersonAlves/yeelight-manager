@@ -65,32 +65,32 @@ export default class YeelightDevice {
 
   static ExecCommand(
     device: YeelightDevice,
-    { kind, name, hex, ip, ct, brightlevel, deviceid, power }: CommandSignal,
+    { kind, deviceid, value }: CommandSignal,
   ): Either<Promise<void>> {
     switch (kind) {
       case CommandList.TOGGLE: {
         return [null, device.toggle()];
       }
       case CommandList.POWER: {
-        return [null, device.setPower(power)];
+        return [null, device.setPower(value as "on" | "off")];
       }
       case CommandList.NAME: {
-        return [null, device.setName(name)];
+        return [null, device.setName(value)];
       }
-      case CommandList.RGB: {
-        return [null, device.setHex(hex)];
+      case CommandList.COLOR: {
+        return [null, device.setHex(value)];
       }
       case CommandList.AMBILIGHT: {
-        return [null, device.ambiLight({ width: 2560, height: 1080, ip })];
+        return [null, device.ambiLight({ width: 2560, height: 1080, ip: value })];
       }
       case CommandList.CANCEL_AMBILIGHT: {
-        return [null, device.cancelAmbiLight(ip)];
+        return [null, device.cancelAmbiLight(value)];
       }
       case CommandList.CT: {
-        return [null, device.setColorTemperature(ct)];
+        return [null, device.setColorTemperature(Number(value))];
       }
       case CommandList.BRIGHT: {
-        return [null, device.setBright(brightlevel)];
+        return [null, device.setBright(Number(value))];
       }
       case CommandList.BLINK: {
         return [null, device.blinkDevice()];
@@ -131,7 +131,7 @@ export default class YeelightDevice {
   private colorMode: 'RGB' | 'CT' | 'HSV';
   private colorTemperatureValue: number;
   private rgb: number;
-  private name: string;
+  name: string;
   private client: TCPSocket;
   private localAddress: string;
   private localPort: number;

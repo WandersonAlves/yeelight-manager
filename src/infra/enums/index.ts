@@ -13,7 +13,7 @@ export enum ColorFlowAction {
 
 export enum CommandList {
   TOGGLE = 'toggle',
-  RGB = 'rgb',
+  COLOR = 'color',
   CT = 'color-temperature',
   BRIGHT = 'bright',
   NAME = 'name',
