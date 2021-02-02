@@ -97,7 +97,7 @@ export default class YeelightDevice {
         return [null, device.blinkDevice()];
       }
       default: {
-        return [new UnsuportedCommandException(device.id), null];
+        return [new UnsuportedCommandException(device.id, kind, value), null];
       }
     }
   }
