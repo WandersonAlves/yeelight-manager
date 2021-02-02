@@ -1,9 +1,10 @@
 import { CommandList } from '../infra/enums';
+import { ConfigureCmds } from './utils';
 import { execSync } from 'child_process';
-import { logger } from '../shared/Logger';
 
 interface SendCommandOptionals {
-  verbose: string;
+  verbose: boolean;
+  debug: boolean;
   effect: 'sudden' | 'smooth';
   duration: string;
 }
@@ -14,10 +15,10 @@ type SendCommandFn = (
   { verbose, effect, duration }: SendCommandOptionals,
 ) => Promise<void>;
 
-export const SendCommandCmd: SendCommandFn = async (deviceid, cmd, value, { verbose }) => {
-  logger.level = verbose ? 'verbose' : 'info';
+export const SendCommandCmd: SendCommandFn = async (deviceid, cmd, value, { verbose, debug }) => {
+  const port = ConfigureCmds(verbose ? 'verbose' : debug ? 'debug' : 'info');
   execSync(
-    `curl --location --request POST 'localhost:${process.env.YEELIGHT_PORT}/yeelight/command' \
+    `curl --location --request POST 'localhost:${port}/yeelight/command' \
       --header 'deviceId: ${deviceid}' \
       --header 'kind: ${cmd}' \
       --header 'value: ${value}'`,
