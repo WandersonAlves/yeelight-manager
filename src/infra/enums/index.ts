@@ -15,6 +15,8 @@ export enum CommandList {
   TOGGLE = 'toggle',
   COLOR = 'color',
   CT = 'temperature',
+  CT2 = 'ct',
+  CT3 = 'temp',
   BRIGHT = 'bright',
   NAME = 'name',
   AMBILIGHT = 'ambilight',

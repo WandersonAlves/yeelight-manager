@@ -85,6 +85,8 @@ export default class YeelightDevice {
       case CommandList.CANCEL_AMBILIGHT: {
         return [null, device.cancelAmbiLight(value)];
       }
+      case CommandList.CT3:
+      case CommandList.CT2:
       case CommandList.CT: {
         void device.setPower('on');
         return [null, device.setColorTemperature(Number(value))];
