@@ -15,7 +15,7 @@ export default class Screenshot {
             '-f',
             'x11grab',
             '-i',
-            ':0.0',
+            ':1',
             '-vf',
             `scale=${width / 2}:-1`,
             '-frames:v',
