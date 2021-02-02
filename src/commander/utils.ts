@@ -1,4 +1,6 @@
-import { logger } from "../shared/Logger";
+import { AxiosError, AxiosResponse } from 'axios';
+import { IHttpError, IHttpRequest } from '../shared/contracts';
+import { jsonString, logger } from '../shared/Logger';
 
 export const ConfigureCmds = (logLevel: 'verbose' | 'debug' | 'info') => {
   logger.level = logLevel;
@@ -8,5 +10,16 @@ export const ConfigureCmds = (logLevel: 'verbose' | 'debug' | 'info') => {
     );
     return 3500;
   }
-  return process.env.YEELIGHT_PORT
-}
+  return Number(process.env.YEELIGHT_PORT);
+};
+
+export const HandleRequest = async (fn: Promise<AxiosResponse<any>>) => {
+  try {
+    const { data } = await fn;
+    logger.info(jsonString(data));
+  } catch (e) {
+    const error: AxiosError<IHttpRequest<IHttpError>> = e;
+    const err = error?.response?.data ? jsonString(error.response?.data) : error.message;
+    logger.error(err);
+  }
+};

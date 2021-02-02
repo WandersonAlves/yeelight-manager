@@ -1,5 +1,4 @@
-import { ConfigureCmds } from './utils';
-import { jsonString, logger } from '../shared/Logger';
+import { ConfigureCmds, HandleRequest } from './utils';
 import HttpResponse from '../shared/responses/HttpResponse';
 import axios from 'axios';
 
@@ -11,13 +10,13 @@ type ToggleCmdFn = (deviceid: string, { verbose, debug }: OptionalParams) => Pro
 
 export const ToggleCmd: ToggleCmdFn = async (deviceid: string, { verbose, debug }) => {
   const port = ConfigureCmds(verbose ? 'verbose' : debug ? 'debug' : 'info');
-  console.log(deviceid)
-  const { data } = await axios.post<HttpResponse<any>>(`http://localhost:${port}/yeelight/command`, null, {
-    headers: {
-      deviceId: deviceid,
-      kind: 'toggle'
-    },
-  });
-  logger.info(jsonString(data));
+  void HandleRequest(
+    axios.post<HttpResponse<any>>(`http://localhost:${port}/yeelight/command`, null, {
+      headers: {
+        deviceId: deviceid,
+        kind: 'toggle',
+      },
+    }),
+  );
   return;
 };
