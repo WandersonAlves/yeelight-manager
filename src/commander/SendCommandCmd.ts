@@ -18,7 +18,7 @@ type SendCommandFn = (
 
 export const SendCommandCmd: SendCommandFn = async (deviceid, cmd, value, { verbose, debug }) => {
   const port = ConfigureCmds(verbose ? 'verbose' : debug ? 'debug' : 'info');
-  const { data } = await axios.post(`localhost:${port}/yeelight/command`, null, {
+  const { data } = await axios.post(`http://localhost:${port}/yeelight/command`, null, {
     headers: {
       deviceId: deviceid,
       kind: cmd,
