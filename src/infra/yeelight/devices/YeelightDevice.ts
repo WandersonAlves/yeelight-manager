@@ -63,40 +63,41 @@ export default class YeelightDevice {
     return device.connect();
   }
 
-  static ExecCommand(
-    device: YeelightDevice,
-    { kind, deviceid, value }: CommandSignal,
-  ): Either<Promise<void>> {
+  static ExecCommand(device: YeelightDevice, { kind, value }: CommandSignal): Either<Promise<void>> {
     switch (kind) {
       case CommandList.TOGGLE: {
         return [null, device.toggle()];
       }
       case CommandList.POWER: {
-        return [null, device.setPower(value as "on" | "off")];
+        return [null, device.setPower(value as 'on' | 'off')];
       }
       case CommandList.NAME: {
         return [null, device.setName(value)];
       }
       case CommandList.COLOR: {
+        void device.setPower('on');
         return [null, device.setHex(value)];
       }
       case CommandList.AMBILIGHT: {
+        void device.setPower('on');
         return [null, device.ambiLight({ width: 2560, height: 1080, ip: value })];
       }
       case CommandList.CANCEL_AMBILIGHT: {
         return [null, device.cancelAmbiLight(value)];
       }
       case CommandList.CT: {
+        void device.setPower('on');
         return [null, device.setColorTemperature(Number(value))];
       }
       case CommandList.BRIGHT: {
+        void device.setPower('on');
         return [null, device.setBright(Number(value))];
       }
       case CommandList.BLINK: {
         return [null, device.blinkDevice()];
       }
       default: {
-        return [new UnsuportedCommandException(deviceid), null];
+        return [new UnsuportedCommandException(device.id), null];
       }
     }
   }
@@ -175,7 +176,7 @@ export default class YeelightDevice {
             this.changeEvent(JSON.parse(r));
             this.events.emit('data', r);
           }
-        })
+        });
       });
 
       this.client.on('close', () => {
@@ -352,7 +353,7 @@ export default class YeelightDevice {
     return this.name || 'UnamedYeelight';
   }
 
-  private log(type: 'info'| 'warn'| 'error'| 'debug'| 'verbose', str: string) {
+  private log(type: 'info' | 'warn' | 'error' | 'debug' | 'verbose', str: string) {
     const label = `${this.id}:${this._name}`;
     logger[type](str, { label });
   }
