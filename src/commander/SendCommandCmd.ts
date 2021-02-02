@@ -1,6 +1,7 @@
 import { CommandList } from '../infra/enums';
 import { ConfigureCmds } from './utils';
-import { execSync } from 'child_process';
+import { jsonString, logger } from '../shared/Logger';
+import axios from 'axios';
 
 interface SendCommandOptionals {
   verbose: boolean;
@@ -17,13 +18,13 @@ type SendCommandFn = (
 
 export const SendCommandCmd: SendCommandFn = async (deviceid, cmd, value, { verbose, debug }) => {
   const port = ConfigureCmds(verbose ? 'verbose' : debug ? 'debug' : 'info');
-  execSync(
-    `curl --location --request POST 'localhost:${port}/yeelight/command' \
-      --header 'deviceId: ${deviceid}' \
-      --header 'kind: ${cmd}' \
-      --header 'value: ${value}'`,
-    { stdio: 'ignore' },
-  );
-
+  const { data } = await axios.post(`localhost:${port}/yeelight/command`, null, {
+    headers: {
+      deviceId: deviceid,
+      kind: cmd,
+      value
+    }
+  });
+  logger.info(jsonString(data));
   return;
 };
