@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'reflect-metadata';
-import { DiscoverDevicesCmd } from './commander/cmds/DiscoverDevicesCmd';
-import { SendCommandCmd } from './commander/cmds/SendCommandCmd';
+import { DiscoverDevicesCmd } from './commander/DiscoverDevicesCmd';
+import { SendCommandCmd } from './commander/SendCommandCmd';
 import { createCommand } from 'commander';
 
 const program = createCommand();

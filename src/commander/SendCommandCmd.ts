@@ -1,6 +1,6 @@
-import { CommandList } from '../../infra/enums';
+import { CommandList } from '../infra/enums';
 import { execSync } from 'child_process';
-import { logger } from '../../shared/Logger';
+import { logger } from '../shared/Logger';
 
 interface SendCommandOptionals {
   verbose: string;

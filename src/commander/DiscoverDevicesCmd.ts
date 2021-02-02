@@ -1,7 +1,7 @@
-import { GetBindingFromContainer } from "../../infra/container";
-import { logger } from "../../shared/Logger";
-import DiscoverDevicesCase from "../../modules/Discovery/DiscoverDevices/DiscoverDevicesCase";
-import server from "../../server";
+import { GetBindingFromContainer } from "../infra/container";
+import { logger } from "../shared/Logger";
+import DiscoverDevicesCase from "../modules/Discovery/DiscoverDevices/DiscoverDevicesCase";
+import server from "../server";
 
 export const DiscoverDevicesCmd = async ({ verbose }) => {
   logger.level = verbose ? 'debug' : 'info';
