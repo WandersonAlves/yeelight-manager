@@ -18,7 +18,7 @@ program
   .action(DiscoverDevicesCmd);
 
 program
-  .command('set <deviceid> <cmd> <value>')
+  .command('set <deviceid> <cmd> <value> [bright]')
   .description('Send a command to a device')
   .option('--verbose', 'Output verbose info')
   .option('--debug', 'Output debug info')

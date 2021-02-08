@@ -4,4 +4,5 @@ export interface CommandSignal {
   deviceid: string;
   kind: CommandList;
   value: string;
+  bright?: string;
 }

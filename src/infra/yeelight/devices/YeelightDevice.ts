@@ -63,7 +63,10 @@ export default class YeelightDevice {
     return device.connect();
   }
 
-  static ExecCommand(device: YeelightDevice, { kind, value }: CommandSignal): Either<Promise<void>> {
+  static ExecCommand(device: YeelightDevice, { kind, value, bright }: CommandSignal): Either<Promise<void>> {
+    if (bright && kind !== CommandList.BRIGHT) {
+      void device.setBright(Number(bright));
+    }
     switch (kind) {
       case CommandList.TOGGLE: {
         return [null, device.toggle()];

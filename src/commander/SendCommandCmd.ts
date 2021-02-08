@@ -13,10 +13,11 @@ type SendCommandFn = (
   deviceid: string,
   cmd: CommandList,
   value: string,
+  bright: string,
   { verbose, effect, duration }: SendCommandOptionals,
 ) => Promise<void>;
 
-export const SendCommandCmd: SendCommandFn = async (deviceid, cmd, value, { verbose, debug }) => {
+export const SendCommandCmd: SendCommandFn = async (deviceid, cmd, value, bright, { verbose, debug }) => {
   const port = ConfigureCmds(verbose ? 'verbose' : debug ? 'debug' : 'info');
   void HandleRequest(
     axios.post<HttpResponse<any>>(`http://localhost:${port}/yeelight/command`, null, {
@@ -24,6 +25,7 @@ export const SendCommandCmd: SendCommandFn = async (deviceid, cmd, value, { verb
         deviceId: deviceid,
         kind: cmd,
         value,
+        bright,
       },
     }),
   );
