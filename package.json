@@ -1,13 +1,13 @@
 {
-  "name": "yeelight-manager-backend",
+  "name": "yeelight-manager",
   "version": "0.0.1",
-  "description": "Backend server to control yeelight devices",
+  "description": "Backend server/CLI to control yeelight devices!",
   "main": "src/index.ts",
   "engines": {
     "node": ">=10.22.0"
   },
   "bin": {
-    "yeelight-manager": "./lib/index.js"
+    "yee": "./lib/index.js"
   },
   "scripts": {
     "test": "mocha -r ts-node/register tests/cases/**/*.spec.ts",
