@@ -58,7 +58,7 @@ export class ColorFlowCommand extends Command {
 }
 
 export class PowerCommand extends Command {
-  constructor(power: 'on' | 'off', effect: EffectTypes = 'smooth', duration = 300, id = 1) {
+  constructor(power: 'on' | 'off', effect: EffectTypes = 'smooth', duration = 300, id = 9999) {
     super(id, 'set_power', [power, effect, duration]);
   }
 }
