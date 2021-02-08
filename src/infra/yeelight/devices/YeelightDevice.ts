@@ -226,7 +226,7 @@ export default class YeelightDevice {
     return this.sendCommand(new MusicModeCommand(false, currentIpAddress, this.localPort));
   }
 
-  async ambiLight({ width, height, interval = 300, ip }: { width: number; height: number; interval?: number; ip: string }) {
+  async ambiLight({ width, height, interval = 500, ip }: { width: number; height: number; interval?: number; ip: string }) {
     await this.startMusicMode(ip);
     this.interval = setInterval(async () => {
       try {
