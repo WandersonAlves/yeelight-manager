@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import 'reflect-metadata';
+import { BlinkCmd } from './commander/BlinkCmd';
 import { DiscoverDevicesCmd } from './commander/DiscoverDevicesCmd';
 import { SeeLogsCmd } from './commander/SeeLogsCmd';
 import { SendCommandCmd } from './commander/SendCommandCmd';
@@ -28,6 +29,11 @@ program
   .command('toggle <deviceid>')
   .description('Toggle a device (turn on/off)')
   .action(ToggleCmd)
+
+program
+  .command('blink <deviceid>')
+  .description('Blink the device')
+  .action(BlinkCmd)
 
 program
   .command('logs')
