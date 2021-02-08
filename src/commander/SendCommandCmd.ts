@@ -19,15 +19,17 @@ type SendCommandFn = (
 
 export const SendCommandCmd: SendCommandFn = async (deviceid, cmd, value, bright, { verbose, debug }) => {
   const port = ConfigureCmds(verbose ? 'verbose' : debug ? 'debug' : 'info');
+  const headers = {
+    deviceId: deviceid,
+    kind: cmd,
+    value,
+    bright,
+  };
+  if (!bright) {
+    Reflect.deleteProperty(headers, 'bright');
+  }
   void HandleRequest(
-    axios.post<HttpResponse<any>>(`http://localhost:${port}/yeelight/command`, null, {
-      headers: {
-        deviceId: deviceid,
-        kind: cmd,
-        value,
-        bright,
-      },
-    }),
+    axios.post<HttpResponse<any>>(`http://localhost:${port}/yeelight/command`, null, { headers }),
   );
   return;
 };
