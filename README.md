@@ -29,10 +29,12 @@ After `yeelight-manager` start, you can run commands to control your lights, ex:
 
 
 1. `yee start` Start the server. Accepts `--verbose` or `--debug` to adjust the logging level
-2. `yee set xxx bright <1-100>` Change the brightness of a device. Any value below 1 will be threated as 1 and above 100 will be threated as 100;
-3. `yee set xxx ct|temperature|color_temperature <1700~6500> [bright]` Change the color temperature of a device. Any value below 1700 will be threated as 1700 and any value above 6500 will be threated as 6500;
-4. `yee toggle xxx` Toggles a device
-5. `yee set xxx power off|on` Explicity turn on or off a device. Usefful when creating scenes
-6. `yee set xxx ambilight <ip>` (**beta**) Using Yeelight's Music Mode, scan for predominant color on screen and change on device. Uses `node-vibrant` and `ffmpeg` under the hood. Not tested on Windows and Mac OS
-7. `yee set xxx color <hex-color> [bright]` Change the color of the device
-8. `yee logs` See the logs
+2. `yee blink xxx` Blink a device. Useful when you have multiple devices and wanna know with id belongs to a device
+3. `yee set xxx name <name>` Sets a name for your device
+4. `yee set xxx bright <1-100>` Change the brightness of a device. Any value below 1 will be threated as 1 and above 100 will be threated as 100;
+5. `yee set xxx ct|temperature|color_temperature <1700~6500> [bright]` Change the color temperature of a device. Any value below 1700 will be threated as 1700 and any value above 6500 will be threated as 6500;
+6. `yee toggle xxx` Toggles a device
+7. `yee set xxx power off|on` Explicity turn on or off a device. Usefful when creating scenes
+8. `yee set xxx ambilight <ip>` (**beta**) Using Yeelight's Music Mode, scan for predominant color on screen and change on device. Uses `node-vibrant` and `ffmpeg` under the hood. Not tested on Windows and Mac OS
+9. `yee set xxx color <hex-color> [bright]` Change the color of the device
+10. `yee logs` See the logs
