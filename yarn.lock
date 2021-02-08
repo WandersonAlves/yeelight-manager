@@ -447,6 +447,11 @@
     "@types/mime" "*"
     "@types/node" "*"
 
+"@types/tail@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/tail/-/tail-2.0.0.tgz#d1d035cd0caa5a2ed4a5b805acc6596fc6a233a2"
+  integrity sha512-TYTfnILhrZUAZKGNgot5+sBDap7oPIzV3818p7g4VhKGc81+/eoEZ93wKBTGnSg/tpDjzWSb8Wx5E737FCH/Sw==
+
 "@typescript-eslint/eslint-plugin@^4.4.0":
   version "4.10.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-4.10.0.tgz#19ed3baf4bc4232c5a7fcd32eaca75c3a5baf9f3"
@@ -4222,6 +4227,11 @@ table@^5.2.3:
     lodash "^4.17.14"
     slice-ansi "^2.1.0"
     string-width "^3.0.0"
+
+tail@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/tail/-/tail-2.2.0.tgz#ef9a7f170c5a33bc0b3ca92a5d5fcd4748a77f46"
+  integrity sha512-QqUMtWlnzArTvGyjVnAE5fAiXEm2Psvk/BlE7vWx2/dIEWMsAhcNPz7iW6WTiSM8h1fjtCkRMsaWBS1j6rpGBg==
 
 term-size@^2.1.0:
   version "2.2.1"

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import 'reflect-metadata';
 import { DiscoverDevicesCmd } from './commander/DiscoverDevicesCmd';
+import { SeeLogsCmd } from './commander/SeeLogsCmd';
 import { SendCommandCmd } from './commander/SendCommandCmd';
 import { ToggleCmd } from './commander/ToggleCmd';
 import { createCommand } from 'commander';
@@ -31,5 +32,10 @@ program
   .option('--verbose', 'Output verbose info')
   .option('--debug', 'Output debug info')
   .action(ToggleCmd)
+
+program
+  .command('logs')
+  .description('See the logs')
+  .action(SeeLogsCmd)
 
 program.parse(process.argv);

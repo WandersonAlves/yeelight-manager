@@ -26,10 +26,18 @@ const baseLogger = createLogger({
  */
 export const jsonString = (obj: any) => `\n${JSON.stringify(obj, null, 2)}\n`;
 
-baseLogger.add(
-  new transports.Console({
-    format: consoleFormatter,
-  }),
-);
+baseLogger
+  .add(
+    new transports.Console({
+      format: consoleFormatter,
+    }),
+  )
+  .add(
+    new transports.File({
+      format: consoleFormatter,
+      filename: 'log.log',
+      options: { flags: 'w' },
+    }),
+  );
 
 export const logger = baseLogger;
