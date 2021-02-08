@@ -20,8 +20,6 @@ program
 program
   .command('set <deviceid> <cmd> <value> [bright]')
   .description('Send a command to a device')
-  .option('--verbose', 'Output verbose info')
-  .option('--debug', 'Output debug info')
   .option('--effect', 'Apply a transition effect to the command. Can be `smooth` or `sudden`. Defaults to `smooth`', 'smooth')
   .option('--duration', 'The duration of the transition effect. Defaults to 300', '300')
   .action(SendCommandCmd);
@@ -29,8 +27,6 @@ program
 program
   .command('toggle <deviceid>')
   .description('Toggle a device (turn on/off)')
-  .option('--verbose', 'Output verbose info')
-  .option('--debug', 'Output debug info')
   .action(ToggleCmd)
 
 program

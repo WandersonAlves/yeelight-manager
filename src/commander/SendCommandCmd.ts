@@ -4,8 +4,6 @@ import HttpResponse from '../shared/responses/HttpResponse';
 import axios from 'axios';
 
 interface SendCommandOptionals {
-  verbose: boolean;
-  debug: boolean;
   effect: 'sudden' | 'smooth';
   duration: string;
 }
@@ -14,11 +12,11 @@ type SendCommandFn = (
   cmd: CommandList,
   value: string,
   bright: string,
-  { verbose, effect, duration }: SendCommandOptionals,
+  { effect, duration }: SendCommandOptionals,
 ) => Promise<void>;
 
-export const SendCommandCmd: SendCommandFn = async (deviceid, cmd, value, bright, { verbose, debug }) => {
-  const port = ConfigureCmds(verbose ? 'verbose' : debug ? 'debug' : 'info');
+export const SendCommandCmd: SendCommandFn = async (deviceid, cmd, value, bright) => {
+  const port = ConfigureCmds();
   const headers = {
     deviceId: deviceid,
     kind: cmd,
