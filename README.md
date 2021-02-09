@@ -4,6 +4,8 @@ A service to super charge your yeelight use!
 
 ## Getting Started
 
+Firstly, setup a variable called `YEELIGHT_PORT` on your environment (`.zshrc`, `.bashrc`, etc)
+
 Install `yeelight-manager` running `npm i -g yeelight-manager`, then, run `yee start` to start the server
 
 Under your terminal, you'll see that `yeelight-manager` have found your bulbs. Remember that all your devices **must** be connected under the same network.
