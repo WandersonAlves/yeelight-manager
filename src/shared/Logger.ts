@@ -36,7 +36,6 @@ baseLogger
     new transports.File({
       format: consoleFormatter,
       filename: 'log.log',
-      options: { flags: 'w' },
     }),
   );
 

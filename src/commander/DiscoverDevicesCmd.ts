@@ -1,10 +1,12 @@
 import { ConfigureCmds } from './utils';
 import { GetBindingFromContainer } from '../infra/container';
 import { logger } from '../shared/Logger';
+import { unlinkSync } from 'fs';
 import DiscoverDevicesCase from '../modules/Discovery/DiscoverDevices/DiscoverDevicesCase';
 import server from '../server';
 
 export const DiscoverDevicesCmd = async ({ verbose, debug }) => {
+  unlinkSync('log.log');
   const port = ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
   const cmdCase = GetBindingFromContainer(DiscoverDevicesCase);
   await cmdCase.execute();
