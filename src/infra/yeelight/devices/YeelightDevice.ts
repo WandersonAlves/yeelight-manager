@@ -165,12 +165,12 @@ export default class YeelightDevice {
   connect(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.client = new TCPSocket();
-      this.log('info', `Trying to connect into ${this._name} in ${this.host}:${this.port}`);
+      this.log('info', `⚡Trying to connect into ${this._name} in ${this.host}:${this.port}`);
 
       this.client.connect(this.port, this.host, () => {
         this.events.emit('connected');
         this.isConnected = true;
-        this.log('info', `Connected into ${this._name}`);
+        this.log('info', `💡 Connected into ${this._name}`);
         resolve();
       });
 
@@ -197,21 +197,21 @@ export default class YeelightDevice {
   }
 
   startMusicMode(currentIpAddress: string): Promise<void> {
-    this.log('info', 'Starting music mode');
+    this.log('info', '📀 Starting music mode');
     return new Promise((resolve, reject) => {
       try {
         this.server.listen(() => {
-          this.log('info', 'Server Created!');
+          this.log('info', '⚡ Server Created!');
           const ad = this.server.address() as AddressInfo;
           this.localAddress = ad.address;
           this.localPort = ad.port;
-          this.log('info', `TCP Server Info: ${this.localAddress}:${this.localPort}`);
+          this.log('info', `⚡ TCP Server Info: ${this.localAddress}:${this.localPort}`);
           // Tell the lightbulb to try to connect to our server
           void this.sendCommand(new MusicModeCommand(true, currentIpAddress, this.localPort));
         });
 
         this.server.on('connection', sock => {
-          this.log('info', 'Device connected to server');
+          this.log('info', '⚡ Device connected to server');
           // If the lightbulb connect succefully, it will be here on sock
           // Else it will print something like {"method":"props","params":{"music_on":0}} on client
           this.socket = sock;

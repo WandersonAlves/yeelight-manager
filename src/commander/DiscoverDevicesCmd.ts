@@ -9,7 +9,8 @@ export const DiscoverDevicesCmd = async ({ verbose, debug }) => {
   const cmdCase = GetBindingFromContainer(DiscoverDevicesCase);
   await cmdCase.execute();
   server.listen(port, () => {
-    logger.info(`yeelight-manager-backend listening on ${port}`);
+    logger.info(`yeelight-manager aka yee listening on ${port}`);
+    logger.info('You can use yee CLI or use HTTP requests to control your lights');
   });
   return;
 };
