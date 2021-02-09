@@ -7,11 +7,6 @@ import YeelightDevice from '../devices/YeelightDevice';
 export default class Discovery {
   private devices: YeelightDevice[] = [];
 
-  // TODO Implement this
-  static CreateDevice(deviceId: string): Promise<YeelightDevice> {
-    return null;
-  }
-
   findDevice(idOrName: string): YeelightDevice {
     return this.devices.find(d => d.id === idOrName || d.name === idOrName);
   }
