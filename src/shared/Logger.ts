@@ -1,4 +1,6 @@
 import { createLogger, format, transports } from 'winston';
+import { join } from 'path';
+
 const { printf, colorize } = format;
 const colorizer = colorize();
 
@@ -35,7 +37,7 @@ baseLogger
   .add(
     new transports.File({
       format: consoleFormatter,
-      filename: 'log.log',
+      filename: join(__dirname, '..', '..', 'log.log'),
     }),
   );
 
