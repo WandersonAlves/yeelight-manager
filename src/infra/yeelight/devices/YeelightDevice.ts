@@ -163,36 +163,44 @@ export default class YeelightDevice {
   }
 
   connect(): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       this.client = new TCPSocket();
       this.log('info', `⚡Trying to connect into ${this._name} in ${this.host}:${this.port}`);
 
-      this.client.connect(this.port, this.host, () => {
-        this.events.emit('connected');
-        this.isConnected = true;
-        this.log('info', `💡 Connected into ${this._name}`);
-        resolve();
-      });
-
-      this.client.on('data', data => {
-        const responses = data.toString().split('\n');
-        responses.forEach(r => {
-          if (r) {
-            this.changeEvent(JSON.parse(r));
-            this.events.emit('data', r);
-          }
+      const connectDevice = () => {
+        this.client.connect(this.port, this.host, () => {
+          this.events.emit('connected');
+          this.isConnected = true;
+          this.log('info', `💡 Connected into ${this._name}`);
+          resolve();
         });
-      });
 
-      this.client.on('close', () => {
-        this.isConnected = false;
-        this.events.emit('close_connection');
-      });
+        this.client.on('data', data => {
+          const responses = data.toString().split('\n');
+          responses.forEach(r => {
+            if (r) {
+              this.changeEvent(JSON.parse(r));
+              this.events.emit('data', r);
+            }
+          });
+        });
+
+        this.client.on('close', () => {
+          this.isConnected = false;
+          this.events.emit('close_connection');
+        });
+      };
 
       this.client.on('error', err => {
-        this.events.emit('error', err);
-        reject();
+        this.log('error', err.name);
+        this.log('warn', `Trying to re-connect to ${this._name}`);
+        this.isConnected = false;
+        this.client.removeAllListeners();
+        this.client = null;
+        connectDevice();
       });
+
+      connectDevice();
     });
   }
 
