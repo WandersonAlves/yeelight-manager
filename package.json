@@ -9,6 +9,9 @@
   "bin": {
     "yee": "./lib/index.js"
   },
+  "files": [
+    "lib/**/*"
+  ],
   "scripts": {
     "test": "mocha -r ts-node/register tests/cases/**/*.spec.ts",
     "lint": "eslint -c .eslintrc.js --ext .ts ./src/**/*.ts --fix",
