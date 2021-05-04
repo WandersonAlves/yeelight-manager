@@ -1,10 +1,13 @@
 import { CommandList } from '../infra/enums';
-import { ConfigureCmds, HandleRequest } from './utils';
-import HttpResponse from '../shared/responses/HttpResponse';
-import axios from 'axios';
+import { ConfigureCmds } from './utils';
+import { GetBindingFromContainer } from '../infra/container';
+import DiscoverDevicesCase from '../modules/Discovery/DiscoverDevices/DiscoverDevicesCase';
+import ReceiveCommandCase from '../modules/Yeelight/ReceiveCommand/ReceiveCommandCase';
 
 interface SendCommandOptionals {
   effect: 'sudden' | 'smooth';
+  verbose?: boolean;
+  debug?: boolean;
   duration: string;
 }
 type SendCommandFn = (
@@ -15,19 +18,15 @@ type SendCommandFn = (
   { effect, duration }: SendCommandOptionals,
 ) => Promise<void>;
 
-export const SendCommandCmd: SendCommandFn = async (deviceid, cmd, value, bright) => {
-  const port = ConfigureCmds();
+export const SendCommandCmd: SendCommandFn = async (deviceid, cmd, value, bright, { verbose, debug }) => {
+  ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
   const headers = {
-    deviceId: deviceid,
+    deviceid,
     kind: cmd,
     value,
     bright,
   };
-  if (!bright) {
-    Reflect.deleteProperty(headers, 'bright');
-  }
-  void HandleRequest(
-    axios.post<HttpResponse<any>>(`http://localhost:${port}/yeelight/command`, null, { headers }),
-  );
-  return;
+  await GetBindingFromContainer(DiscoverDevicesCase).execute({ headers: {} });
+  await GetBindingFromContainer(ReceiveCommandCase).execute({ headers });
+  process.exit();
 };

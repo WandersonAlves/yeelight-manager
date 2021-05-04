@@ -1,19 +1,21 @@
-import { UseCase } from "../../../shared/contracts";
-import { YeelightDeviceJSON } from "../../../infra/yeelight/devices/YeelightDevice";
-import { inject, injectable } from "inversify";
-import Discovery from "../../../infra/yeelight/discovery";
-import ExceptionHandler from "../../../shared/decorators/ExceptionHandler";
-import HttpResponse from "../../../shared/responses/HttpResponse";
+import { UseCase } from '../../../shared/contracts';
+import { YeelightDeviceJSON } from '../../../infra/yeelight/devices/YeelightDevice';
+import { inject, injectable } from 'inversify';
+import Discovery from '../../../infra/yeelight/discovery';
+import ExceptionHandler from '../../../shared/decorators/ExceptionHandler';
+import HttpResponse from '../../../shared/responses/HttpResponse';
 
 @injectable()
 export default class DiscoverDevicesCase implements UseCase<YeelightDeviceJSON> {
   @inject(Discovery) private discovery: Discovery;
 
   @ExceptionHandler()
-  async execute() {
-    await this.discovery.discoverDevices();
+  async execute({ headers }: { headers: { waitTime?: number } }) {
+    await this.discovery.discoverDevices(headers.waitTime);
     const devices = this.discovery.getDevices();
-    return HttpResponse.success(200, devices.map(d => d.toString()))
+    return HttpResponse.success(
+      200,
+      devices.map(d => d.toString()),
+    );
   }
-
 }
