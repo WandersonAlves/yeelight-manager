@@ -79,7 +79,7 @@ export default class YeelightDevice {
       }
       case CommandList.COLOR: {
         void device.setPower('on');
-        return [null, device.setHex(value)];
+        return [null, device.setHex(YeelightDevice.FetchColor(value))];
       }
       case CommandList.AMBILIGHT: {
         void device.setPower('on');
@@ -103,6 +103,46 @@ export default class YeelightDevice {
       }
       default: {
         return [new UnsuportedCommandException(device.id, kind, value), null];
+      }
+    }
+  }
+  /**
+   * Returns a hex value based on input.
+   *
+   * If the value is a well-know color name, it'll return the hex for that color. Otherwise, returns the given value
+   *
+   * @param value Hex or color name
+   * @returns Hex value for given string
+   */
+  private static FetchColor(value: string) {
+    const innerValue = value.replace('#', '');
+    switch (innerValue) {
+      case 'red': {
+        return 'FF0000';
+      }
+      case 'blue': {
+        return '0000FF';
+      }
+      case 'green': {
+        return '00FF00';
+      }
+      case 'cyan': {
+        return '00FFFF';
+      }
+      case 'purple': {
+        return '800080';
+      }
+      case 'pink': {
+        return 'FFC0CB';
+      }
+      case 'orange': {
+        return 'FFA500';
+      }
+      case 'yellow': {
+        return 'FFFF00';
+      }
+      default: {
+        return innerValue;
       }
     }
   }
