@@ -1,7 +1,7 @@
 {
   "name": "yeelight-manager",
-  "version": "0.0.3",
-  "description": "Backend server/CLI to control yeelight devices!",
+  "version": "0.0.4",
+  "description": "CLI to control yeelight devices!",
   "main": "src/index.ts",
   "engines": {
     "node": ">=10.22.0"
@@ -28,7 +28,6 @@
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
     "@types/chai": "^4.2.11",
-    "@types/express": "^4.17.8",
     "@types/express-winston": "^4.0.0",
     "@types/ffmpeg-static": "^3.0.0",
     "@types/mocha": "^8.0.3",
@@ -53,7 +52,6 @@
   "dependencies": {
     "axios": "^0.21.1",
     "commander": "^7.0.0",
-    "express": "^4.17.1",
     "ffmpeg-static": "^4.2.7",
     "http-status": "^1.4.2",
     "inversify": "^5.0.1",
