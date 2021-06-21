@@ -43,7 +43,7 @@ export default class Discovery {
         const uniqueDevices = [...new Map(devices.map(item => [item.id, item])).values()];
         this.devices = [...uniqueDevices];
         logger.info(`Found ${this.devices.length} devices`, { label: 'Discovery' });
-        this.devices.forEach(d => logger.info(`${d.id} - ${d.name}`, { label: 'Discovery' }));
+        this.devices.forEach(d => logger.info(`YeelightID: ${d.id} | DeviceName: ${d.name}`, { label: 'Discovery' }));
         // logger.info('Connecting to devices');
         // this.devices.forEach(d => d.connect());
         client.close();
