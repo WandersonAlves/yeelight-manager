@@ -1,4 +1,5 @@
 import { execSync } from 'child_process';
+import { logger } from '../../shared/Logger';
 import pathToFfmpeg from 'ffmpeg-static';
 import vibrant from 'node-vibrant';
 
@@ -33,6 +34,7 @@ export default class Screenshot {
         const { hex } = [DarkMuted, DarkVibrant, LightVibrant, LightMuted, Muted, Vibrant].sort(
           (a, b) => b.population - a.population,
         )[0];
+        logger.debug(`ffmpeg proeminent color: ${hex}`)
         resolve(hex.replace('#', ''));
       } catch (e) {
         reject(e);

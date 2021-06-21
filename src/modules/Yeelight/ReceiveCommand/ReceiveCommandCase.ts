@@ -18,11 +18,11 @@ export default class ReceiveCommandCase implements UseCase<any, IHttpError> {
     if (!device) {
       return HttpResponse.error(new DeviceNotFoundException(deviceid));
     }
-    const [err, promise] = YeelightDevice.ExecCommand(device, headers);
+    const [err, deviceCmdPromise] = await YeelightDevice.ExecCommand(device, headers);
     if (err) {
       return HttpResponse.error(err);
     }
-    await promise;
+    await deviceCmdPromise;
     return HttpResponse.success(200, { deviceid, kind });
   }
 }

@@ -21,11 +21,11 @@ export default class RunSceneCase implements UseCase<CommandSignal[], IHttpError
       if (!device) {
         return devicesNotFound.push(cmd.deviceid);
       }
-      const [err, promise] = YeelightDevice.ExecCommand(device, cmd);
+      const [err, deviceCmdPromise] = await YeelightDevice.ExecCommand(device, cmd);
       if (err) {
         return HttpResponse.error(err);
       }
-      await promise;
+      await deviceCmdPromise;
     });
     if (devicesNotFound.length) {
       return HttpResponse.error(new DeviceNotFoundException(devicesNotFound.toString()));

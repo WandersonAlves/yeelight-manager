@@ -1,6 +1,6 @@
 import { createSocket } from 'dgram';
 import { injectable } from 'inversify';
-import { jsonString, logger } from '../../../shared/Logger';
+import { logger } from '../../../shared/Logger';
 import YeelightDevice from '../devices/YeelightDevice';
 
 @injectable()
@@ -43,9 +43,9 @@ export default class Discovery {
         const uniqueDevices = [...new Map(devices.map(item => [item.id, item])).values()];
         this.devices = [...uniqueDevices];
         logger.info(`Found ${this.devices.length} devices`, { label: 'Discovery' });
-        logger.debug(`Device list: ${jsonString(this.devices.map(d => d.toString()))}`);
-        logger.info('Connecting to devices');
-        this.devices.forEach(d => d.connect());
+        this.devices.forEach(d => logger.info(`${d.id} - ${d.name}`, { label: 'Discovery' }));
+        // logger.info('Connecting to devices');
+        // this.devices.forEach(d => d.connect());
         client.close();
         resolve(this.devices);
       }, timeToDiscover ?? 350);

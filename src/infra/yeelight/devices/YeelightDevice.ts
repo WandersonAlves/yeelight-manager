@@ -63,7 +63,8 @@ export default class YeelightDevice {
     return device.connect();
   }
 
-  static ExecCommand(device: YeelightDevice, { kind, value, bright }: CommandSignal): Either<Promise<void>> {
+  static async ExecCommand(device: YeelightDevice, { kind, value, bright }: CommandSignal): Promise<Either<Promise<any>>>{
+    await device.connect();
     if (bright && kind !== CommandList.BRIGHT) {
       void device.setBright(Number(bright));
     }
@@ -266,6 +267,7 @@ export default class YeelightDevice {
           resolve();
         });
       } catch (e) {
+        console.error(e);
         reject(e);
       }
     });
@@ -279,15 +281,18 @@ export default class YeelightDevice {
 
   async ambiLight({ width, height, interval = 500, ip }: { width: number; height: number; interval?: number; ip: string }) {
     await this.startMusicMode(ip);
-    this.interval = setInterval(async () => {
-      try {
-        const color = await Screenshot.GetProeminentColor(width, height);
-        return this.setHex(color, 'smooth', 300);
-      } catch (e) {
-        this.log('error', e);
-        void this.cancelAmbiLight(ip);
-      }
-    }, interval);
+    return new Promise(async (resolve) => {
+      this.interval = setInterval(async () => {
+        try {
+          const color = await Screenshot.GetProeminentColor(width, height);
+          return this.setHex(color, 'smooth', 300);
+        } catch (e) {
+          this.log('error', e);
+          void this.cancelAmbiLight(ip);
+          resolve(null);
+        }
+      }, interval);
+    })
   }
 
   cancelAmbiLight(ip: string) {
