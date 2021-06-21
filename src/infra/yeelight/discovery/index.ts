@@ -48,7 +48,7 @@ export default class Discovery {
         // this.devices.forEach(d => d.connect());
         client.close();
         resolve(this.devices);
-      }, timeToDiscover ?? 350);
+      }, timeToDiscover ?? 1000);
     });
   }
 }
