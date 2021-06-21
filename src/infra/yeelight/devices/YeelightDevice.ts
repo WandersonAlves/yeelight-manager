@@ -17,7 +17,7 @@ import Command, {
   RGBCommand,
   ToggleCommand,
 } from './Commands';
-import Screenshot from '../screenshot';
+import Screenshot from '../../screenshot';
 import UnsuportedCommandException from '../../../shared/exceptions/UnsuportedCommandException';
 
 type Resolve = (value: void | PromiseLike<void>) => void;

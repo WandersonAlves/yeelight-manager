@@ -15,7 +15,7 @@ export default class Discovery {
     return this.devices;
   }
 
-  discoverDevices(timeToDiscover?: number): Promise<void> {
+  discoverDevices(timeToDiscover?: number): Promise<YeelightDevice[]> {
     return new Promise((resolve, reject) => {
       const discoverMessage = `M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1982\r\nMAN: "ssdp:discover"\r\nST: wifi_bulb\r\n`;
       const client = createSocket('udp4');
@@ -47,7 +47,7 @@ export default class Discovery {
         logger.info('Connecting to devices');
         this.devices.forEach(d => d.connect());
         client.close();
-        resolve();
+        resolve(this.devices);
       }, timeToDiscover ?? 350);
     });
   }
