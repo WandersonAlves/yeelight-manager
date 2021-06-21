@@ -5,9 +5,7 @@ const { printf, colorize } = format;
 const colorizer = colorize();
 
 const timestampFormatter = () =>
-  new Date().toLocaleString('pt-BR', {
-    timeZone: 'America/Sao_Paulo',
-  });
+  new Date().toISOString();
 
 const consoleFormatter = printf(({ stack, level, message, label, timestamp }: { [key: string]: string }) => {
   const levelLabelColorized = colorizer.colorize(level, `${level}:${label}`);
