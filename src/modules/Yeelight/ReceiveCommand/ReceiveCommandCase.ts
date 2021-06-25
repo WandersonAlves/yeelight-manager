@@ -1,6 +1,7 @@
 import { CommandSignal } from './ReceiveCommandInterfaces';
 import { IHttpError, UseCase, UseCaseParams } from '../../../shared/contracts';
 import { inject, injectable } from 'inversify';
+import { logger } from '../../../shared/Logger';
 import DeviceNotFoundException from '../../../shared/exceptions/DeviceNotFoundException';
 import Discovery from '../../../infra/yeelight/discovery';
 import ExceptionHandler from '../../../shared/decorators/ExceptionHandler';
@@ -23,6 +24,7 @@ export default class ReceiveCommandCase implements UseCase<any, IHttpError> {
       return HttpResponse.error(err);
     }
     await deviceCmdPromise;
+    logger.info('Command Success!!!');
     return HttpResponse.success(200, { deviceid, kind });
   }
 }

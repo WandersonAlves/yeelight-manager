@@ -1,10 +1,11 @@
 import { execSync } from 'child_process';
 import { logger } from '../../shared/Logger';
 import pathToFfmpeg from 'ffmpeg-static';
+import tinycolor from 'tinycolor2';
 import vibrant from 'node-vibrant';
 
 export default class Screenshot {
-  static GetProeminentColor(width: number, height: number): Promise<string> {
+  static GetProeminentColor(width: number, height: number): Promise<{ color: string; bright: number }> {
     return new Promise(async (resolve, reject) => {
       try {
         execSync(
@@ -34,8 +35,9 @@ export default class Screenshot {
         const { hex } = [DarkMuted, DarkVibrant, LightVibrant, LightMuted, Muted, Vibrant].sort(
           (a, b) => b.population - a.population,
         )[0];
-        logger.debug(`ffmpeg proeminent color: ${hex}`)
-        resolve(hex.replace('#', ''));
+        const bright = (tinycolor(hex).getBrightness() / 255) * 100;
+        logger.debug(`ffmpeg proeminent color: ${hex} | brightness: ${bright}`);
+        resolve({ color: hex.replace('#', ''), bright });
       } catch (e) {
         reject(e);
       }
