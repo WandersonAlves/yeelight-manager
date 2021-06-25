@@ -9,7 +9,7 @@ export const DiscoverDevicesCmd = async ({ verbose, debug, waitTime }) => {
   }
   finally {
     ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
-    const cmdCase = GetBindingFromContainer(DiscoverDevicesCase);
-    await cmdCase.execute({ headers: { waitTime }});
+    const discoveryCase = GetBindingFromContainer(DiscoverDevicesCase);
+    await discoveryCase.execute({ headers: { waitTime }});
   }
 };

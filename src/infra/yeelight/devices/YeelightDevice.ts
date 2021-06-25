@@ -63,7 +63,7 @@ export default class YeelightDevice {
     return device.connect();
   }
 
-  static async ExecCommand(device: YeelightDevice, { kind, value, bright }: CommandSignal): Promise<Either<Promise<any>>>{
+  static async ExecCommand(device: YeelightDevice, { kind, value, bright }: CommandSignal): Promise<Either<Promise<any>>> {
     await device.connect();
     if (bright && kind !== CommandList.BRIGHT) {
       void device.setBright(Number(bright));
@@ -168,8 +168,8 @@ export default class YeelightDevice {
   }
 
   readonly id: string;
-  private port: number;
-  private host: string;
+  readonly port: number;
+  readonly host: string;
   private model: 'color';
   private support: string[];
   private power: boolean;
@@ -204,7 +204,7 @@ export default class YeelightDevice {
   }
 
   connect(): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       this.client = new TCPSocket();
       this.log('info', `⚡Trying to connect into ${this._name} in ${this.host}:${this.port}`);
 
@@ -281,7 +281,7 @@ export default class YeelightDevice {
 
   async ambiLight({ width, height, interval = 500, ip }: { width: number; height: number; interval?: number; ip: string }) {
     await this.startMusicMode(ip);
-    return new Promise(async (resolve) => {
+    return new Promise(async resolve => {
       this.interval = setInterval(async () => {
         try {
           const color = await Screenshot.GetProeminentColor(width, height);
@@ -292,7 +292,7 @@ export default class YeelightDevice {
           resolve(null);
         }
       }, interval);
-    })
+    });
   }
 
   cancelAmbiLight(ip: string) {
