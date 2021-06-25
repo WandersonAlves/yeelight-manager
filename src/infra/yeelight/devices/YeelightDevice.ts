@@ -205,15 +205,27 @@ export default class YeelightDevice {
 
   connect(): Promise<void> {
     return new Promise(resolve => {
-      this.client = new TCPSocket();
-      this.log('info', `⚡Trying to connect into ${this._name} in ${this.host}:${this.port}`);
-
-      const connectDevice = () => {
+      const _connect = () => {
+        this.log('info', `⚡Trying to connect into ${this._name} in ${this.host}:${this.port}`);
+        if (!this.socket && !this.isConnected) {
+          _createSocket();
+        }
         this.client.connect(this.port, this.host, () => {
           this.events.emit('connected');
           this.isConnected = true;
           this.log('info', `💡 Connected into ${this._name}`);
           resolve();
+        });
+      };
+
+      const _handleYeelightConnectionEvents = () => {
+        this.client.on('error', err => {
+          this.log('error', err.name);
+          this.log('warn', `Trying to re-connect to ${this._name}`);
+          this.isConnected = false;
+          this.client.removeAllListeners();
+          this.client = null;
+          _connect();
         });
 
         this.client.on('data', data => {
@@ -230,18 +242,19 @@ export default class YeelightDevice {
           this.isConnected = false;
           this.events.emit('close_connection');
         });
-      };
+      }
 
-      this.client.on('error', err => {
-        this.log('error', err.name);
-        this.log('warn', `Trying to re-connect to ${this._name}`);
-        this.isConnected = false;
-        this.client.removeAllListeners();
-        this.client = null;
-        connectDevice();
-      });
+      const _createSocket = () => {
+        this.client = new TCPSocket();
+      }
 
-      connectDevice();
+      if (this.isConnected) {
+        return resolve();
+      }
+
+      _createSocket();
+      _handleYeelightConnectionEvents();
+      _connect();
     });
   }
 
@@ -279,13 +292,14 @@ export default class YeelightDevice {
     return this.sendCommand(new MusicModeCommand(false, currentIpAddress, this.localPort));
   }
 
-  async ambiLight({ width, height, interval = 500, ip }: { width: number; height: number; interval?: number; ip: string }) {
+  async ambiLight({ width, height, interval = 300, ip }: { width: number; height: number; interval?: number; ip: string }) {
     await this.startMusicMode(ip);
     return new Promise(async resolve => {
       this.interval = setInterval(async () => {
         try {
-          const color = await Screenshot.GetProeminentColor(width, height);
-          return this.setHex(color, 'smooth', 300);
+          const { color, bright } = await Screenshot.GetProeminentColor(width, height);
+          void this.setBright(bright, 'smooth', interval);
+          void this.setHex(color, 'smooth', interval);
         } catch (e) {
           this.log('error', e);
           void this.cancelAmbiLight(ip);
