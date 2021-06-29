@@ -20,7 +20,7 @@
     "release": "npx standard-version",
     "clean": "rm -rf dist/",
     "build": "tsc",
-    "prepublish": "yarn lint && yarn build"
+    "prepublish": "yarn release && yarn build"
   },
   "license": "ISC",
   "devDependencies": {
