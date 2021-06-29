@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.8](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.7...v0.0.8) (2021-06-29)
+
+
+### Features
+
+* ambilight fetchs ip automatically ([18d0610](https://github.com/WandersonAlves/yeelight-manager/commit/18d06103bd0428e52c9ba784de58c14ef086f6a9))
+
+
+### Bug Fixes
+
+* remove release from prepublish ([4d74638](https://github.com/WandersonAlves/yeelight-manager/commit/4d74638eb774dacb553bab9f92ef828bc8eb1c7f))
+
 ### [0.0.7](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.6...v0.0.7) (2021-06-29)
 
 ### 0.0.6 (2021-06-29)

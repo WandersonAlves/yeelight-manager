@@ -1,6 +1,6 @@
 {
   "name": "yeelight-manager",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "CLI to control yeelight devices!",
   "main": "src/index.ts",
   "engines": {
@@ -20,7 +20,7 @@
     "release": "npx standard-version",
     "clean": "rm -rf dist/",
     "build": "tsc",
-    "prepublish": "yarn build"
+    "prepublish": "yarn release && yarn build"
   },
   "license": "ISC",
   "devDependencies": {
