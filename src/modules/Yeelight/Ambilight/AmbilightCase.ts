@@ -1,4 +1,5 @@
 import { UseCase, UseCaseParams } from '../../../shared/contracts';
+import { address } from 'ip';
 import { inject, injectable } from 'inversify';
 import Discovery from '../../../infra/yeelight/discovery';
 import ExceptionHandler from '../../../shared/decorators/ExceptionHandler';
@@ -6,7 +7,6 @@ import HttpResponse from '../../../shared/responses/HttpResponse';
 import Screenshot from '../../../infra/screenshot';
 
 interface AmbilightCaseHeaders {
-  ip: string;
   interval?: number;
   width: number;
   height: number;
@@ -20,7 +20,8 @@ export default class AmbilightCase implements UseCase {
 
   @ExceptionHandler()
   async execute({ headers }: UseCaseParams<AmbilightCaseHeaders>) {
-    const { deviceNames, ip, interval = 300, width, height } = headers;
+    const { deviceNames, interval = 300, width, height } = headers;
+    const ip = address();
     const devices = await this.discovery.discoverDevices();
     if (!devices.length) {
       process.exit(0);

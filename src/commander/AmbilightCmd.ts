@@ -2,11 +2,11 @@ import { ConfigureCmds } from './utils';
 import { GetBindingFromContainer } from '../infra/container';
 import AmbilightCase from '../modules/Yeelight/Ambilight/AmbilightCase';
 
-export const AmbilightCmd = async (devices: string, ip: string, resolution: string, interval: string, { verbose, debug }) => {
+export const AmbilightCmd = async (devices: string, resolution: string, interval: string, { verbose, debug }) => {
   ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
   const deviceNames = devices.split(',');
   const [width, height] = resolution.split('x').map(v => Number(v));
 
-  await GetBindingFromContainer(AmbilightCase).execute({ headers: { deviceNames, ip, height, width, interval: Number(interval) } });
+  await GetBindingFromContainer(AmbilightCase).execute({ headers: { deviceNames, height, width, interval: Number(interval) } });
   process.exit();
 };

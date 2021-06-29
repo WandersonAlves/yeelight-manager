@@ -39,7 +39,7 @@ program
   .action(SendCommandCmd);
 
 program
-  .command('ambilight <devices> <ip> <resolution> [interval]')
+  .command('ambilight <devices> <resolution> [interval]')
   .description('Turn ambilight for given devices')
   .option('--verbose', 'Output verbose info')
   .option('--debug', 'Output debug info')
