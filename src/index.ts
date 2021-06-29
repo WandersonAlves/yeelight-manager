@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import 'reflect-metadata';
+import { AmbilightCmd } from './commander/AmbilightCmd';
 import { BlinkCmd } from './commander/BlinkCmd';
 import { DiscoverDevicesCmd } from './commander/DiscoverDevicesCmd';
 import { ListCmd } from './commander/ListCmd';
@@ -36,6 +37,13 @@ program
   .option('--verbose', 'Output verbose info')
   .option('--debug', 'Output debug info')
   .action(SendCommandCmd);
+
+program
+  .command('ambilight <devices> <ip> <resolution> [interval]')
+  .description('Turn ambilight for given devices')
+  .option('--verbose', 'Output verbose info')
+  .option('--debug', 'Output debug info')
+  .action(AmbilightCmd)
 
 program
   .command('toggle <deviceid>')

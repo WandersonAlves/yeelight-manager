@@ -17,7 +17,6 @@ import Command, {
   RGBCommand,
   ToggleCommand,
 } from './Commands';
-import Screenshot from '../../screenshot';
 import UnsuportedCommandException from '../../../shared/exceptions/UnsuportedCommandException';
 
 type Resolve = (value: void | PromiseLike<void>) => void;
@@ -81,13 +80,6 @@ export default class YeelightDevice {
       case CommandList.COLOR: {
         void device.setPower('on');
         return [null, device.setHex(YeelightDevice.FetchColor(value))];
-      }
-      case CommandList.AMBILIGHT: {
-        void device.setPower('on');
-        return [null, device.ambiLight({ width: 2560, height: 1080, ip: value })];
-      }
-      case CommandList.CANCEL_AMBILIGHT: {
-        return [null, device.cancelAmbiLight(value)];
       }
       case CommandList.CT3:
       case CommandList.CT2:
@@ -187,7 +179,6 @@ export default class YeelightDevice {
   isConnected = false;
   private events = new EventEmitter();
   private commandId = 1;
-  private interval;
 
   private constructor({ id, port, host, model, support, power, bright, colorMode, colorTemperatureValue, rgbValue, name }) {
     this.id = id;
@@ -289,29 +280,8 @@ export default class YeelightDevice {
   finishMusicMode(currentIpAddress: string) {
     this.socket = null;
     this.server.close();
+    this.log('info', '📀 Finishing music mode');
     return this.sendCommand(new MusicModeCommand(false, currentIpAddress, this.localPort));
-  }
-
-  async ambiLight({ width, height, interval = 300, ip }: { width: number; height: number; interval?: number; ip: string }) {
-    await this.startMusicMode(ip);
-    return new Promise(async resolve => {
-      this.interval = setInterval(async () => {
-        try {
-          const { color, bright } = await Screenshot.GetProeminentColor(width, height);
-          void this.setBright(bright, 'smooth', interval);
-          void this.setHex(color, 'smooth', interval);
-        } catch (e) {
-          this.log('error', e);
-          void this.cancelAmbiLight(ip);
-          resolve(null);
-        }
-      }, interval);
-    });
-  }
-
-  cancelAmbiLight(ip: string) {
-    clearInterval(this.interval);
-    return this.finishMusicMode(ip);
   }
 
   toggle() {
