@@ -22,3 +22,23 @@ export const HexToInteger = (hex: string): number => {
   }
   return result;
 };
+
+export const GetListIpAddress = (currentIp: string, from = 1, to = 254): string[] =>  {
+  const startNumber = parseInt(currentIp.split('.')[3], 10);
+  const results: string[] = [];
+  let before = startNumber;
+  let after = startNumber;
+  const sub = currentIp.substring(0, currentIp.lastIndexOf('.'));
+
+  while (before > from || after < to) {
+    before--;
+    after++;
+    if (before >= from && before > 0) {
+      results.push(`${sub}.${before}`);
+    }
+    if (after <= to && after < 255) {
+      results.push(`${sub}.${after}`);
+    }
+  }
+  return results;
+}

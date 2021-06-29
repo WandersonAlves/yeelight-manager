@@ -49,6 +49,7 @@ interface Params {
 }
 
 export default class YeelightDevice {
+  static YeelightDefaultPort = 55443;
   /**
    * Checks if given device is connected.
    * If not, then returns a promise that attempts to connect
@@ -159,6 +160,22 @@ export default class YeelightDevice {
     });
   }
 
+  static CreateDeviceByIp(ip: string, port: number) {
+    return new YeelightDevice({
+      host: ip,
+      port,
+      bright: null,
+      colorMode: null,
+      colorTemperatureValue: null,
+      id: null,
+      model: null,
+      name: null,
+      power: null,
+      rgbValue: null,
+      support: null,
+    });
+  }
+
   readonly id: string;
   readonly port: number;
   readonly host: string;
@@ -197,7 +214,7 @@ export default class YeelightDevice {
   connect(): Promise<void> {
     return new Promise(resolve => {
       const _connect = () => {
-        this.log('info', `⚡Trying to connect into ${this._name} in ${this.host}:${this.port}`);
+        this.log('info', `⚡ Trying to connect into ${this._name} in ${this.host}:${this.port}`);
         if (!this.socket && !this.isConnected) {
           _createSocket();
         }
@@ -212,7 +229,7 @@ export default class YeelightDevice {
       const _handleYeelightConnectionEvents = () => {
         this.client.on('error', err => {
           this.log('error', err.name);
-          this.log('warn', `Trying to re-connect to ${this._name}`);
+          this.log('warn', `⚡ Trying to re-connect to ${this._name}`);
           this.isConnected = false;
           this.client.removeAllListeners();
           this.client = null;
@@ -233,11 +250,11 @@ export default class YeelightDevice {
           this.isConnected = false;
           this.events.emit('close_connection');
         });
-      }
+      };
 
       const _createSocket = () => {
         this.client = new TCPSocket();
-      }
+      };
 
       if (this.isConnected) {
         return resolve();
@@ -396,7 +413,7 @@ export default class YeelightDevice {
   }
 
   private log(type: 'info' | 'warn' | 'error' | 'debug' | 'verbose', str: string) {
-    const label = `${this.id}:${this._name}`;
+    const label = `${this.id || this.host}:${this._name}`;
     logger[type](str, { label });
   }
 }
