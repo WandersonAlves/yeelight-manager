@@ -50,8 +50,6 @@ export default class Discovery {
           logger.error(error.toString(), { label: 'Discovery' });
           client.close();
           reject(error);
-        } else {
-          logger.info('Discovery success', { label: 'Discovery' });
         }
       });
       client.on('message', msg => {
