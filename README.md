@@ -81,3 +81,9 @@ A CLI to super charge your yeelight use!
 
 16:00:03 debug:0x0000000011301d41:Living Room: Command sent: {"id":6,"method":"set_rgb","params":[817867,"smooth",600]}
 ```
+
+### Troubleshooting
+
+> *Can't find my devices via SSDP*
+
+Try to turn off `IGMP Snooping` on your router (source: https://forum.yeelight.com/t/bulb-stops-to-respond-to-ssdp-requests-after-some-minutes/702)
