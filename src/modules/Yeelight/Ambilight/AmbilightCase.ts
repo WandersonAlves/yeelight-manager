@@ -26,6 +26,11 @@ export default class AmbilightCase implements UseCase {
     if (!devices.length) {
       process.exit(0);
     }
+    process.on('SIGINT', () => {
+      selectedDevices.forEach(d => void d.finishMusicMode(ip));
+      clearInterval(this._interval);
+      process.exit(0);
+    });
     const selectedDevices = devices.filter(d => deviceNames.includes(d.name));
     await Promise.all(selectedDevices.map(d => void d.connect()));
     await Promise.all(selectedDevices.map(d => void d.startMusicMode(ip)));
@@ -43,11 +48,6 @@ export default class AmbilightCase implements UseCase {
           resolve(null);
         }
       }, interval);
-    });
-    process.on('SIGINT', () => {
-      selectedDevices.forEach(d => void d.finishMusicMode(ip));
-      clearInterval(this._interval);
-      process.exit(0);
     });
     return HttpResponse.success(200, 'Ambilight finished');
   }
