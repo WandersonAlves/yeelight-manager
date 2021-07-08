@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.11](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.9...v0.0.11) (2021-07-08)
+
+
+### Features
+
+* commands now accept multiple devices ([a2bb9aa](https://github.com/WandersonAlves/yeelight-manager/commit/a2bb9aaf386c4c33c1d08cf20c683ad4b04d31d2))
+
+
+### Bug Fixes
+
+* move SIGINT to start on Ambilight ([731d9c7](https://github.com/WandersonAlves/yeelight-manager/commit/731d9c7e3c793f3ece4528f30dc90bc84f912f85))
+
 ### [0.0.9](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.8...v0.0.9) (2021-06-29)
 
 ### [0.0.8](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.7...v0.0.8) (2021-06-29)
