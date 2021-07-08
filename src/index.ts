@@ -30,7 +30,7 @@ program
   .action(ListCmd);
 
 program
-  .command('set <deviceid> <cmd> <value> [bright]')
+  .command('set <devices> <cmd> <value> [bright]')
   .description('Send a command to a device')
   .option('--effect', 'Apply a transition effect to the command. Can be `smooth` or `sudden`. Defaults to `smooth`', 'smooth')
   .option('--duration', 'The duration of the transition effect. Defaults to 300', '300')
@@ -46,7 +46,7 @@ program
   .action(AmbilightCmd)
 
 program
-  .command('toggle <deviceid>')
+  .command('toggle <devices>')
   .description('Toggle a device (turn on/off)')
   .option('-t --waitTime <value>', 'Time to wait to yeelights connect')
   .option('--verbose', 'Output verbose info')
@@ -54,7 +54,7 @@ program
   .action(ToggleCmd);
 
 program
-  .command('blink <deviceid>')
+  .command('blink <devices>')
   .description('Blink the device')
   .option('-t --waitTime <value>', 'Time to wait to yeelights connect')
   .option('--verbose', 'Output verbose info')

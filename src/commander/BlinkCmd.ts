@@ -4,12 +4,12 @@ import { GetBindingFromContainer } from "../infra/container";
 import DiscoverDevicesCase from "../modules/Discovery/DiscoverDevices/DiscoverDevicesCase";
 import ReceiveCommandCase from "../modules/Yeelight/ReceiveCommand/ReceiveCommandCase";
 
-export const BlinkCmd = async (deviceid: string, { verbose, debug, waitTime }) => {
+export const BlinkCmd = async (devices: string, { verbose, debug, waitTime }) => {
   ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
   await GetBindingFromContainer(DiscoverDevicesCase).execute({ headers: { waitTime } });
   await GetBindingFromContainer(ReceiveCommandCase).execute({
     headers: {
-      deviceid,
+      deviceNames: devices.split(','),
       kind: CommandList.BLINK,
     },
   });

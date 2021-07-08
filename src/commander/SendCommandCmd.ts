@@ -11,17 +11,17 @@ interface SendCommandOptionals {
   duration: string;
 }
 type SendCommandFn = (
-  deviceid: string,
+  devices: string,
   cmd: CommandList,
   value: string,
   bright: string,
   { effect, duration }: SendCommandOptionals,
 ) => Promise<void>;
 
-export const SendCommandCmd: SendCommandFn = async (deviceid, cmd, value, bright, { verbose, debug }) => {
+export const SendCommandCmd: SendCommandFn = async (devices, cmd, value, bright, { verbose, debug }) => {
   ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
   const headers = {
-    deviceid,
+    deviceNames: devices.split(','),
     kind: cmd,
     value,
     bright,

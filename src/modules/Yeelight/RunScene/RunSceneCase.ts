@@ -8,6 +8,7 @@ import ExceptionHandler from "../../../shared/decorators/ExceptionHandler";
 import HttpResponse from "../../../shared/responses/HttpResponse";
 import YeelightDevice from "../../../infra/yeelight/devices/YeelightDevice";
 
+// NOTE WIP
 @injectable()
 export default class RunSceneCase implements UseCase<CommandSignal[], IHttpError> {
   @inject(Discovery) private discovery: Discovery;
@@ -17,8 +18,12 @@ export default class RunSceneCase implements UseCase<CommandSignal[], IHttpError
     const cmds = body.commands;
     const devicesNotFound: string[] = [];
     cmds.forEach(async cmd => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const device = this.discovery.findDevice(cmd.deviceid);
       if (!device) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         return devicesNotFound.push(cmd.deviceid);
       }
       const [err, deviceCmdPromise] = await YeelightDevice.ExecCommand(device, cmd);
