@@ -72,7 +72,7 @@ export default class Discovery {
     const uniqueDevices = [...new Map(devices.map(item => [item.host, item])).values()];
     this.devices = [...uniqueDevices];
     this.devices.forEach(d =>
-      logger.info(`YeelightID: ${d.id} | Name: ${d.name} | IP: ${d.host}:${d.port}`, { label: 'Discovery' }),
+      logger.info(`YeelightID: ${d.id} | Name: ${d.name || 'UnamedYeelight'} | IP: ${d.host}:${d.port}`, { label: 'Discovery' }),
     );
   }
 }

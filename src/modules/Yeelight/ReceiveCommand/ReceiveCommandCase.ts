@@ -16,7 +16,7 @@ export default class ReceiveCommandCase implements UseCase<any, IHttpError> {
   async execute({ headers }: UseCaseParams<CommandSignal & { deviceNames?: string[]}>) {
     const { deviceNames, kind } = headers;
     const devices = this.discovery.getDevices();
-    const selectedDevices = devices.filter(d => deviceNames.includes(d.name));
+    const selectedDevices = devices.filter(d => deviceNames.includes(d.name) || deviceNames.includes(d.host) || deviceNames.includes(d.id));
     if (!devices.length) {
       return HttpResponse.error(new DeviceNotFoundException(deviceNames.join(',')));
     }
