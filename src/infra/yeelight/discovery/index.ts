@@ -71,8 +71,14 @@ export default class Discovery {
   private _handleNewDevices(devices: YeelightDevice[]) {
     const uniqueDevices = [...new Map(devices.map(item => [item.host, item])).values()];
     this.devices = [...uniqueDevices];
-    this.devices.forEach(d =>
-      logger.info(`YeelightID: ${d.id} | Name: ${d.name || 'UnamedYeelight'} | IP: ${d.host}:${d.port}`, { label: 'Discovery' }),
-    );
+    this.devices.forEach(d => {
+      const { id, name = 'UnamedYeelight', host, port, power, colorMode, bright } = d.toObject();
+      logger.info(
+        `YeelightID: ${id} | Name: ${name} | IP: ${host}:${port} | On: ${power}, Mode: ${colorMode}, Brightness: ${bright}`,
+        {
+          label: 'Discovery',
+        },
+      );
+    });
   }
 }
