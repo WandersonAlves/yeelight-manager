@@ -9,6 +9,6 @@ export default class RetrieveDeviceCase implements UseCase {
 
   async execute({ headers }: UseCaseParams<{ deviceid: string }>) {
     const device = this.discovery.findDevice(headers.deviceid);
-    return HttpResponse.success(200, device ? device.toString() : null);
+    return HttpResponse.success(200, device ? device.toObject() : null);
   }
 }

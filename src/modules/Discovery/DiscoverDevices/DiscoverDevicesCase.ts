@@ -23,13 +23,13 @@ export default class DiscoverDevicesCase implements UseCase<YeelightDeviceJSON> 
       logger.info('Discovery finished.', { label: 'Discovery' });
       return HttpResponse.success(
         200,
-        devicesFallback.map(d => d.toString()),
+        devicesFallback.map(d => d.toObject()),
       );
     }
     logger.info('Discovery finished.', { label: 'Discovery' });
     return HttpResponse.success(
       200,
-      devices.map(d => d.toString()),
+      devices.map(d => d.toObject()),
     );
   }
 }

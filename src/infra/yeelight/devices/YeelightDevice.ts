@@ -336,7 +336,7 @@ export default class YeelightDevice {
     ]);
   }
 
-  toString(): YeelightDeviceJSON {
+  toObject(): YeelightDeviceJSON {
     return {
       id: this.id,
       model: this.model,
