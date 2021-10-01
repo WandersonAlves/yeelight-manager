@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.13](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.12...v0.0.13) (2021-10-01)
+
+
+### Features
+
+* show some stats when list ([dc2274a](https://github.com/WandersonAlves/yeelight-manager/commit/dc2274abd47c2c468432957d793ef379096dcb4c))
+
+
+### Bug Fixes
+
+* accepts devices by ip,name,id on ReceiveCommandCase ([7d67854](https://github.com/WandersonAlves/yeelight-manager/commit/7d6785400732608851b82505df60486cd7627fca))
+
 ### [0.0.11](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.9...v0.0.11) (2021-07-08)
 
 
