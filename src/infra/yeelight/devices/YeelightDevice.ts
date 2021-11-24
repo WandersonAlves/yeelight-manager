@@ -395,16 +395,16 @@ export default class YeelightDevice {
         return reject(err);
       }
       this.events.emit('command_success', cmdJSON);
-      resolve();
+      return resolve();
     };
     return new Promise((resolve, reject) => {
       if (!this.client && !this.isConnected) {
         return reject(new Error('DeviceNotConnected'));
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      this.socket && cmdName !== 'set_music'
-        ? this.socket.write(cmdJSON, sharedCb(resolve, reject))
-        : this.client.write(cmdJSON, sharedCb(resolve, reject));
+      if (this.socket && cmdName !== 'set_music') {
+        return this.socket.write(cmdJSON, sharedCb(resolve, reject));
+      }
+      return this.client.write(cmdJSON, sharedCb(resolve, reject));
     });
   }
 
