@@ -4,6 +4,7 @@ import { checkPortStatus } from 'portscanner';
 import { createSocket } from 'dgram';
 import { injectable } from 'inversify';
 import { logger } from '../../../shared/Logger';
+import Table from 'cli-table';
 import YeelightDevice from '../devices/YeelightDevice';
 
 @injectable()
@@ -71,14 +72,13 @@ export default class Discovery {
   private _handleNewDevices(devices: YeelightDevice[]) {
     const uniqueDevices = [...new Map(devices.map(item => [item.host, item])).values()];
     this.devices = [...uniqueDevices];
+    const table = new Table({ head: ['DeviceID', 'Name', 'IP', 'On?', 'Mode', 'Brightness'], style: { head: ['green'] } });
     this.devices.forEach(d => {
       const { id, name = 'UnamedYeelight', host, port, power, colorMode, bright } = d.toObject();
-      logger.info(
-        `YeelightID: ${id} | Name: ${name} | IP: ${host}:${port} | On: ${power}, Mode: ${colorMode}, Brightness: ${bright}`,
-        {
-          label: 'Discovery',
-        },
-      );
+      table.push([id, name, `${host}:${port}`, power, colorMode, bright]);
+    });
+    logger.info('\n' + table.toString(), {
+      label: 'Discovery',
     });
   }
 }
