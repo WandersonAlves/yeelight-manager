@@ -13,16 +13,18 @@ export default class ReceiveCommandCase implements UseCase<any, IHttpError> {
   @inject(Discovery) private discovery: Discovery;
 
   @ExceptionHandler()
-  async execute({ headers }: UseCaseParams<CommandSignal & { deviceNames?: string[]}>) {
+  async execute({ headers }: UseCaseParams<CommandSignal & { deviceNames?: string[] }>) {
     const { deviceNames, kind } = headers;
     const devices = this.discovery.getDevices();
-    const selectedDevices = devices.filter(d => deviceNames.includes(d.name) || deviceNames.includes(d.host) || deviceNames.includes(d.id));
-    if (!devices.length) {
+    const selectedDevices = devices.filter(
+      d => deviceNames.includes(d.name) || deviceNames.includes(d.host) || deviceNames.includes(d.id),
+    );
+    if (!selectedDevices.length) {
+      logger.error("Specified devices can't be found. Try again or check if device is on the same network", { label: 'Discovery' });
       return HttpResponse.error(new DeviceNotFoundException(deviceNames.join(',')));
     }
     const results = await Promise.all(selectedDevices.map(d => YeelightDevice.ExecCommand(d, headers)));
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    await Promise.all(results.map(([_, promise]) => promise));
+    await Promise.all(results.map(([, promise]) => promise));
     logger.info('Command Success!!!');
     return HttpResponse.success(200, { deviceNames, kind });
   }
