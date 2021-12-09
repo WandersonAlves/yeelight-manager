@@ -19,7 +19,8 @@ import Command, {
 } from './Commands';
 import UnsuportedCommandException from '../../../shared/exceptions/UnsuportedCommandException';
 
-type Resolve = (value: void | PromiseLike<void>) => void;
+type ResolveFn = (value: void | PromiseLike<void>) => void;
+type RejectFn = (e: Error) => void;
 
 export interface YeelightDeviceJSON {
   id: string;
@@ -39,7 +40,7 @@ export interface YeelightDeviceJSON {
 
 interface DataReceived {
   method?: string;
-  params?: Params;
+  params?: Record<string, string | number>;
   id?: number;
   result?: [any];
 }
@@ -389,7 +390,7 @@ export default class YeelightDevice {
     const cmdName = command.name;
     const cmdJSON = command.toString();
     this.log('debug', `Command sent: ${cmdJSON}`);
-    const sharedCb = (resolve: Resolve, reject: (e: Error) => void) => (err: Error) => {
+    const sharedCb = (resolve: ResolveFn, reject: RejectFn) => (err: Error) => {
       if (err) {
         this.events.emit('command_failure', cmdJSON);
         return reject(err);
