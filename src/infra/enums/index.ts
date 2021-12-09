@@ -22,5 +22,6 @@ export enum CommandList {
   AMBILIGHT = 'ambilight',
   CANCEL_AMBILIGHT = 'cancel_ambilight',
   BLINK = 'blink',
-  POWER = 'power'
+  POWER = 'power',
+  FLOW = 'flow'
 }
