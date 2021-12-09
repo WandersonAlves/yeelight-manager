@@ -45,10 +45,6 @@ interface DataReceived {
   result?: [any];
 }
 
-interface Params {
-  [k: string]: string | number;
-}
-
 export default class YeelightDevice {
   static YeelightDefaultPort = 55443;
   /**
@@ -95,6 +91,9 @@ export default class YeelightDevice {
       }
       case CommandList.BLINK: {
         return [null, device.blinkDevice()];
+      }
+      case CommandList.FLOW: {
+        return [null, device.setFlow(1, null, [])]
       }
       default: {
         return [new UnsuportedCommandException(device.id, kind, value), null];
@@ -331,9 +330,9 @@ export default class YeelightDevice {
   }
 
   blinkDevice() {
-    return this.setFlow(2, ColorFlowAction.RECOVER_STATE, [
-      new ColorFlowExpression(1000, ColorFlowExpressionMode.TEMPERATURE, 4500, 100),
-      new ColorFlowExpression(500, ColorFlowExpressionMode.TEMPERATURE, 4500, 1),
+    return this.setFlow(1, ColorFlowAction.RECOVER_STATE, [
+      new ColorFlowExpression(750, ColorFlowExpressionMode.TEMPERATURE, 9999, 100),
+      new ColorFlowExpression(750, ColorFlowExpressionMode.TEMPERATURE, 9999, 1),
     ]);
   }
 
