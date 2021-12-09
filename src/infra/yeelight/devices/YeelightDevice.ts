@@ -410,11 +410,10 @@ export default class YeelightDevice {
   }
 
   private get _name() {
-    return this.name || 'UnamedYeelight';
+    return this.name ? this.name : this.id;
   }
 
   private log(type: 'info' | 'warn' | 'error' | 'debug' | 'verbose', str: string) {
-    const label = `${this.id || this.host}:${this._name}`;
-    logger[type](str, { label });
+    logger[type](str, { label: this._name });
   }
 }
