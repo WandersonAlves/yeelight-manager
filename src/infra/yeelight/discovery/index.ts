@@ -71,11 +71,15 @@ export default class Discovery {
 
   private _handleNewDevices(devices: YeelightDevice[]) {
     const uniqueDevices = [...new Map(devices.map(item => [item.host, item])).values()];
+    const table = new Table({
+      head: ['DeviceID', 'Name', 'IP', 'On?', 'Mode', 'Value', 'Brightness'],
+      style: { head: ['green'] },
+    });
     this.devices = [...uniqueDevices];
-    const table = new Table({ head: ['DeviceID', 'Name', 'IP', 'On?', 'Mode', 'Brightness'], style: { head: ['green'] } });
     this.devices.forEach(d => {
-      const { id, name = 'UnamedYeelight', host, port, power, colorMode, bright } = d.toObject();
-      table.push([id, name, `${host}:${port}`, power, colorMode, bright]);
+      const { id, name = 'UnamedYeelight', host, port, power, colorMode, bright, rgbValue, colorTemperatureValue } = d.toObject();
+      const value = colorMode === 'RGB' ? rgbValue : colorTemperatureValue;
+      table.push([id, name, `${host}:${port}`, power ? 'Yes' : 'No', colorMode, value, bright]);
     });
     logger.info('\n' + table.toString(), {
       label: 'Discovery',
