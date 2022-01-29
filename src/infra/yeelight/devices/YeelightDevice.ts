@@ -61,7 +61,6 @@ export default class YeelightDevice {
   }
 
   static async ExecCommand(device: YeelightDevice, { kind, value, bright }: CommandSignal): Promise<Either<Promise<any>>> {
-    await device.connect();
     if (bright && kind !== CommandList.BRIGHT) {
       void device.setBright(Number(bright));
     }

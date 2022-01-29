@@ -20,9 +20,12 @@ export default class ReceiveCommandCase implements UseCase<any, IHttpError> {
       d => deviceNames.includes(d.name) || deviceNames.includes(d.host) || deviceNames.includes(d.id),
     );
     if (!selectedDevices.length) {
-      logger.error("Specified devices can't be found. Try again or check if device is on the same network", { label: 'Discovery' });
+      logger.error("Specified devices can't be found. Try again or check if device is on the same network", {
+        label: 'Discovery',
+      });
       return HttpResponse.error(new DeviceNotFoundException(deviceNames.join(',')));
     }
+    await Promise.all(selectedDevices.map(d => d.connect()));
     const results = await Promise.all(selectedDevices.map(d => YeelightDevice.ExecCommand(d, headers)));
     await Promise.all(results.map(([, promise]) => promise));
     logger.info('Command Success!!!');
