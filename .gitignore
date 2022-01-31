@@ -5,3 +5,4 @@ dist/
 2560x1080.jpg
 *.log
 lib/
+localStorage/

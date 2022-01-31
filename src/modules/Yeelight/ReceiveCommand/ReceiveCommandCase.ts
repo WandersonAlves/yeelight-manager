@@ -13,7 +13,7 @@ export default class ReceiveCommandCase implements UseCase<any, IHttpError> {
   @inject(Discovery) private discovery: Discovery;
 
   @ExceptionHandler()
-  async execute({ headers }: UseCaseParams<CommandSignal & { deviceNames?: string[] }>) {
+  async execute({ headers }: UseCaseParams<CommandSignal & { deviceNames?: string[]; manualConnect?: boolean }>) {
     const { deviceNames, kind } = headers;
     const devices = this.discovery.getDevices();
     const selectedDevices = devices.filter(
@@ -25,7 +25,9 @@ export default class ReceiveCommandCase implements UseCase<any, IHttpError> {
       });
       return HttpResponse.error(new DeviceNotFoundException(deviceNames.join(',')));
     }
-    await Promise.all(selectedDevices.map(d => d.connect()));
+    if (!headers.manualConnect) {
+      await Promise.all(selectedDevices.map(d => d.connect()));
+    }
     const results = await Promise.all(selectedDevices.map(d => YeelightDevice.ExecCommand(d, headers)));
     await Promise.all(results.map(([, promise]) => promise));
     logger.info('Command Success!!!');
