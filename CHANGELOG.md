@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.16](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.15...v0.0.16) (2022-01-31)
+
+
+### Bug Fixes
+
+* saved setx file location ([9d5e017](https://github.com/WandersonAlves/yeelight-manager/commit/9d5e01796ac2e61bb5bb59c23f8351c7666c741e))
+
 ### [0.0.15](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.14...v0.0.15) (2022-01-31)
 
 
