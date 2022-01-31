@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.14](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.13...v0.0.14) (2022-01-31)
+
+
+### Features
+
+* add 'setx' and 'load' cmds ([bd659a8](https://github.com/WandersonAlves/yeelight-manager/commit/bd659a8ce5e187b5d74a2e07854662bc5e88ef2b))
+* better table on discovery ([de2dcac](https://github.com/WandersonAlves/yeelight-manager/commit/de2dcac03b15613183f0d1e6a79b385357a53b8f))
+* use cli-table to show devices on discovery ([5d6b566](https://github.com/WandersonAlves/yeelight-manager/commit/5d6b566e91f6ac21fe5dec28b5b37fb06994b37f))
+
+
+### Bug Fixes
+
+* add flow to CommandList ([1fb238d](https://github.com/WandersonAlves/yeelight-manager/commit/1fb238db7ac5bceb68a7d05f04c1868fe02898b5))
+* add flow to YeelightDevice ([eaa6655](https://github.com/WandersonAlves/yeelight-manager/commit/eaa6655219e3ae1b74394cc910ce752bd495b14e))
+* device connection on ReceiveCommandCase ([b381644](https://github.com/WandersonAlves/yeelight-manager/commit/b381644f9fd6bc1a6456770d251635998248c0f0))
+* logging error when devices can't be found ([9250382](https://github.com/WandersonAlves/yeelight-manager/commit/925038208a97ff991d481765303e76da0077ce30))
+
 ### [0.0.13](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.12...v0.0.13) (2021-10-01)
 
 

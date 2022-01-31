@@ -1,6 +1,6 @@
 {
   "name": "yeelight-manager",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "CLI to control yeelight devices!",
   "main": "src/index.ts",
   "engines": {
