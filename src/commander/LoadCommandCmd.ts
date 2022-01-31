@@ -1,10 +1,10 @@
 import { GetBindingFromContainer } from '../infra/container';
-import { LocalStorage } from 'node-localstorage';
 import { logger } from '../shared/Logger';
+import CommandStorage from '../infra/storage/CommandStorage';
 import SetxCommandCase from '../modules/Yeelight/SetxCommand/SetxCommandCase';
 
 export const LoadCommandCmd = async (name: string) => {
-  const rawString = new LocalStorage('./localStorage').getItem(name);
+  const rawString = CommandStorage.load(name);
   if (!rawString) {
     logger.error(`Command '${name}' not found`);
   }

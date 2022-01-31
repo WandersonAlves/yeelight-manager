@@ -1,13 +1,13 @@
 import { ConfigureCmds } from './utils';
 import { GetBindingFromContainer } from '../infra/container';
-import { LocalStorage } from 'node-localstorage';
 import { logger } from '../shared/Logger';
+import CommandStorage from '../infra/storage/CommandStorage';
 import SetxCommandCase from '../modules/Yeelight/SetxCommand/SetxCommandCase';
 
 interface SetxCommandOptionals {
   verbose?: boolean;
   debug?: boolean;
-  save?: string
+  save?: string;
 }
 
 type SetxCommandFn = (rawString: string, opts: SetxCommandOptionals) => Promise<void>;
@@ -16,7 +16,7 @@ export const SetxCommandCmd: SetxCommandFn = async (rawString, { debug, verbose,
   ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
 
   if (save) {
-    new LocalStorage('./localStorage').setItem(save, rawString);
+    CommandStorage.save(save, rawString);
     logger.info(`New command saved as "${save}"`);
     return process.exit();
   }
