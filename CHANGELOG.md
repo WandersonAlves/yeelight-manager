@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.15](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.14...v0.0.15) (2022-01-31)
+
+
+### Bug Fixes
+
+* add DOM to tsconfig ([f951ccd](https://github.com/WandersonAlves/yeelight-manager/commit/f951ccdf35978d3059d879e7dea5e79988a50357))
+
 ### [0.0.14](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.13...v0.0.14) (2022-01-31)
 
 
