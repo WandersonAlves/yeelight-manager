@@ -46,7 +46,11 @@ program
   .option('-s --save <value>', 'Save the setx command to be used later on load command')
   .action(SetxCommandCmd);
 
-program.command('load <name>').description('Load a command saved with setx command').action(LoadCommandCmd);
+program
+  .command('load [name]')
+  .option('-ls --list', 'List all saved commands')
+  .description('Load a command saved with setx command')
+  .action(LoadCommandCmd);
 
 program
   .command('ambilight <devices> <resolution> [interval]')
