@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.18](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.17...v0.0.18) (2022-02-03)
+
+
+### Bug Fixes
+
+* exit program when a load cmd fails ([197c64f](https://github.com/WandersonAlves/yeelight-manager/commit/197c64f78c5cb8b620cb2806389c692a0865b106))
+
 ### [0.0.17](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.16...v0.0.17) (2022-02-02)
 
 
