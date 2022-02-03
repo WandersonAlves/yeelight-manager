@@ -14,6 +14,7 @@ export const LoadCommandCmd = async (name: string, { list }) => {
   const rawString = CommandStorage.load(name);
   if (!rawString) {
     logger.error(`Command '${name}' not found`);
+    process.exit();
   }
 
   await GetBindingFromContainer(SetxCommandCase).execute({ body: rawString });
