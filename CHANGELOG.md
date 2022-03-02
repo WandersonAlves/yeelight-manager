@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.19](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.18...v0.0.19) (2022-03-02)
+
+
+### Bug Fixes
+
+* only show device table if devices was found ([8a1990f](https://github.com/WandersonAlves/yeelight-manager/commit/8a1990fc3e39de5e900395d1cded0197d7e7e405))
+
 ### [0.0.18](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.17...v0.0.18) (2022-02-03)
 
 
