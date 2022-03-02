@@ -63,19 +63,20 @@ export default class Discovery {
 
       setTimeout(() => {
         this._handleNewDevices(devices);
+        if (this.devices.length) {
+          this._printDevicesTable();
+        }
         client.close();
         resolve(this.devices);
       }, timeToDiscover ?? 1000);
     });
   }
 
-  private _handleNewDevices(devices: YeelightDevice[]) {
-    const uniqueDevices = [...new Map(devices.map(item => [item.host, item])).values()];
+  private _printDevicesTable() {
     const table = new Table({
       head: ['DeviceID', 'Name', 'IP', 'On?', 'Mode', 'Value', 'Brightness'],
       style: { head: ['green'] },
     });
-    this.devices = [...uniqueDevices];
     this.devices.forEach(d => {
       const { id, name = 'UnamedYeelight', host, port, power, colorMode, bright, rgbValue, colorTemperatureValue } = d.toObject();
       const value = colorMode === 'RGB' ? rgbValue : colorTemperatureValue;
@@ -84,5 +85,10 @@ export default class Discovery {
     logger.info('\n' + table.toString(), {
       label: 'Discovery',
     });
+  }
+
+  private _handleNewDevices(devices: YeelightDevice[]) {
+    const uniqueDevices = [...new Map(devices.map(item => [item.host, item])).values()];
+    this.devices = [...uniqueDevices];
   }
 }
