@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.21](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.20...v0.0.21) (2022-03-24)
+
+
+### Bug Fixes
+
+* show version number ([4eeed50](https://github.com/WandersonAlves/yeelight-manager/commit/4eeed5009c54e7218ecdbe2ab8dbca39831a695e))
+
 ### [0.0.20](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.19...v0.0.20) (2022-03-24)
 
 
