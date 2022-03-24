@@ -75,24 +75,21 @@ export default class YeelightDevice {
         return [null, device.setName(value)];
       }
       case CommandList.COLOR: {
-        void device.setPower('on');
         return [null, device.setHex(YeelightDevice.FetchColor(value))];
       }
       case CommandList.CT3:
       case CommandList.CT2:
       case CommandList.CT: {
-        void device.setPower('on');
         return [null, device.setColorTemperature(Number(value))];
       }
       case CommandList.BRIGHT: {
-        void device.setPower('on');
         return [null, device.setBright(Number(value))];
       }
       case CommandList.BLINK: {
         return [null, device.blinkDevice()];
       }
       case CommandList.FLOW: {
-        return [null, device.setFlow(1, null, [])]
+        return [null, device.setFlow(1, null, [])];
       }
       default: {
         return [new UnsuportedCommandException(device.id, kind, value), null];
@@ -305,6 +302,7 @@ export default class YeelightDevice {
   }
 
   setHex(hex: string, effect: EffectTypes = 'smooth', duration = 300) {
+    this.prepareDevice();
     return this.sendCommand(new RGBCommand(HexToInteger(hex), effect, duration, this.commandId++));
   }
 
@@ -313,6 +311,7 @@ export default class YeelightDevice {
   }
 
   setBright(level: number, effect: EffectTypes = 'smooth', duration = 300) {
+    this.prepareDevice();
     return this.sendCommand(new BrightCommand(level, effect, duration, this.commandId++));
   }
 
@@ -321,6 +320,7 @@ export default class YeelightDevice {
   }
 
   setColorTemperature(ct: number, effect: EffectTypes = 'smooth', duration = 300) {
+    this.prepareDevice();
     return this.sendCommand(new ColorTemperatureCommand(ct, effect, duration, this.commandId++));
   }
 
@@ -349,6 +349,12 @@ export default class YeelightDevice {
       host: this.host,
       port: this.port,
     };
+  }
+
+  private prepareDevice() {
+    if (!this.power) {
+      void this.setPower('on');
+    }
   }
 
   private changeEvent(dataObj: DataReceived) {
