@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.20](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.19...v0.0.20) (2022-03-24)
+
+
+### Bug Fixes
+
+* order device names on list cmd ([76d7a5b](https://github.com/WandersonAlves/yeelight-manager/commit/76d7a5ba5838ee167b3a8f50d1d4e383af003f2b))
+* power on device on ct, bright and color cmds ([7f84b1f](https://github.com/WandersonAlves/yeelight-manager/commit/7f84b1fb81c6ad1996ded9c61cfea9d4b383ea5d))
+
 ### [0.0.19](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.18...v0.0.19) (2022-03-02)
 
 
