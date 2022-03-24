@@ -77,11 +77,23 @@ export default class Discovery {
       head: ['DeviceID', 'Name', 'IP', 'On?', 'Mode', 'Value', 'Brightness'],
       style: { head: ['green'] },
     });
-    this.devices.forEach(d => {
-      const { id, name = 'UnamedYeelight', host, port, power, colorMode, bright, rgbValue, colorTemperatureValue } = d.toObject();
-      const value = colorMode === 'RGB' ? rgbValue : colorTemperatureValue;
-      table.push([id, name, `${host}:${port}`, power ? 'Yes' : 'No', colorMode, value, bright]);
-    });
+    this.devices
+      .sort((a, b) => (a.name < b.name ? -1 : 1))
+      .forEach(d => {
+        const {
+          id,
+          name = 'UnamedYeelight',
+          host,
+          port,
+          power,
+          colorMode,
+          bright,
+          rgbValue,
+          colorTemperatureValue,
+        } = d.toObject();
+        const value = colorMode === 'RGB' ? rgbValue : colorTemperatureValue;
+        table.push([id, name, `${host}:${port}`, power ? 'Yes' : 'No', colorMode, value, bright]);
+      });
     logger.info('\n' + table.toString(), {
       label: 'Discovery',
     });
