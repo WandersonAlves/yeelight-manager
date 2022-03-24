@@ -13,7 +13,10 @@ import { createCommand } from 'commander';
 
 const program = createCommand();
 
-program.version(process.env.npm_package_version, '-v, --version');
+program
+  .name('yeelight-manager')
+  .description('Allow you to control yeelight bulbs from your CLI!')
+  .version(process.env.npm_package_version, '-v, --version');
 
 program
   .command('start')
