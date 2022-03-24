@@ -13,7 +13,7 @@ import { createCommand } from 'commander';
 
 const program = createCommand();
 
-program.version('0.0.1', '-v, --version');
+program.version(process.env.npm_package_version, '-v, --version');
 
 program
   .command('start')
