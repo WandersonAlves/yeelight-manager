@@ -87,3 +87,7 @@ A CLI to super charge your yeelight use!
 > *Can't find my devices via SSDP*
 
 Try to turn off `IGMP Snooping` on your router (source: https://forum.yeelight.com/t/bulb-stops-to-respond-to-ssdp-requests-after-some-minutes/702)
+
+> *Gets a `Error: connect EHOSTUNREACH` error*
+
+If you're connected in VPN, please disconect and try again. (Problem reported on a macos 12.3.1 M1 Pro with Cisco Any Connect)

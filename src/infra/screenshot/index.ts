@@ -30,8 +30,7 @@ export default class Screenshot {
           ].join(' '),
           { stdio: 'ignore' },
         );
-        const result = await new vibrant(`${width}x${height}.jpg`).getPalette();
-        const { DarkMuted, DarkVibrant, LightMuted, LightVibrant, Muted, Vibrant } = result;
+        const { DarkMuted, DarkVibrant, LightMuted, LightVibrant, Muted, Vibrant } = await new vibrant(`${width}x${height}.jpg`).getPalette();
         const { hex } = [DarkMuted, DarkVibrant, LightVibrant, LightMuted, Muted, Vibrant].sort(
           (a, b) => b.population - a.population,
         )[0];
