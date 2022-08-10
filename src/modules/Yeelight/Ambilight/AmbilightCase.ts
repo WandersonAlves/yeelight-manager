@@ -1,6 +1,7 @@
 import { UseCase, UseCaseParams } from '../../../shared/contracts';
 import { address } from 'ip';
 import { inject, injectable } from 'inversify';
+import { logger } from '../../../shared/Logger';
 import Discovery from '../../../infra/yeelight/discovery';
 import ExceptionHandler from '../../../shared/decorators/ExceptionHandler';
 import HttpResponse from '../../../shared/responses/HttpResponse';
@@ -44,7 +45,8 @@ export default class AmbilightCase implements UseCase {
             void d.setHex(color, 'smooth', interval);
           });
         } catch (e) {
-          selectedDevices.forEach(d => void d.finishMusicMode(ip));
+          logger.error(e);
+          selectedDevices.forEach(d => void d.finishMusicMode(ip, true));
           resolve(null);
         }
       }, interval);

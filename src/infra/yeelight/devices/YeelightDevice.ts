@@ -290,10 +290,10 @@ export default class YeelightDevice {
     });
   }
 
-  finishMusicMode(currentIpAddress: string) {
+  finishMusicMode(currentIpAddress: string, fromError?: boolean) {
     this.socket = null;
     this.server.close();
-    this.log('info', '📀 Finishing music mode');
+    this.log(fromError ? 'error' : 'info', '📀 Finishing music mode');
     return this.sendCommand(new MusicModeCommand(false, currentIpAddress, this.localPort));
   }
 
