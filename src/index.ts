@@ -45,13 +45,19 @@ program
 
 program
   .command('setx <raw>')
-  .description('Send multiple commands to multiple devices. Example: yee setx "\'Living Room\' ct=9999 bright=100 Kitchen ct=9999 bright=100" --save \'Normal Room\'')
+  .description(
+    "Send multiple commands to multiple devices. Example: yee setx \"'Living Room' ct=9999 bright=100 Kitchen ct=9999 bright=100\" --save 'Normal Room'",
+  )
   .option('-s --save <value>', 'Save the setx command to be used later on load command')
+  .option('--verbose', 'Output verbose info')
+  .option('--debug', 'Output debug info')
   .action(SetxCommandCmd);
 
 program
   .command('load [name]')
   .option('-ls --list', 'List all saved commands')
+  .option('--verbose', 'Output verbose info')
+  .option('--debug', 'Output debug info')
   .description('Load a command saved with setx command')
   .action(LoadCommandCmd);
 

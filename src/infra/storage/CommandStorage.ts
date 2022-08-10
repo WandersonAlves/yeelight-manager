@@ -4,13 +4,16 @@ import { logger } from '../../shared/Logger';
 import Table from 'cli-table';
 
 export default class CommandStorage {
-  private static storage = new LocalStorage(join(__dirname, '../../../localStorage'));
+  private static storageFolder = join(__dirname, '../../../localStorage');
+  private static storage = new LocalStorage(CommandStorage.storageFolder);
 
   static save(str: string, rawString: string) {
+    logger.verbose(`LocalStorage are on ${CommandStorage.storageFolder}`);
     return this.storage.setItem(str, rawString);
   }
 
   static load(str: string) {
+    logger.verbose(`LocalStorage are on ${CommandStorage.storageFolder}`);
     return this.storage.getItem(str);
   }
 
@@ -23,6 +26,7 @@ export default class CommandStorage {
       const key = this.storage.key(index);
       table.push([key, this.storage.getItem(key)]);
     });
+    logger.verbose(`LocalStorage are on ${CommandStorage.storageFolder}`);
     logger.info('\n' + table.toString());
   }
 }

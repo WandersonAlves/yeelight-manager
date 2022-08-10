@@ -15,13 +15,10 @@ type SetxCommandFn = (rawString: string, opts: SetxCommandOptionals) => Promise<
 export const SetxCommandCmd: SetxCommandFn = async (rawString, { debug, verbose, save }) => {
   ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
 
-  if (save) {
+  const result = await GetBindingFromContainer(SetxCommandCase).execute({ body: rawString });
+  if (save && result.statusCode === 204) {
     CommandStorage.save(save, rawString);
     logger.info(`New command saved as "${save}"`);
-    return process.exit();
   }
-
-  await GetBindingFromContainer(SetxCommandCase).execute({ body: rawString });
-
   process.exit();
 };
