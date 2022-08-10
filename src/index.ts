@@ -45,7 +45,7 @@ program
 
 program
   .command('setx <raw>')
-  .description('Send multiple commands to multiple devices')
+  .description('Send multiple commands to multiple devices. Example: yee setx "\'Living Room\' ct=9999 bright=100 Kitchen ct=9999 bright=100" --save \'Normal Room\'')
   .option('-s --save <value>', 'Save the setx command to be used later on load command')
   .action(SetxCommandCmd);
 

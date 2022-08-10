@@ -4,6 +4,8 @@ import { UseCase, UseCaseParams } from '../../../shared/contracts';
 import { inject, injectable } from 'inversify';
 import DiscoverDevicesCase from '../../Discovery/DiscoverDevices/DiscoverDevicesCase';
 import Discovery from '../../../infra/yeelight/discovery';
+import ExceptionHandler from '../../../shared/decorators/ExceptionHandler';
+import GenericException from '../../../shared/exceptions/GenericException';
 import HttpResponse from '../../../shared/responses/HttpResponse';
 import ReceiveCommandCase from '../ReceiveCommand/ReceiveCommandCase';
 
@@ -12,9 +14,12 @@ export default class SetxCommandCase implements UseCase {
   @inject(DiscoverDevicesCase) private discoverDevices: DiscoverDevicesCase;
   @inject(Discovery) private discovery: Discovery;
   @inject(ReceiveCommandCase) private receiveCmdCase: ReceiveCommandCase;
+
+  @ExceptionHandler()
   async execute({ body }: UseCaseParams<any, string>) {
     const rawString = body;
-    const cmds = this.processRawString(rawString);
+    const cmds: DeviceCmd[] = SetxCommandCase.ProcessRawString(rawString);
+    SetxCommandCase.ValidateDeviceCmds(cmds, rawString);
 
     await this.discoverDevices.execute({ headers: {} });
     const promises: Promise<any>[] = [];
@@ -38,7 +43,14 @@ export default class SetxCommandCase implements UseCase {
     return HttpResponse.success(204, null);
   }
 
-  private processRawString(rawString: string) {
+  static ValidateDeviceCmds(cmds: DeviceCmd[], rawString: string) {
+    if (cmds.find(c => !c.signals.length)) {
+      throw new GenericException({ name: 'MalformedSetxStringException', message: `Provided string is broken: ${rawString}` });
+    }
+    return;
+  }
+
+  static ProcessRawString(rawString: string): DeviceCmd[] {
     const rawSplited = rawString.split(' ');
     const cmds: DeviceCmd[] = [];
 
@@ -59,5 +71,5 @@ export default class SetxCommandCase implements UseCase {
     });
 
     return cmds;
-  };
+  }
 }

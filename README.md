@@ -16,8 +16,9 @@ A CLI to super charge your yeelight use!
 5. `yee set <name|id|ip> ct|temperature|color_temperature <1700~6500> [bright]` Change the color temperature of a device. Any value below 1700 will be threated as 1700 and any value above 6500 will be threated as 6500;
 6. `yee set <name|id|ip> color <hex-color> [bright]` Change the color of the device;
 7. `yee set <name|id|ip> power off|on` Explicity turn on or off a device;
-8. `yee toggle <name|id|ip>` Toggles a device;
-9. `yee ambilight <name|id|ip> <resolution> [interval]` (**beta**) Using Yeelight's Music Mode, scan for predominant color on screen and change on device. Uses `node-vibrant` and `ffmpeg` under the hood. Not tested on Windows and Mac OS.
+8. `yee setx "'Living Room' ct=9999 bright=100 Kitchen ct=9999 bright=100" --save 'Normal Room'` Set a custom command to later use
+9. `yee toggle <name|id|ip>` Toggles a device;
+10. `yee ambilight <name|id|ip> <resolution> [interval]` (**beta**) Using Yeelight's Music Mode, scan for predominant color on screen and change on device. Uses `node-vibrant` and `ffmpeg` under the hood. Not tested on Windows and Mac OS.
 
 ### Output Examples
 > `yee list`: List devices. Sometimes, IP scan can fail
