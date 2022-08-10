@@ -5,12 +5,17 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "node",
-      "request": "attach",
-      "name": "Node: Attach",
-      "processId": "${command:PickProcess}",
-      "restart": true,
-      "protocol": "inspector"
+      "command": "yarn run dev  ${input:command}",
+      "name": "Run yarn dev",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+  ],
+  "inputs": [
+    {
+        "id": "command",
+        "description": "Command to run",
+        "type": "promptString"
     }
-  ]
+    ]
 }
