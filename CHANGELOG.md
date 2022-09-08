@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.24](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.23...v0.0.24) (2022-09-08)
+
+
+### Bug Fixes
+
+* show device table when discovering via ip scan ([39b963c](https://github.com/WandersonAlves/yeelight-manager/commit/39b963c288a45bec3775164263c65c4c3cc250e4))
+
 ### [0.0.23](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.22...v0.0.23) (2022-08-10)
 
 
