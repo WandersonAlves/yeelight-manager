@@ -4,7 +4,6 @@ import { checkPortStatus } from 'portscanner';
 import { createSocket } from 'dgram';
 import { injectable } from 'inversify';
 import { logger } from '../../../shared/Logger';
-import Table from 'cli-table';
 import YeelightDevice from '../devices/YeelightDevice';
 
 @injectable()
@@ -38,9 +37,6 @@ export default class Discovery {
     const openDevices = await Promise.all(promises);
 
     this._handleNewDevices(openDevices.filter(d => d).map(d => YeelightDevice.CreateDeviceByIp(d.ip, 55443)));
-    if (this.devices.length) {
-      this._printDevicesTable();
-    }
     return this.devices;
   }
 
@@ -66,39 +62,9 @@ export default class Discovery {
 
       setTimeout(() => {
         this._handleNewDevices(devices);
-        if (this.devices.length) {
-          this._printDevicesTable();
-        }
         client.close();
         resolve(this.devices);
       }, timeToDiscover ?? 1000);
-    });
-  }
-
-  private _printDevicesTable() {
-    const table = new Table({
-      head: ['DeviceID', 'Name', 'IP', 'On?', 'Mode', 'Value', 'Brightness'],
-      style: { head: ['green'] },
-    });
-    this.devices
-      .sort((a, b) => (a.name < b.name ? -1 : 1))
-      .forEach(d => {
-        const {
-          id,
-          name = 'UnamedYeelight',
-          host,
-          port,
-          power,
-          colorMode,
-          bright,
-          rgbValue,
-          colorTemperatureValue,
-        } = d.toObject();
-        const value = colorMode === 'RGB' ? rgbValue : colorTemperatureValue;
-        table.push([id, name, `${host}:${port}`, power ? 'Yes' : 'No', colorMode, value, bright]);
-      });
-    logger.info('\n' + table.toString(), {
-      label: 'Discovery',
     });
   }
 
