@@ -4,6 +4,6 @@ import DiscoverDevicesCase from '../modules/Discovery/DiscoverDevices/DiscoverDe
 
 export const ListCmd = async ({ verbose, debug, waitTime }) => {
   ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
-  await GetBindingFromContainer(DiscoverDevicesCase).execute({ headers: { waitTime, logDevices: true } });
+  await GetBindingFromContainer(DiscoverDevicesCase).execute({ waitTime, logDevices: true });
   process.exit(0);
 };

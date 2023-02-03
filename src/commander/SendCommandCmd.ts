@@ -20,13 +20,12 @@ type SendCommandFn = (
 
 export const SendCommandCmd: SendCommandFn = async (devices, cmd, value, bright, { verbose, debug }) => {
   ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
-  const headers = {
+  await GetBindingFromContainer(DiscoverDevicesCase).execute();
+  await GetBindingFromContainer(ReceiveCommandCase).execute({
     deviceNames: devices.split(','),
     kind: cmd,
     value,
     bright,
-  };
-  await GetBindingFromContainer(DiscoverDevicesCase).execute({ headers: {} });
-  await GetBindingFromContainer(ReceiveCommandCase).execute({ headers });
+  });
   process.exit();
 };

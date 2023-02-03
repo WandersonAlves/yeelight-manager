@@ -10,6 +10,6 @@ export const DiscoverDevicesCmd = async ({ verbose, debug, waitTime }) => {
   finally {
     ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
     const discoveryCase = GetBindingFromContainer(DiscoverDevicesCase);
-    await discoveryCase.execute({ headers: { waitTime }});
+    await discoveryCase.execute({ waitTime });
   }
 };

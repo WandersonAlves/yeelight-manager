@@ -19,6 +19,6 @@ export const LoadCommandCmd = async (name: string, { list, verbose, debug }) => 
     process.exit();
   }
 
-  await GetBindingFromContainer(SetxCommandCase).execute({ body: rawString });
+  await GetBindingFromContainer(SetxCommandCase).execute(rawString);
   process.exit();
 };

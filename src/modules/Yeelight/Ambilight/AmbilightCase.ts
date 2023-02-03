@@ -1,13 +1,12 @@
-import { UseCase, UseCaseParams } from '../../../shared/contracts';
+import { UseCase } from '../../../shared/contracts';
 import { address } from 'ip';
 import { inject, injectable } from 'inversify';
 import { logger } from '../../../shared/Logger';
 import Discovery from '../../../infra/yeelight/discovery';
 import ExceptionHandler from '../../../shared/decorators/ExceptionHandler';
-import HttpResponse from '../../../shared/responses/HttpResponse';
 import Screenshot from '../../../infra/screenshot';
 
-interface AmbilightCaseHeaders {
+interface AmbilightCaseParams {
   interval?: number;
   width: number;
   height: number;
@@ -15,13 +14,13 @@ interface AmbilightCaseHeaders {
 }
 
 @injectable()
-export default class AmbilightCase implements UseCase {
+export default class AmbilightCase implements UseCase<AmbilightCaseParams, string> {
   @inject(Discovery) private discovery: Discovery;
   private _interval: NodeJS.Timeout;
 
   @ExceptionHandler()
-  async execute({ headers }: UseCaseParams<AmbilightCaseHeaders>) {
-    const { deviceNames, interval = 300, width, height } = headers;
+  async execute(params: AmbilightCaseParams): Promise<string> {
+    const { deviceNames, interval = 300, width, height } = params;
     const ip = address();
     const devices = await this.discovery.discoverDevices();
     if (!devices.length) {
@@ -51,6 +50,6 @@ export default class AmbilightCase implements UseCase {
         }
       }, interval);
     });
-    return HttpResponse.success(200, 'Ambilight finished');
+    return 'Ambilight finished';
   }
 }

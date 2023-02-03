@@ -7,6 +7,11 @@ export const AmbilightCmd = async (devices: string, resolution: string, interval
   const deviceNames = devices.split(',');
   const [width, height] = resolution.split('x').map(v => Number(v));
 
-  await GetBindingFromContainer(AmbilightCase).execute({ headers: { deviceNames, height, width, interval: Number(interval) } });
+  await GetBindingFromContainer(AmbilightCase).execute({
+    deviceNames,
+    height,
+    width,
+    interval: Number(interval),
+  });
   process.exit();
 };

@@ -6,12 +6,10 @@ import ReceiveCommandCase from "../modules/Yeelight/ReceiveCommand/ReceiveComman
 
 export const BlinkCmd = async (devices: string, { verbose, debug, waitTime }) => {
   ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
-  await GetBindingFromContainer(DiscoverDevicesCase).execute({ headers: { waitTime } });
+  await GetBindingFromContainer(DiscoverDevicesCase).execute({ waitTime });
   await GetBindingFromContainer(ReceiveCommandCase).execute({
-    headers: {
-      deviceNames: devices.split(','),
-      kind: CommandList.BLINK,
-    },
+    deviceNames: devices.split(','),
+    kind: CommandList.BLINK,
   });
   process.exit(0);
 };
