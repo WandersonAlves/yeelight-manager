@@ -51,6 +51,7 @@ program
   .option('-s --save <value>', 'Save the setx command to be used later on load command')
   .option('--verbose', 'Output verbose info')
   .option('--debug', 'Output debug info')
+  .option('-e --exec', 'Save and execute cmd')
   .action(SetxCommandCmd);
 
 program
