@@ -175,35 +175,39 @@ export default class YeelightDevice {
   readonly id: string;
   readonly port: number;
   readonly host: string;
-  private model: 'color';
-  private support: string[];
-  private power: boolean;
-  private bright: number;
+  private _model: 'color';
+  private _support: string[];
+  private _power: boolean;
+  private _bright: number;
   // 1-RGB, 2-CT, 3-HSV
-  private colorMode: 'RGB' | 'CT' | 'HSV';
-  private colorTemperatureValue: number;
-  private rgb: number;
+  private _colorMode: 'RGB' | 'CT' | 'HSV';
+  private _colorTemperatureValue: number;
+  private _rgb: number;
   name: string;
-  private client: TCPSocket;
-  private localAddress: string;
-  private localPort: number;
-  private server = createServer();
-  private socket: TCPSocket;
+  private _client: TCPSocket;
+  private _localAddress: string;
+  private _localPort: number;
+  private _server = createServer();
+  private _socket: TCPSocket;
   isConnected = false;
-  private events = new EventEmitter();
-  private commandId = 1;
+  private _events = new EventEmitter();
+  private _commandId = 1;
+
+  get power() {
+    return this._power;
+  }
 
   private constructor({ id, port, host, model, support, power, bright, colorMode, colorTemperatureValue, rgbValue, name }) {
     this.id = id;
     this.port = port;
     this.host = host;
-    this.model = model;
-    this.support = support;
-    this.power = power;
-    this.bright = bright;
-    this.colorMode = colorMode;
-    this.colorTemperatureValue = colorTemperatureValue;
-    this.rgb = rgbValue;
+    this._model = model;
+    this._support = support;
+    this._power = power;
+    this._bright = bright;
+    this._colorMode = colorMode;
+    this._colorTemperatureValue = colorTemperatureValue;
+    this._rgb = rgbValue;
     this.name = name;
   }
 
@@ -211,11 +215,11 @@ export default class YeelightDevice {
     return new Promise(resolve => {
       const _connect = () => {
         this.log('info', `⚡ Trying to connect into ${this._name} in ${this.host}:${this.port}`);
-        if (!this.socket && !this.isConnected) {
+        if (!this._socket && !this.isConnected) {
           _createSocket();
         }
-        this.client.connect(this.port, this.host, () => {
-          this.events.emit('connected');
+        this._client.connect(this.port, this.host, () => {
+          this._events.emit('connected');
           this.isConnected = true;
           this.log('info', `💡 Connected into ${this._name}`);
           resolve();
@@ -223,33 +227,35 @@ export default class YeelightDevice {
       };
 
       const _handleYeelightConnectionEvents = () => {
-        this.client.on('error', err => {
+        this._client.on('error', err => {
           this.log('error', err.name);
           this.log('warn', `⚡ Trying to re-connect to ${this._name}`);
           this.isConnected = false;
-          this.client.removeAllListeners();
-          this.client = null;
+          this._client.removeAllListeners();
+          this._client = null;
           _connect();
         });
 
-        this.client.on('data', data => {
+        this._client.on('data', data => {
           const responses = data.toString().split('\n');
           responses.forEach(r => {
             if (r) {
-              this.changeEvent(JSON.parse(r));
-              this.events.emit('data', r);
+              const parsed = JSON.parse(r);
+              this.log('debug', `Change event ${parsed}`)
+              this.changeEvent(parsed);
+              this._events.emit('data', r);
             }
           });
         });
 
-        this.client.on('close', () => {
+        this._client.on('close', () => {
           this.isConnected = false;
-          this.events.emit('close_connection');
+          this._events.emit('close_connection');
         });
       };
 
       const _createSocket = () => {
-        this.client = new TCPSocket();
+        this._client = new TCPSocket();
       };
 
       if (this.isConnected) {
@@ -266,21 +272,21 @@ export default class YeelightDevice {
     this.log('info', '📀 Starting music mode');
     return new Promise((resolve, reject) => {
       try {
-        this.server.listen(() => {
+        this._server.listen(() => {
           this.log('info', '⚡ Server Created!');
-          const ad = this.server.address() as AddressInfo;
-          this.localAddress = ad.address;
-          this.localPort = ad.port;
-          this.log('info', `⚡ TCP Server Info: ${this.localAddress}:${this.localPort}`);
+          const ad = this._server.address() as AddressInfo;
+          this._localAddress = ad.address;
+          this._localPort = ad.port;
+          this.log('info', `⚡ TCP Server Info: ${this._localAddress}:${this._localPort}`);
           // Tell the lightbulb to try to connect to our server
-          void this.sendCommand(new MusicModeCommand(true, currentIpAddress, this.localPort));
+          void this.sendCommand(new MusicModeCommand(true, currentIpAddress, this._localPort));
         });
 
-        this.server.on('connection', sock => {
+        this._server.on('connection', sock => {
           this.log('info', '⚡ Device connected to server');
           // If the lightbulb connect succefully, it will be here on sock
           // Else it will print something like {"method":"props","params":{"music_on":0}} on client
-          this.socket = sock;
+          this._socket = sock;
           resolve();
         });
       } catch (e) {
@@ -291,37 +297,37 @@ export default class YeelightDevice {
   }
 
   finishMusicMode(currentIpAddress: string, fromError?: boolean) {
-    this.socket = null;
-    this.server.close();
+    this._socket = null;
+    this._server.close();
     this.log(fromError ? 'error' : 'info', '📀 Finishing music mode');
-    return this.sendCommand(new MusicModeCommand(false, currentIpAddress, this.localPort));
+    return this.sendCommand(new MusicModeCommand(false, currentIpAddress, this._localPort));
   }
 
   toggle() {
-    return this.sendCommand(new ToggleCommand(this.commandId++));
+    return this.sendCommand(new ToggleCommand(this._commandId++));
   }
 
   setHex(hex: string, effect: EffectTypes = 'smooth', duration = 300) {
     this.prepareDevice();
-    return this.sendCommand(new RGBCommand(HexToInteger(hex), effect, duration, this.commandId++));
+    return this.sendCommand(new RGBCommand(HexToInteger(hex), effect, duration, this._commandId++));
   }
 
   setFlow(repeat: number, action: ColorFlowAction, flows: ColorFlowExpression[]) {
-    return this.sendCommand(new ColorFlowCommand(repeat, action, flows, this.commandId++));
+    return this.sendCommand(new ColorFlowCommand(repeat, action, flows, this._commandId++));
   }
 
   setBright(level: number, effect: EffectTypes = 'smooth', duration = 300) {
     this.prepareDevice();
-    return this.sendCommand(new BrightCommand(level, effect, duration, this.commandId++));
+    return this.sendCommand(new BrightCommand(level, effect, duration, this._commandId++));
   }
 
   setName(name: string) {
-    return this.sendCommand(new NameCommand(name, this.commandId++));
+    return this.sendCommand(new NameCommand(name, this._commandId++));
   }
 
   setColorTemperature(ct: number, effect: EffectTypes = 'smooth', duration = 300) {
     this.prepareDevice();
-    return this.sendCommand(new ColorTemperatureCommand(ct, effect, duration, this.commandId++));
+    return this.sendCommand(new ColorTemperatureCommand(ct, effect, duration, this._commandId++));
   }
 
   setPower(power: 'on' | 'off', effect: EffectTypes = 'smooth', duration = 300) {
@@ -338,21 +344,21 @@ export default class YeelightDevice {
   toObject(): YeelightDeviceJSON {
     return {
       id: this.id,
-      model: this.model,
-      bright: this.bright,
-      rgbValue: this.rgb,
-      colorTemperatureValue: this.colorTemperatureValue,
+      model: this._model,
+      bright: this._bright,
+      rgbValue: this._rgb,
+      colorTemperatureValue: this._colorTemperatureValue,
       name: this.name,
-      colorMode: this.colorMode,
-      support: this.support,
-      power: this.power,
+      colorMode: this._colorMode,
+      support: this._support,
+      power: this._power,
       host: this.host,
       port: this.port,
     };
   }
 
   private prepareDevice() {
-    if (!this.power) {
+    if (!this._power) {
       void this.setPower('on');
     }
   }
@@ -364,15 +370,15 @@ export default class YeelightDevice {
       this.log('verbose', `${key} changed to ${value}`);
       switch (key) {
         case 'color_mode': {
-          this.colorMode = value === 1 ? 'RGB' : value === 2 ? 'CT' : 'HSV';
+          this._colorMode = value === 1 ? 'RGB' : value === 2 ? 'CT' : 'HSV';
           break;
         }
         case 'power': {
-          this.power = value === 'on' ? true : false;
+          this._power = value === 'on' ? true : false;
           break;
         }
         case 'ct': {
-          this.colorTemperatureValue = Number(value);
+          this._colorTemperatureValue = Number(value);
           break;
         }
         default: {
@@ -396,20 +402,20 @@ export default class YeelightDevice {
     this.log('debug', `Command sent: ${cmdJSON}`);
     const sharedCb = (resolve: ResolveFn, reject: RejectFn) => (err: Error) => {
       if (err) {
-        this.events.emit('command_failure', cmdJSON);
+        this._events.emit('command_failure', cmdJSON);
         return reject(err);
       }
-      this.events.emit('command_success', cmdJSON);
+      this._events.emit('command_success', cmdJSON);
       return resolve();
     };
     return new Promise((resolve, reject) => {
-      if (!this.client && !this.isConnected) {
+      if (!this._client && !this.isConnected) {
         return reject(new Error('DeviceNotConnected'));
       }
-      if (this.socket && cmdName !== 'set_music') {
-        return this.socket.write(cmdJSON, sharedCb(resolve, reject));
+      if (this._socket && cmdName !== 'set_music') {
+        return this._socket.write(cmdJSON, sharedCb(resolve, reject));
       }
-      return this.client.write(cmdJSON, sharedCb(resolve, reject));
+      return this._client.write(cmdJSON, sharedCb(resolve, reject));
     });
   }
 

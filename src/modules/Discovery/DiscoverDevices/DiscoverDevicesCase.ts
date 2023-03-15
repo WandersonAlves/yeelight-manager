@@ -13,7 +13,7 @@ export default class DiscoverDevicesCase implements UseCase<DiscoverDevicesParam
   @inject(Discovery) private discovery: Discovery;
 
   @ExceptionHandler()
-  async execute(params?: DiscoverDevicesParams) {
+  async execute(params: DiscoverDevicesParams = {}) {
     const { waitTime, logDevices } = params;
     logger.info('Discovery started...', { label: 'Discovery' });
 

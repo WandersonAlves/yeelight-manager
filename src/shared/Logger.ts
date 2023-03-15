@@ -4,8 +4,7 @@ import { join } from 'path';
 const { printf, colorize } = format;
 const colorizer = colorize();
 
-const timestampFormatter = () =>
-  new Date().toISOString();
+const timestampFormatter = () => new Date().toISOString();
 
 const consoleFormatter = printf(({ stack, level, message, label, timestamp }: { [key: string]: string }) => {
   const levelLabelColorized = colorizer.colorize(level, `${level}:${label}`);
@@ -13,11 +12,25 @@ const consoleFormatter = printf(({ stack, level, message, label, timestamp }: { 
   return `${timestampColorized} ${levelLabelColorized}: ${stack ? stack : message}`;
 });
 
-const baseLogger = createLogger({
-  level: 'info',
-  defaultMeta: { label: 'main' },
-  format: format.combine(format.errors({ stack: true }), format.timestamp({ format: timestampFormatter })),
-});
+const configureLogger = (label = 'main', level = 'info') =>
+  createLogger({
+    level,
+    defaultMeta: { label },
+    format: format.combine(format.errors({ stack: true }), format.timestamp({ format: timestampFormatter })),
+  })
+    .add(
+      new transports.Console({
+        format: consoleFormatter,
+      }),
+    )
+    .add(
+      new transports.File({
+        format: consoleFormatter,
+        filename: join(__dirname, '..', '..', 'log.log'),
+      }),
+    );
+
+const baseLogger = configureLogger();
 
 /**
  * Returns a pretty represetation of a json for a give object
@@ -25,18 +38,5 @@ const baseLogger = createLogger({
  * @param obj An object
  */
 export const jsonString = (obj: any) => `\n${JSON.stringify(obj, null, 2)}\n`;
-
-baseLogger
-  .add(
-    new transports.Console({
-      format: consoleFormatter,
-    }),
-  )
-  .add(
-    new transports.File({
-      format: consoleFormatter,
-      filename: join(__dirname, '..', '..', 'log.log'),
-    }),
-  );
 
 export const logger = baseLogger;
