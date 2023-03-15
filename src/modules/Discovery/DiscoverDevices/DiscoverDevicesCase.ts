@@ -35,6 +35,7 @@ export default class DiscoverDevicesCase implements UseCase<DiscoverDevicesParam
     if (devicesFallback.length) {
       return devicesFallback;
     }
+    return [];
   }
 
   private async _discoverDevicesFallback() {
