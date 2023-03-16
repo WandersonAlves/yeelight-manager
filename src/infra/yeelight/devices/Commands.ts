@@ -5,14 +5,15 @@ import ColorFlowExpression from './Flow';
 export type EffectTypes = 'smooth' | 'sudden';
 
 export default class Command {
-  constructor(private id: number, private command: string, private params: any[]) {}
+  constructor(private id: number, private method: string, private params: any[]) {}
 
   toString() {
     return JSON.stringify(this) + '\r\n';
   }
 
+  // TODO document this to avoid refactoring. `method` is used in yeelight message
   get name() {
-    return this.command;
+    return this.method;
   }
 }
 

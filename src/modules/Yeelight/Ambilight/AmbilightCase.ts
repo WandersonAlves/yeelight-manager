@@ -1,7 +1,7 @@
 import { UseCase } from '../../../shared/contracts';
 import { address } from 'ip';
 import { inject, injectable } from 'inversify';
-import { logger } from '../../../shared/Logger';
+import { jsonString, logger } from '../../../shared/Logger';
 import Discovery from '../../../infra/yeelight/discovery';
 import ExceptionHandler from '../../../shared/decorators/ExceptionHandler';
 import Screenshot from '../../../infra/screenshot';
@@ -21,6 +21,7 @@ export default class AmbilightCase implements UseCase<AmbilightCaseParams, void>
   @ExceptionHandler()
   async execute(params: AmbilightCaseParams): Promise<void> {
     const { deviceNames, interval = 300, width, height } = params;
+    logger.debug(`Received parameters ${jsonString(params)}`, { label: 'ambilightCase' });
     const ip = address();
     const devices = await this.discovery.discoverDevices();
     if (!devices.length) {
@@ -40,8 +41,8 @@ export default class AmbilightCase implements UseCase<AmbilightCaseParams, void>
       this._interval = setInterval(async () => {
         try {
           const { color, luminance } = await Screenshot.FetchPredominantColor(0,0,width, height);
-          selectedDevices.forEach(d => {
-            void d.setBright(Number(luminance), 'smooth', interval);
+          selectedDevices.forEach(async d => {
+            // void d.setBright(Number(luminance), 'smooth', interval);
             void d.setHex(color, 'smooth', interval);
           });
         } catch (e) {
