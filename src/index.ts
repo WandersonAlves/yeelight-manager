@@ -2,7 +2,6 @@
 import 'reflect-metadata';
 import { AmbilightCmd } from './commander/AmbilightCmd';
 import { BlinkCmd } from './commander/BlinkCmd';
-import { DiscoverDevicesCmd } from './commander/DiscoverDevicesCmd';
 import { ListCmd } from './commander/ListCmd';
 import { LoadCommandCmd } from './commander/LoadCommandCmd';
 import { SeeLogsCmd } from './commander/SeeLogsCmd';
@@ -17,14 +16,6 @@ program
   .name('yeelight-manager')
   .description('Allow you to control yeelight bulbs from your CLI!')
   .version(process.env.npm_package_version, '-v, --version');
-
-program
-  .command('start')
-  .description('Start the service and allow to send commands to devices')
-  .option('-t --waitTime', 'Time to wait to yeelights connect')
-  .option('--verbose', 'Output verbose info')
-  .option('--debug', 'Output debug info')
-  .action(DiscoverDevicesCmd);
 
 program
   .command('list')
