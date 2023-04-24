@@ -14,6 +14,16 @@ export default class GenericException extends Error {
     Object.setPrototypeOf(this, GenericException.prototype);
   }
 
+  toString(): string {
+    return `${this.name}: ${this.message}`;
+  }
+
+  /**
+   * Dont use this method, this project has some legacy code that refers to old http server idea
+   *
+   * @deprecated
+   * @returns
+   */
   formatError(): IHttpError {
     return {
       name: this.name,

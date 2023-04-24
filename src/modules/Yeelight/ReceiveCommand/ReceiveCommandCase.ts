@@ -32,8 +32,16 @@ export default class ReceiveCommandCase implements UseCase<ReceiveCommandParams,
       await Promise.all(selectedDevices.map(d => d.connect()));
     }
     const results = await Promise.all(selectedDevices.map(d => YeelightDevice.ExecCommand(d, params)));
-    await Promise.all(results.map(([, promise]) => promise));
-    logger.info('Command Success!!!');
+    const errors = results.filter(either => either[0] != null).map(e => e[0]);
+    if (errors.length) {
+      for (const e of errors) {
+        logger.error(e.toString(), { label: ReceiveCommandCase.name });
+      }
+    }
+    else {
+      await Promise.all(results.map(([, promise]) => promise));
+      logger.info('Command(s) Success!!!', { label: ReceiveCommandCase.name });
+    }
     return { deviceNames, kind };
   }
 }
