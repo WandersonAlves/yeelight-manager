@@ -4,7 +4,7 @@ import { UseCase } from '../../../shared/contracts';
 import { inject, injectable } from 'inversify';
 import { logger } from '../../../shared/Logger';
 import DeviceNotFoundException from '../../../shared/exceptions/DeviceNotFoundException';
-import Discovery from '../../../infra/yeelight/discovery';
+import Discovery from '../../../infra/yeelight/discovery/Discovery';
 import ExceptionHandler from '../../../shared/decorators/ExceptionHandler';
 import GenericException from '../../../shared/exceptions/GenericException';
 import YeelightDevice from '../../../infra/yeelight/devices/YeelightDevice';

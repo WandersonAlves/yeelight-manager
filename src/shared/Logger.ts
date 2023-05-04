@@ -39,4 +39,8 @@ const baseLogger = configureLogger();
  */
 export const jsonString = (obj: any) => `\n${JSON.stringify(obj, null, 2)}\n`;
 
+export const ConfigureCmds = (logLevel?: 'verbose' | 'debug' | 'info') => {
+  logger.level = logLevel;
+};
+
 export const logger = baseLogger;

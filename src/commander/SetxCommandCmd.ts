@@ -1,4 +1,4 @@
-import { ConfigureCmds } from './utils';
+import { ConfigureCmds } from '../shared/Logger';
 import { GetBindingFromContainer } from '../infra/container';
 import { jsonString, logger } from '../shared/Logger';
 import CommandStorage from '../infra/storage/CommandStorage';

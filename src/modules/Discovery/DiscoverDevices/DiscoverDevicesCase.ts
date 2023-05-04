@@ -1,7 +1,7 @@
 import { UseCase } from '../../../shared/contracts';
 import { inject, injectable } from 'inversify';
 import { logger } from '../../../shared/Logger';
-import Discovery from '../../../infra/yeelight/discovery';
+import Discovery from '../../../infra/yeelight/discovery/Discovery';
 import ExceptionHandler from '../../../shared/decorators/ExceptionHandler';
 import Table from 'cli-table';
 import YeelightDevice, { YeelightDeviceJSON } from '../../../infra/yeelight/devices/YeelightDevice';

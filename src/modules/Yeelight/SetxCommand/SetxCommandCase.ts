@@ -3,7 +3,7 @@ import { DeviceCmd } from './SetxCommandInterface';
 import { UseCase } from '../../../shared/contracts';
 import { inject, injectable } from 'inversify';
 import DiscoverDevicesCase from '../../Discovery/DiscoverDevices/DiscoverDevicesCase';
-import Discovery from '../../../infra/yeelight/discovery';
+import Discovery from '../../../infra/yeelight/discovery/Discovery';
 import ExceptionHandler from '../../../shared/decorators/ExceptionHandler';
 import GenericException from '../../../shared/exceptions/GenericException';
 import ReceiveCommandCase from '../ReceiveCommand/ReceiveCommandCase';

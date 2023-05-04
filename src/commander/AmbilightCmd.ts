@@ -1,4 +1,4 @@
-import { ConfigureCmds } from './utils';
+import { ConfigureCmds } from '../shared/Logger';
 import { GetBindingFromContainer } from '../infra/container';
 import AmbilightCase from '../modules/Yeelight/Ambilight/AmbilightCase';
 

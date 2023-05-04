@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { ColorFlowAction } from '../../enums';
-import ColorFlowExpression from './Flow';
+import ColorFlowExpression from './ColorFlowExpression';
 
 export type EffectTypes = 'smooth' | 'sudden';
 

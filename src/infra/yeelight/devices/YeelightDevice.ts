@@ -5,7 +5,7 @@ import { Either } from '../../../shared/contracts';
 import { EventEmitter } from 'events';
 import { GetValueFromString, HexToInteger } from '../../../utils';
 import { jsonString, logger } from '../../../shared/Logger';
-import ColorFlowExpression from './Flow';
+import ColorFlowExpression from './ColorFlowExpression';
 import Command, {
   BrightCommand,
   ColorFlowCommand,

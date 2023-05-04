@@ -2,9 +2,9 @@ import { UseCase } from '../../../shared/contracts';
 import { address } from 'ip';
 import { inject, injectable } from 'inversify';
 import { jsonString, logger } from '../../../shared/Logger';
-import Discovery from '../../../infra/yeelight/discovery';
+import Discovery from '../../../infra/yeelight/discovery/Discovery';
 import ExceptionHandler from '../../../shared/decorators/ExceptionHandler';
-import Screenshot from '../../../infra/screenshot';
+import Screenshot from '../../../infra/screenshot/Screenshot';
 
 interface AmbilightCaseParams {
   interval?: number;
