@@ -11,6 +11,6 @@
     "inlineSourceMap": true,
     "lib": ["es2017", "DOM"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["./src/**/*.ts"],
   "exclude": ["node_modules"]
 }
