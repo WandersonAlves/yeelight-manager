@@ -10,6 +10,8 @@ interface AmbilightCaseParams {
   interval?: number;
   width: number;
   height: number;
+  x: number;
+  y: number;
   deviceNames: string[];
 }
 
@@ -20,7 +22,7 @@ export default class AmbilightCase implements UseCase<AmbilightCaseParams, void>
 
   @ExceptionHandler()
   async execute(params: AmbilightCaseParams): Promise<void> {
-    const { deviceNames, interval = 300, width, height } = params;
+    const { deviceNames, interval = 300, width, height, x, y } = params;
     logger.debug(`Received parameters ${jsonString(params)}`, { label: 'ambilightCase' });
     const ip = address();
     const devices = await this.discovery.discoverDevices();
@@ -40,10 +42,10 @@ export default class AmbilightCase implements UseCase<AmbilightCaseParams, void>
     await new Promise(async resolve => {
       this._interval = setInterval(async () => {
         try {
-          const { color, luminance } = await Screenshot.FetchPredominantColor(0,0,width, height);
+          const { color, luminance } = await Screenshot.FetchPredominantColor(x, y, width, height);
           selectedDevices.forEach(async d => {
             // void d.setBright(Number(luminance), 'smooth', interval);
-            void d.setHex(color, 'smooth', interval);
+            await d.setHex(color, 'smooth', interval);
           });
         } catch (e) {
           logger.error(e);

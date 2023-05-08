@@ -1,6 +1,5 @@
-import { FileType, Region, screen } from '@nut-tree/nut-js';
+import { getDominantColor } from '.';
 import { logger } from '../../shared/Logger';
-import sharp from 'sharp';
 
 interface FetchPredominantColorResult {
   color: string;
@@ -50,63 +49,6 @@ export default class Screenshot {
   };
 
   /**
-   * This method takes a buffer containing an image and uses the sharp library to calculate
-   * the dominant color in the image.
-   *
-   * The method returns an array containing the RGB values of the dominant color.
-   *
-   * @param image `Buffer`
-   * @returns [r,g,b] array
-   */
-  private static async DominantColorSharp(image: Buffer) {
-    const { dominant } = await sharp(new Int16Array(image)).stats();
-    return [dominant.r, dominant.g, dominant.b];
-  }
-
-  /**
-   * This method takes a buffer containing an image and uses a custom algorithm to
-   * calculate the dominant color in the image.
-   *
-   * The method returns an array containing the RGB values of the dominant color.
-   *
-   * @param image `Buffer`
-   * @returns [r,g,b] array
-   * @deprecated
-   */
-  private static DominantColorRaw(image: Buffer) {
-    // NOTE This algorithm has a bug and dont work most of the time
-    // Extract all pixels in the region
-    const pixelData = image;
-    const pixels: number[][] = [];
-    for (let i = 0; i < pixelData.length; i += 4) {
-      pixels.push([pixelData[i], pixelData[i + 1], pixelData[i + 2]]);
-    }
-    // Calculate color histogram
-    const histogram = pixels.reduce((hist: { [key: string]: number }, pixel) => {
-      const colorKey = pixel.join(',');
-      if (!hist[colorKey]) {
-        hist[colorKey] = 0;
-      }
-      hist[colorKey]++;
-      return hist;
-    }, {});
-    // Find color with highest count in histogram
-    let maxCount = 0;
-    let RGBArray: number[] = [];
-    // eslint-disable-next-line guard-for-in
-    for (const colorKey in histogram) {
-      const count = histogram[colorKey];
-      const _color = colorKey.split(',').map(c => parseInt(c));
-      if (count > maxCount) {
-        maxCount = count;
-        RGBArray = _color;
-      }
-    }
-
-    return RGBArray;
-  }
-
-  /**
    * Fetches the predominant color and luminance of a region of the screen.
    *
    * @param x {number} the x-coordinate of the top-left corner of the region to capture
@@ -121,25 +63,12 @@ export default class Screenshot {
     width: number,
     height: number,
   ): Promise<FetchPredominantColorResult> => {
-    const region = new Region(x, y, width, 50);
-    const image = await screen.grabRegion(region);
+    const rgbArray = getDominantColor(x ?? 0, y ?? 0, width, height);
 
-    // TODO Check captured region
-    // const png = new PNG({ filterType: 4 });
-    // png.parse(image.data);
-    // png.pack().pipe(fs.createWriteStream('image.png'));
-    if (logger.level === 'debug') {
-      logger.warn(`saving region to file`, { label: 'image' });
-      await screen.captureRegion('test', region, FileType.PNG);
-    }
+    const color = Screenshot.RgbToHex(rgbArray[0]);
+    const luminance = Screenshot.GetColorLuminance(rgbArray[0]);
 
-    const rgbArray = await Screenshot.DominantColorSharp(image.data);
-    // const rgbArray = Screenshot.DominantColorRaw(image.data);
-
-    const color = Screenshot.RgbToHex(rgbArray);
-    const luminance = Screenshot.GetColorLuminance(rgbArray);
-
-    logger.debug(`raw rgb array ${rgbArray} color #${color} / luminance ${luminance}`, { label: 'image' });
+    logger.debug(`Color #${color} / Luminance ${luminance}`, { label: 'image' });
 
     return {
       color,
