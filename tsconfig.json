@@ -9,7 +9,8 @@
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "inlineSourceMap": true,
-    "lib": ["es2017", "DOM"]
+    "lib": ["es2017", "DOM"],
+    "allowJs": true
   },
   "include": ["./src/**/*.ts"],
   "exclude": ["node_modules"]

@@ -1,0 +1,18 @@
+[package]
+name = "screen-color"
+version = "1.0.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+path = "rust/color.rs"
+
+[dependencies]
+color-thief = "0.2.2"
+napi = "2"
+napi-derive = "2"
+rgb = "0.8.36"
+screenshots = "0.5.4"
+
+[build-dependencies]
+napi-build = "2"
