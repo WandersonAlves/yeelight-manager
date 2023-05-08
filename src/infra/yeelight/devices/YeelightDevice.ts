@@ -40,7 +40,7 @@ export interface YeelightDeviceJSON {
 
 interface DataReceived {
   method?: string;
-  params?: Record<string, string | number>;
+  params: Record<string, string | number>;
   id?: number;
   result?: [any];
 }
@@ -72,10 +72,10 @@ export default class YeelightDevice {
         return [null, device.setPower(value as 'on' | 'off')];
       }
       case CommandList.NAME: {
-        return [null, device.setName(value)];
+        return [null, device.setName(value ?? "")];
       }
       case CommandList.COLOR: {
-        return [null, device.setHex(YeelightDevice.FetchColor(value))];
+        return [null, device.setHex(YeelightDevice.FetchColor(value ?? ""))];
       }
       case CommandList.CT3:
       case CommandList.CT2:
@@ -89,7 +89,7 @@ export default class YeelightDevice {
         return [null, device.blinkDevice()];
       }
       case CommandList.FLOW: {
-        return [null, device.setFlow(1, null, [])];
+        return [null, device.setFlow(1, ColorFlowAction.STAY, [])];
       }
       default: {
         return [new UnsuportedCommandException(device.id, kind, value), null];
@@ -184,11 +184,11 @@ export default class YeelightDevice {
   private _colorTemperatureValue: number;
   private _rgb: number;
   name: string;
-  private _client: TCPSocket;
+  private _socket: TCPSocket | null;
+  private _client: TCPSocket | null;
   private _localAddress: string;
   private _localPort: number;
   private _server = createServer();
-  private _socket: TCPSocket;
   isConnected = false;
   private _events = new EventEmitter();
   private _commandId = 1;
@@ -218,7 +218,7 @@ export default class YeelightDevice {
         if (!this._socket && !this.isConnected) {
           _createSocket();
         }
-        this._client.connect(this.port, this.host, () => {
+        this._client?.connect(this.port, this.host, () => {
           this._events.emit('connected');
           this.isConnected = true;
           this.log('info', `💡 Connected into ${this._name}`);
@@ -227,20 +227,20 @@ export default class YeelightDevice {
       };
 
       const _handleYeelightConnectionEvents = () => {
-        this._client.on('error', err => {
+        this._client?.on('error', err => {
           this.log('error', err.name);
           this.log('warn', `⚡ Trying to re-connect to ${this._name}`);
           this.isConnected = false;
-          this._client.removeAllListeners();
+          this._client?.removeAllListeners();
           this._client = null;
           _connect();
         });
 
-        this._client.on('data', data => {
+        this._client?.on('data', data => {
           const responses = data.toString().split('\n');
           responses.forEach(r => {
             if (r) {
-              const parsed = JSON.parse(r);
+              const parsed: DataReceived = JSON.parse(r);
               this.log('debug', `Change event ${parsed}`)
               this.changeEvent(parsed);
               this._events.emit('data', r);
@@ -248,7 +248,7 @@ export default class YeelightDevice {
           });
         });
 
-        this._client.on('close', () => {
+        this._client?.on('close', () => {
           this.isConnected = false;
           this._events.emit('close_connection');
         });
@@ -400,7 +400,7 @@ export default class YeelightDevice {
     const cmdName = command.name;
     const cmdJSON = command.toString();
     this.log('debug', `Command sent: ${cmdJSON}`);
-    const sharedCb = (resolve: ResolveFn, reject: RejectFn) => (err: Error) => {
+    const sharedCb = (resolve: ResolveFn, reject: RejectFn) => (err?: Error) => {
       if (err) {
         this._events.emit('command_failure', cmdJSON);
         return reject(err);
@@ -415,7 +415,7 @@ export default class YeelightDevice {
       if (this._socket && cmdName !== 'set_music') {
         return this._socket.write(cmdJSON, sharedCb(resolve, reject));
       }
-      return this._client.write(cmdJSON, sharedCb(resolve, reject));
+      return this._client?.write(cmdJSON, sharedCb(resolve, reject));
     });
   }
 

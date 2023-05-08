@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { logger } from '../Logger';
 
+// eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 export default function ExceptionHandler(customFn?: (e: Error) => any) {
   return (target: unknown, name: unknown, descriptor: PropertyDescriptor) => {
     const original = descriptor.value;
@@ -12,6 +13,7 @@ export default function ExceptionHandler(customFn?: (e: Error) => any) {
       } catch (err) {
         logger.error(err);
         if (customFn) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           return customFn(err);
         }
         process.exit(1);

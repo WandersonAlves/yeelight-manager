@@ -72,6 +72,8 @@ export default class DiscoverDevicesCase implements UseCase<DiscoverDevicesParam
           colorTemperatureValue,
         } = d.toObject();
         const value = colorMode === 'RGB' ? rgbValue : colorTemperatureValue;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         table.push([id, name, `${host}:${port}`, power ? 'Yes' : 'No', colorMode, value, bright]);
       });
     logger.info('List of devices:\n' + table.toString(), {

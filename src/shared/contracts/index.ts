@@ -1,7 +1,7 @@
 import GenericException from '../exceptions/GenericException';
 
-type Left = GenericException;
-type Right<T> = T;
+type Left = GenericException | null;
+type Right<T> = T | null;
 export type Either<T> = [Left, Right<T>];
 
 
