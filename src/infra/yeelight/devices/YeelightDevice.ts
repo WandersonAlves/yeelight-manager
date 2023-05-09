@@ -215,9 +215,7 @@ export default class YeelightDevice {
     return new Promise(resolve => {
       const _connect = () => {
         this.log('info', `⚡ Trying to connect into ${this._name} in ${this.host}:${this.port}`);
-        if (!this._socket && !this.isConnected) {
-          _createSocket();
-        }
+
         this._client?.connect(this.port, this.host, () => {
           this._events.emit('connected');
           this.isConnected = true;
