@@ -5,8 +5,13 @@ import ColorFlowExpression from './ColorFlowExpression';
 export type EffectTypes = 'smooth' | 'sudden';
 
 export default class Command {
-  constructor(private id: number, private method: string, private params: any[]) {}
+  constructor(public id: number, private method: string, private params: any[]) {}
 
+  /**
+   * Returns a valid command to be sent to socket/client
+   *
+   * @returns string
+   */
   toString() {
     return JSON.stringify(this) + '\r\n';
   }
