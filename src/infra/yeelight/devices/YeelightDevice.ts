@@ -17,6 +17,8 @@ import Command, {
   RGBCommand,
   ToggleCommand,
 } from './Commands';
+import GenericException from '../../../shared/exceptions/GenericException';
+import TimeoutException from '../../../shared/exceptions/TimeoutException';
 import UnsuportedCommandException from '../../../shared/exceptions/UnsuportedCommandException';
 
 type ResolveFn = (value: void | PromiseLike<void>) => void;
@@ -46,19 +48,8 @@ interface DataReceived {
 }
 
 export default class YeelightDevice {
-  static YeelightDefaultPort = 55443;
-  /**
-   * Checks if given device is connected.
-   * If not, then returns a promise that attempts to connect
-   *
-   * @param device A [YeelightDevice] type
-   */
-  static async ConnectDevice(device: YeelightDevice) {
-    if (device.isConnected) {
-      return;
-    }
-    return device.connect();
-  }
+  static readonly YeelightDefaultPort = 55443;
+  static readonly DefaultTimeoutTime = 2500;
 
   static async ExecCommand(device: YeelightDevice, { kind, value, bright }: CommandSignal): Promise<Either<Promise<void>>> {
     if (bright && kind !== CommandList.BRIGHT) {
@@ -72,10 +63,10 @@ export default class YeelightDevice {
         return [null, device.setPower(value as 'on' | 'off')];
       }
       case CommandList.NAME: {
-        return [null, device.setName(value ?? "")];
+        return [null, device.setName(value ?? '')];
       }
       case CommandList.COLOR: {
-        return [null, device.setHex(YeelightDevice.FetchColor(value ?? ""))];
+        return [null, device.setHex(YeelightDevice.FetchColor(value ?? ''))];
       }
       case CommandList.CT3:
       case CommandList.CT2:
@@ -137,6 +128,12 @@ export default class YeelightDevice {
     }
   }
 
+  /**
+   * Creates a YeelightDevice object from a given string
+   *
+   * @param message A string from `client.on('message')`
+   * @returns new insntace of YeelightDevice
+   */
   static CreateDevice(message: string) {
     const colorMode = parseInt(GetValueFromString(message, 'color_mode'));
     const host = GetValueFromString(message, 'Location').substr(11);
@@ -156,7 +153,16 @@ export default class YeelightDevice {
     });
   }
 
-  static CreateDeviceByIp(ip: string, port: number) {
+  /**
+   * Creates a YeelightDevice object from a ip:port
+   *
+   * Cant resolve all properties for the bulb since creating from IP
+   *
+   * @param ip IP of the bulb
+   * @param port Port of the bulb
+   * @returns new insntace of YeelightDevice
+   */
+  static CreateDeviceByIp(ip: string, port = YeelightDevice.YeelightDefaultPort) {
     return new YeelightDevice({
       host: ip,
       port,
@@ -179,13 +185,22 @@ export default class YeelightDevice {
   private _support: string[];
   private _power: boolean;
   private _bright: number;
-  // 1-RGB, 2-CT, 3-HSV
   private _colorMode: 'RGB' | 'CT' | 'HSV';
   private _colorTemperatureValue: number;
+  private _musicMode = false;
   private _rgb: number;
-  name: string;
+  readonly name: string;
+
+  /**
+   * MusicMode TCPSocket for the lightbulb
+   */
   private _socket: TCPSocket | null;
+
+  /**
+   * Main TCPSocket for the lightbulb
+   */
   private _client: TCPSocket | null;
+
   private _localAddress: string;
   private _localPort: number;
   private _server = createServer();
@@ -211,6 +226,11 @@ export default class YeelightDevice {
     this.name = name;
   }
 
+  /**
+   * Tries to create a client connection to the lightbulb
+   *
+   * @returns
+   */
   connect(): Promise<void> {
     return new Promise(resolve => {
       const _connect = () => {
@@ -239,9 +259,9 @@ export default class YeelightDevice {
           responses.forEach(r => {
             if (r) {
               const parsed: DataReceived = JSON.parse(r);
-              this.log('debug', `Change event ${parsed}`)
-              this.changeEvent(parsed);
-              this._events.emit('data', r);
+              this.log('debug', `Result event ${jsonString(parsed)}`);
+              this.handleDataEvent(parsed);
+              this._events.emit('data_received', parsed);
             }
           });
         });
@@ -266,6 +286,15 @@ export default class YeelightDevice {
     });
   }
 
+  /**
+   * Creates a server connection for the lightbulb connect
+   *
+   * When in this mode, lightbulb receives commands without ACK them,
+   * so the bulb will not drop the connection when receving a lot of requests
+   *
+   * @param currentIpAddress Current host IP
+   * @returns
+   */
   startMusicMode(currentIpAddress: string): Promise<void> {
     this.log('info', '📀 Starting music mode');
     return new Promise((resolve, reject) => {
@@ -287,13 +316,28 @@ export default class YeelightDevice {
           this._socket = sock;
           resolve();
         });
-      } catch (e) {
-        console.error(e);
-        reject(e);
+
+        setTimeout(() => {
+          // If lightbulb doesn't connect, then reject the promise with a GenericException
+          if (!this._socket) {
+            reject(new TimeoutException('connect', this._name));
+          }
+        }, YeelightDevice.DefaultTimeoutTime);
+      } catch (e: any) {
+        const err: Error = e;
+        this.log('error', err.toString());
+        reject(err);
       }
     });
   }
 
+  /**
+   * Closes the socket connection and stops the server from accepting connections
+   *
+   * @param currentIpAddress
+   * @param fromError
+   * @returns
+   */
   finishMusicMode(currentIpAddress: string, fromError?: boolean) {
     this._socket = null;
     this._server.close();
@@ -305,8 +349,10 @@ export default class YeelightDevice {
     return this.sendCommand(new ToggleCommand(this._commandId++));
   }
 
-  setHex(hex: string, effect: EffectTypes = 'smooth', duration = 300) {
-    this.prepareDevice();
+  setHex(hex: string, effect: EffectTypes = 'smooth', duration = 300, prepare = false) {
+    if (prepare) {
+      this.prepareDevice();
+    }
     return this.sendCommand(new RGBCommand(HexToInteger(hex), effect, duration, this._commandId++));
   }
 
@@ -314,8 +360,10 @@ export default class YeelightDevice {
     return this.sendCommand(new ColorFlowCommand(repeat, action, flows, this._commandId++));
   }
 
-  setBright(level: number, effect: EffectTypes = 'smooth', duration = 300) {
-    this.prepareDevice();
+  setBright(level: number, effect: EffectTypes = 'smooth', duration = 300, prepare = false) {
+    if (prepare) {
+      this.prepareDevice();
+    }
     return this.sendCommand(new BrightCommand(level, effect, duration, this._commandId++));
   }
 
@@ -323,8 +371,10 @@ export default class YeelightDevice {
     return this.sendCommand(new NameCommand(name, this._commandId++));
   }
 
-  setColorTemperature(ct: number, effect: EffectTypes = 'smooth', duration = 300) {
-    this.prepareDevice();
+  setColorTemperature(ct: number, effect: EffectTypes = 'smooth', duration = 300, prepare = false) {
+    if (prepare) {
+      this.prepareDevice();
+    }
     return this.sendCommand(new ColorTemperatureCommand(ct, effect, duration, this._commandId++));
   }
 
@@ -361,7 +411,18 @@ export default class YeelightDevice {
     }
   }
 
-  private changeEvent(dataObj: DataReceived) {
+  /**
+   * Handler for message ACK when lightbulb sends a event about changing their props
+   *
+   * This is used to update the state of the lightbulb. For message confirmation, take a look at
+   * `this._events.on('data_received')` on :476
+   *
+   * @param dataObj Object from lightbulb connection responses
+   */
+  private handleDataEvent(dataObj: DataReceived) {
+    if (dataObj?.id) {
+      return;
+    }
     if (dataObj?.method === 'props') {
       const key = Object.keys(dataObj.params)[0];
       const value = dataObj.params[key];
@@ -379,6 +440,10 @@ export default class YeelightDevice {
           this._colorTemperatureValue = Number(value);
           break;
         }
+        case 'music_on': {
+          this._musicMode = value === 1 ? true : false;
+          break;
+        }
         default: {
           if (!Object.hasOwnProperty.call(this, key)) {
             this.log('warn', `Event updating unmapped ${key} key`);
@@ -387,8 +452,6 @@ export default class YeelightDevice {
           break;
         }
       }
-    } else if (dataObj?.id && dataObj?.result?.[0] === 'ok') {
-      this.log('info', `Command with id ${dataObj.id} ran successfully`);
     } else {
       this.log('warn', `Unmapped Event: ${jsonString(dataObj)}`);
     }
@@ -397,23 +460,72 @@ export default class YeelightDevice {
   private sendCommand(command: Command): Promise<void> {
     const cmdName = command.name;
     const cmdJSON = command.toString();
-    this.log('debug', `Command sent: ${cmdJSON}`);
-    const sharedCb = (resolve: ResolveFn, reject: RejectFn) => (err?: Error) => {
+    /**
+     * Shared callback for socket/client.write
+     *
+     * Note that this callback only emits if the command *WAS* sent to the bulb.
+     *
+     * The result should be fetched on `this._client?.on('data')` from client event,
+     * then, on `this._events.on('data_received')` we resolve the command
+     *
+     * @param resolve ResolveFn
+     * @param reject RejectFn
+     * @returns void
+     */
+    const sharedTCPSocketResponseCallback = (resolve: ResolveFn, reject: RejectFn) => (err?: Error) => {
+      let commandAck = false;
       if (err) {
-        this._events.emit('command_failure', cmdJSON);
+        this._events.emit('command_sent_failure', cmdJSON);
         return reject(err);
       }
-      this._events.emit('command_success', cmdJSON);
-      return resolve();
+      this._events.emit('command_sent_success', cmdJSON);
+      // If lightbulb isn't on musicMode, resolve the promise within the `data_received` event
+      if (!this._musicMode) {
+        // NOTE Would be nice if all events are kept in the same place
+        this._events.on('data_received', (o: DataReceived) => {
+          // First two assertions: lightbulb response to commands
+          // Last assertion (o.method), turning on musicMode
+          if (command.id === o.id && o.result[0] === 'ok') {
+            this.log('info', `Command with id ${o.id} ran successfully`);
+            commandAck = true;
+            return resolve();
+          } else if (o.method === 'props') {
+            this.log('verbose', `Props updated for ${jsonString(o.params)}`);
+            commandAck = true;
+            return resolve();
+          }
+          // Reject the promise if can't ACK the command sent (or is a unplanned one)
+          return reject(
+            new GenericException({
+              name: 'CommandFailureException',
+              message: `${this._name} refused to run the command. Data received: ${jsonString(o)}`,
+            }),
+          );
+        });
+        setTimeout(() => {
+          if (!commandAck) {
+            reject(new TimeoutException('ack', this.name));
+          }
+        }, YeelightDevice.DefaultTimeoutTime)
+      }
+      // Resolve straight away when on musicMode since bulb don't return anything on musicMode
+      else {
+        return resolve();
+      }
     };
+
     return new Promise((resolve, reject) => {
       if (!this._client && !this.isConnected) {
         return reject(new Error('DeviceNotConnected'));
       }
+      this.log('debug', `Command sent: ${cmdJSON}`);
       if (this._socket && cmdName !== 'set_music') {
-        return this._socket.write(cmdJSON, sharedCb(resolve, reject));
+        return this._socket.write(cmdJSON, sharedTCPSocketResponseCallback(resolve, reject));
       }
-      return this._client?.write(cmdJSON, sharedCb(resolve, reject));
+      // FIXME There's a problem with this call
+      // We're not tracking the response (or timout) of this call.
+      // Solution for reject promise: create a timeout strategy, like :304, check if :304 is necessary when resolve/reject are implemented
+      return this._client?.write(cmdJSON, sharedTCPSocketResponseCallback(resolve, reject));
     });
   }
 
