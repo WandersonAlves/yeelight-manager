@@ -35,13 +35,22 @@ export default class Screenshot {
    */
   private static GetColorLuminance = (value: number[] | string, factor = 1) => {
     if (typeof value == 'string') {
-      const hasFullSpec = value.length === 7;
-      const m = value.match(hasFullSpec ? /(\S{2})/g : /(\S{1})/g);
-        const R = parseInt(m[0] + (hasFullSpec ? '' : m[0]), 16);
-        const G = parseInt(m[1] + (hasFullSpec ? '' : m[1]), 16);
-        const B = parseInt(m[2] + (hasFullSpec ? '' : m[2]), 16);
+      if (value.startsWith('#')) {
+        value = value.substring(1);
+      }
 
-      return (R * 299 + G * 587 + B * 114) / 1000;
+      // Convert the hex color to RGB values
+      const red = parseInt(value.substring(0, 2), 16);
+      const green = parseInt(value.substring(2, 4), 16);
+      const blue = parseInt(value.substring(4, 6), 16);
+
+      // Calculate the relative luminance using the sRGB color space formula
+      const r = red / 255;
+      const g = green / 255;
+      const b = blue / 255;
+
+      const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) * 100 * factor;
+      return Number(luminance.toFixed(1));
     }
     else {
       const [R8bit, G8bit, B8bit] = value;
@@ -68,16 +77,17 @@ export default class Screenshot {
    * @param height {number} the height of the region to capture
    * @returns A Promise that resolves to an object with the predominant color and luminance of the region.
    */
-  static FetchPredominantColor = async (
+  static FetchPredominantColor = (
     x: number,
     y: number,
     width: number,
     height: number,
-  ): Promise<FetchPredominantColorResult> => {
+  ): FetchPredominantColorResult => {
     const hexArr = getDominantColor(x ?? 0, y ?? 0, width, height);
-    logger.debug(`Color from rust ${hexArr}`, { label: 'image' });
+
+    logger.debug(`Colors from rust ${hexArr}`, { label: 'image' });
     const color = hexArr[0];
-    const luminance = Screenshot.GetColorLuminance(hexArr[0], 3);
+    const luminance = Screenshot.GetColorLuminance(hexArr[0], 2.5);
 
     logger.debug(`Color #${color} / Luminance ${luminance}`, { label: 'image' });
 

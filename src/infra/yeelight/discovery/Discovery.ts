@@ -44,7 +44,7 @@ export default class Discovery {
     );
     const openDevices = await Promise.all(promises);
 
-    this._handleNewDevices(openDevices.filter(d => d).map(d => YeelightDevice.CreateDeviceByIp(d.ip, 55443)));
+    this._handleNewDevices(openDevices.filter(d => d).map(d => YeelightDevice.CreateDeviceByIp(d.ip)));
     return this.devices;
   }
 

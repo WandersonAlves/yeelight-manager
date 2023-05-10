@@ -46,17 +46,18 @@ export default class AmbilightCase implements UseCase<AmbilightCaseParams, void>
     await this.discovery.turnOnAll(selectedDevices);
     await this.discovery.musicModeAll(ip, selectedDevices);
     await new Promise(async resolve => {
-      this._interval = setInterval(async () => {
+      this._interval = setInterval(() => {
         try {
-          const { color, luminance } = await Screenshot.FetchPredominantColor(x, y, width, height);
+          const { color, luminance } = Screenshot.FetchPredominantColor(x, y, width, height);
           selectedDevices.forEach(async d => {
-            void d.setBright(Number(luminance), 'sudden', 300);
-            await d.setHex(color, 'smooth', 300);
+            void d.setBright(Number(luminance), 'sudden');
+            void d.setHex(color, interval < 33 ? 'sudden' : 'smooth', interval);
           });
         } catch (e) {
           logger.error(e);
           selectedDevices.forEach(d => void d.finishMusicMode(ip, true));
           resolve(null);
+          process.exit(1);
         }
       }, interval);
     });

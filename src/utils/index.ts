@@ -23,6 +23,8 @@ export const HexToInteger = (hex: string): number => {
   return result;
 };
 
+export const FpsToMs = (fps: number): number => 1000 / fps;
+
 export const GetListIpAddress = (currentIp: string, from = 1, to = 254): string[] =>  {
   const startNumber = parseInt(currentIp.split('.')[3], 10);
   const results: string[] = [];
