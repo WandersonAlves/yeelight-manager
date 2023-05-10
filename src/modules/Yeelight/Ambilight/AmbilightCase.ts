@@ -27,7 +27,8 @@ export default class AmbilightCase implements UseCase<AmbilightCaseParams, void>
     const ip = address();
     const devices = await this.discovery.discoverDevices();
     if (!devices.length) {
-      process.exit(0);
+      logger.error('No devices found', { label: 'ambilightCase' });
+      return process.exit(0);
     }
     process.on('SIGINT', () => {
       selectedDevices.forEach(d => void d.finishMusicMode(ip));
@@ -35,6 +36,11 @@ export default class AmbilightCase implements UseCase<AmbilightCaseParams, void>
       process.exit(0);
     });
     const selectedDevices = devices.filter(d => deviceNames.includes(d.name));
+
+    if (!selectedDevices.length) {
+      logger.error("Specified devices can't be found", { label: 'ambilightCase' });
+      return process.exit(0);
+    }
 
     await Promise.all(selectedDevices.map(d => d.connect()));
     await this.discovery.turnOnAll(selectedDevices);
@@ -44,8 +50,8 @@ export default class AmbilightCase implements UseCase<AmbilightCaseParams, void>
         try {
           const { color, luminance } = await Screenshot.FetchPredominantColor(x, y, width, height);
           selectedDevices.forEach(async d => {
-            // void d.setBright(Number(luminance), 'smooth', interval);
-            await d.setHex(color, 'smooth', interval);
+            void d.setBright(Number(luminance), 'sudden', 300);
+            await d.setHex(color, 'smooth', 300);
           });
         } catch (e) {
           logger.error(e);
