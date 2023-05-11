@@ -22,7 +22,7 @@ export default class Discovery {
   }
 
   async turnOnAll(devices?: YeelightDevice[]) {
-    return Promise.all((devices ?? this.devices).map(d => d.setPower('on')));
+    return Promise.all((devices ?? this.devices).filter(d => !d.power).map(d => d.setPower('on')));
   }
 
   async musicModeAll(ipAddress: string, devices?: YeelightDevice[]) {
