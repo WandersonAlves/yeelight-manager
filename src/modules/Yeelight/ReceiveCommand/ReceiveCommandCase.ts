@@ -17,7 +17,7 @@ export default class ReceiveCommandCase implements UseCase<ReceiveCommandParams,
 
   @ExceptionHandler()
   async execute(params: ReceiveCommandParams): Promise<ReceiveCommandResponse | GenericException> {
-    const { deviceNames, kind, manualConnect } = params;
+    const { deviceNames, kind, manualConnect, bright } = params;
     const devices = this.discovery.getDevices();
     const selectedDevices = devices.filter(
       d => deviceNames.includes(d.name) || deviceNames.includes(d.host) || deviceNames.includes(d.id),
@@ -31,17 +31,12 @@ export default class ReceiveCommandCase implements UseCase<ReceiveCommandParams,
     if (!manualConnect) {
       await Promise.all(selectedDevices.map(d => d.connect()));
     }
-    const results = await Promise.all(selectedDevices.map(d => YeelightDevice.ExecCommand(d, params)));
-    const errors = results.filter(either => either[0] != null).map(e => e[0]);
-    if (errors.length) {
-      for (const e of errors) {
-        logger.error(e.toString(), { label: ReceiveCommandCase.name });
-      }
+    if (bright && kind !== CommandList.BRIGHT) {
+      await Promise.all(selectedDevices.map(d => d.setBright(Number(bright))))
     }
-    else {
-      await Promise.all(results.map(([, promise]) => promise));
-      logger.info('Command(s) Success!!!', { label: ReceiveCommandCase.name });
-    }
+    // ExecCommand returns a array
+    await Promise.all(selectedDevices.map(d => YeelightDevice.ExecCommand(d, params)));
+    logger.info('Command(s) Success!!!', { label: ReceiveCommandCase.name });
     return { deviceNames, kind };
   }
 }

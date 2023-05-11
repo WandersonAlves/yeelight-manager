@@ -17,7 +17,7 @@ import Command, {
   RGBCommand,
   ToggleCommand,
 } from './Commands';
-import GenericException from '../../../shared/exceptions/GenericException';
+import CommandFailureException from '../../../shared/exceptions/CommandFailureException';
 import TimeoutException from '../../../shared/exceptions/TimeoutException';
 import UnsuportedCommandException from '../../../shared/exceptions/UnsuportedCommandException';
 
@@ -51,39 +51,36 @@ export default class YeelightDevice {
   static readonly YeelightDefaultPort = 55443;
   static readonly DefaultTimeoutTime = 2500;
 
-  static async ExecCommand(device: YeelightDevice, { kind, value, bright }: CommandSignal): Promise<Either<Promise<void>>> {
-    if (bright && kind !== CommandList.BRIGHT) {
-      void device.setBright(Number(bright));
-    }
+  static ExecCommand(device: YeelightDevice, { kind, value }: CommandSignal): Promise<void> {
     switch (kind) {
       case CommandList.TOGGLE: {
-        return [null, device.toggle()];
+        return device.toggle();
       }
       case CommandList.POWER: {
-        return [null, device.setPower(value as 'on' | 'off')];
+        return device.setPower(value as 'on' | 'off');
       }
       case CommandList.NAME: {
-        return [null, device.setName(value ?? '')];
+        return device.setName(value ?? '');
       }
       case CommandList.COLOR: {
-        return [null, device.setHex(YeelightDevice.FetchColor(value ?? ''))];
+        return device.setHex(YeelightDevice.FetchColor(value ?? ''));
       }
       case CommandList.CT3:
       case CommandList.CT2:
       case CommandList.CT: {
-        return [null, device.setColorTemperature(Number(value))];
+        return device.setColorTemperature(Number(value));
       }
       case CommandList.BRIGHT: {
-        return [null, device.setBright(Number(value))];
+        return device.setBright(Number(value));
       }
       case CommandList.BLINK: {
-        return [null, device.blinkDevice()];
+        return device.blinkDevice();
       }
       case CommandList.FLOW: {
-        return [null, device.setFlow(1, ColorFlowAction.STAY, [])];
+        return device.setFlow(1, ColorFlowAction.STAY, []);
       }
       default: {
-        return [new UnsuportedCommandException(device.id, kind, value), null];
+        throw new UnsuportedCommandException(device.id, kind, value);
       }
     }
   }
@@ -207,6 +204,57 @@ export default class YeelightDevice {
   isConnected = false;
   private _events = new EventEmitter();
   private _commandId = 1;
+
+  private _resolvePromiseRef: ResolveFn = null;
+  private _rejectPromiseRef: RejectFn = null;
+
+  private _commandAck = false;
+
+  private _currCmd: Command;
+
+  private _eventHandlers = {
+    dataReceived: (command: Command) => (o: DataReceived) => {
+      this._events.removeAllListeners('data_received');
+      this.log('debug', `_eventHandlers.DataReceived: ${jsonString(command)}`);
+      // First two assertions: lightbulb response to commands
+      // Last assertion (o.method), turning on musicMode
+      if (command.id === o.id && o.result[0] === 'ok') {
+        this.log('info', `Command with id ${o.id} ran successfully`);
+        this._commandAck = true;
+        return this._resolvePromiseRef();
+      } else if (o.method === 'props') {
+        this.log('verbose', `Props updated for ${jsonString(o.params)}`);
+        this._commandAck = true;
+        return this._resolvePromiseRef();
+      }
+      this._commandAck = false;
+      // Reject the promise if can't ACK the command sent (or is a unplanned one)
+      return this._rejectPromiseRef(new CommandFailureException(this.name, o, command));
+    },
+    clientSocketCallback: (resolve: ResolveFn, reject: RejectFn, command: Command, cmdJSON: string) => (err?: Error) => {
+      this._resolvePromiseRef = resolve;
+      this._rejectPromiseRef = reject;
+
+      if (err) {
+        this._events.emit('command_sent_failure', cmdJSON);
+        return reject(err);
+      }
+      this._events.emit('command_sent_success', cmdJSON);
+      // If lightbulb isn't on musicMode, resolve the promise within the `data_received` event
+      if (!this._musicMode) {
+        // NOTE Would be nice if all events are kept in the same place
+        this._events.on('data_received', this._eventHandlers.dataReceived(this._currCmd));
+        setTimeout(() => {
+          if (!this._commandAck) {
+            reject(new TimeoutException('ack', this.name));
+          }
+        }, YeelightDevice.DefaultTimeoutTime);
+      }
+      else {
+        return this._resolvePromiseRef();
+      }
+    },
+  };
 
   get power() {
     return this._power;
@@ -444,6 +492,10 @@ export default class YeelightDevice {
           this._musicMode = value === 1 ? true : false;
           break;
         }
+        case 'bright': {
+          this._bright = Number(value);
+          break;
+        }
         default: {
           if (!Object.hasOwnProperty.call(this, key)) {
             this.log('warn', `Event updating unmapped ${key} key`);
@@ -460,59 +512,8 @@ export default class YeelightDevice {
   private sendCommand(command: Command): Promise<void> {
     const cmdName = command.name;
     const cmdJSON = command.toString();
-    /**
-     * Shared callback for socket/client.write
-     *
-     * Note that this callback only emits if the command *WAS* sent to the bulb.
-     *
-     * The result should be fetched on `this._client?.on('data')` from client event,
-     * then, on `this._events.on('data_received')` we resolve the command
-     *
-     * @param resolve ResolveFn
-     * @param reject RejectFn
-     * @returns void
-     */
-    const sharedTCPSocketResponseCallback = (resolve: ResolveFn, reject: RejectFn) => (err?: Error) => {
-      let commandAck = false;
-      if (err) {
-        this._events.emit('command_sent_failure', cmdJSON);
-        return reject(err);
-      }
-      this._events.emit('command_sent_success', cmdJSON);
-      // If lightbulb isn't on musicMode, resolve the promise within the `data_received` event
-      if (!this._musicMode) {
-        // NOTE Would be nice if all events are kept in the same place
-        this._events.on('data_received', (o: DataReceived) => {
-          // First two assertions: lightbulb response to commands
-          // Last assertion (o.method), turning on musicMode
-          if (command.id === o.id && o.result[0] === 'ok') {
-            this.log('info', `Command with id ${o.id} ran successfully`);
-            commandAck = true;
-            return resolve();
-          } else if (o.method === 'props') {
-            this.log('verbose', `Props updated for ${jsonString(o.params)}`);
-            commandAck = true;
-            return resolve();
-          }
-          // Reject the promise if can't ACK the command sent (or is a unplanned one)
-          return reject(
-            new GenericException({
-              name: 'CommandFailureException',
-              message: `${this._name} refused to run the command. Data received: ${jsonString(o)}`,
-            }),
-          );
-        });
-        setTimeout(() => {
-          if (!commandAck) {
-            reject(new TimeoutException('ack', this.name));
-          }
-        }, YeelightDevice.DefaultTimeoutTime)
-      }
-      // Resolve straight away when on musicMode since bulb don't return anything on musicMode
-      else {
-        return resolve();
-      }
-    };
+    this._currCmd = command;
+    this._commandAck = false;
 
     return new Promise((resolve, reject) => {
       if (!this._client && !this.isConnected) {
@@ -520,12 +521,9 @@ export default class YeelightDevice {
       }
       this.log('debug', `Command sent: ${cmdJSON}`);
       if (this._socket && cmdName !== 'set_music') {
-        return this._socket.write(cmdJSON, sharedTCPSocketResponseCallback(resolve, reject));
+        return this._socket.write(cmdJSON, this._eventHandlers.clientSocketCallback(resolve, reject, command, cmdJSON));
       }
-      // FIXME There's a problem with this call
-      // We're not tracking the response (or timout) of this call.
-      // Solution for reject promise: create a timeout strategy, like :304, check if :304 is necessary when resolve/reject are implemented
-      return this._client?.write(cmdJSON, sharedTCPSocketResponseCallback(resolve, reject));
+      return this._client?.write(cmdJSON, this._eventHandlers.clientSocketCallback(resolve, reject, command, cmdJSON));
     });
   }
 
