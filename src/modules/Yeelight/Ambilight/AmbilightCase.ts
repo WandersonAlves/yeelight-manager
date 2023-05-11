@@ -13,6 +13,7 @@ interface AmbilightCaseParams {
   x: number;
   y: number;
   deviceNames: string[];
+  useLuminance?: boolean;
 }
 
 @injectable()
@@ -22,8 +23,8 @@ export default class AmbilightCase implements UseCase<AmbilightCaseParams, void>
 
   @ExceptionHandler()
   async execute(params: AmbilightCaseParams): Promise<void> {
-    const { deviceNames, interval = 300, width, height, x, y } = params;
-    logger.debug(`Received parameters ${jsonString(params)}`, { label: 'ambilightCase' });
+    const { deviceNames, interval = 300, width, height, x, y, useLuminance } = params;
+    logger.debug(`Received parameters ${jsonString(params)}`, { label: 'AmbilightCase' });
     const ip = address();
     const devices = await this.discovery.discoverDevices();
     if (!devices.length) {
@@ -49,9 +50,12 @@ export default class AmbilightCase implements UseCase<AmbilightCaseParams, void>
       this._interval = setInterval(() => {
         try {
           const { color, luminance } = Screenshot.FetchPredominantColor(x, y, width, height);
+          const suddenSmooth = interval < 33 ? 'sudden' : 'smooth';
           selectedDevices.forEach(async d => {
-            void d.setBright(Number(luminance), 'sudden');
-            void d.setHex(color, interval < 33 ? 'sudden' : 'smooth', interval);
+            if (useLuminance) {
+              void d.setBright(Number(luminance), suddenSmooth, interval);
+            }
+            void d.setHex(color, 'smooth', 200);
           });
         } catch (e) {
           logger.error(e);

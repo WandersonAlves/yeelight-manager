@@ -62,6 +62,7 @@ program
   .usage('yee ambilight <devices> <resolution> [interval] --options')
   .option('--verbose', 'Output verbose info')
   .option('--debug', 'Output debug info')
+  .option('--no-luminance', 'Dont use luminance values to increase/decrease brightness')
   .action(AmbilightCmd);
 
 program

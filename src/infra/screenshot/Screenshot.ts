@@ -87,7 +87,7 @@ export default class Screenshot {
 
     logger.debug(`Colors from rust ${hexArr}`, { label: 'image' });
     const color = hexArr[0];
-    const luminance = Screenshot.GetColorLuminance(hexArr[0], 2.5);
+    const luminance = Screenshot.GetColorLuminance(hexArr[0]);
 
     logger.debug(`Color #${color} / Luminance ${luminance}`, { label: 'image' });
 

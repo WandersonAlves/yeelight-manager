@@ -3,7 +3,7 @@ import { FpsToMs } from '../utils';
 import { GetBindingFromContainer } from '../infra/container';
 import AmbilightCase from '../modules/Yeelight/Ambilight/AmbilightCase';
 
-export const AmbilightCmd = async (devices: string, resolution: string, interval = "300", { verbose, debug }) => {
+export const AmbilightCmd = async (devices: string, resolution: string, interval = "300", { verbose, debug, luminance }) => {
   ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
   const deviceNames = devices.split(',');
   const [width, height, x, y] = resolution.split('x').map(v => Number(v));
@@ -18,6 +18,7 @@ export const AmbilightCmd = async (devices: string, resolution: string, interval
     x,
     y,
     interval: fetchColorsInterval,
+    useLuminance: !luminance,
   });
   process.exit();
 };
