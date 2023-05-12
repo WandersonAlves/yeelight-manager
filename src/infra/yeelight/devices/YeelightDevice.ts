@@ -1,7 +1,6 @@
 import { AddressInfo, Socket as TCPSocket, createServer } from 'net';
 import { ColorFlowAction, ColorFlowExpressionMode, CommandList } from '../../enums';
 import { CommandSignal } from '../../../modules/Yeelight/ReceiveCommand/ReceiveCommandInterfaces';
-import { Either } from '../../../shared/contracts';
 import { EventEmitter } from 'events';
 import { GetValueFromString, HexToInteger } from '../../../utils';
 import { jsonString, logger } from '../../../shared/Logger';
@@ -215,7 +214,7 @@ export default class YeelightDevice {
   private _eventHandlers = {
     dataReceived: (command: Command) => (o: DataReceived) => {
       this._events.removeAllListeners('data_received');
-      this.log('debug', `_eventHandlers.DataReceived: ${jsonString(command)}`);
+      this.log('debug', `_eventHandlers.DataReceived: ${jsonString(o)}==${jsonString(command)}`);
       // First two assertions: lightbulb response to commands
       // Last assertion (o.method), turning on musicMode
       if (command.id === o.id && o.result[0] === 'ok') {
