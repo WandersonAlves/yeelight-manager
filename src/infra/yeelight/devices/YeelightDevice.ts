@@ -217,7 +217,7 @@ export default class YeelightDevice {
       this.log('debug', `_eventHandlers.DataReceived: ${jsonString(o)}==${jsonString(command)}`);
       // First two assertions: lightbulb response to commands
       // Last assertion (o.method), turning on musicMode
-      if (command.id === o.id && o.result[0] === 'ok') {
+      if (command.id === o.id && (o.result && o.result[0] === 'ok')) {
         this.log('info', `Command with id ${o.id} ran successfully`);
         this._commandAck = true;
         return this._resolvePromiseRef();
