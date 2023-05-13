@@ -1,4 +1,4 @@
-import { createLogger, format, transports } from 'winston';
+import { Logger, createLogger, format, transports } from 'winston';
 import { join } from 'path';
 
 const { printf, colorize } = format;
@@ -44,3 +44,7 @@ export const ConfigureCmds = (logLevel?: 'verbose' | 'debug' | 'info') => {
 };
 
 export const logger = baseLogger;
+
+export const labeledLogger = (label: string) => (type: 'info' | 'warn' | 'error' | 'debug' | 'verbose', str: any) => logger[type](str as string, { label });
+
+export type LabeledLoggerFn = (type: 'info' | 'warn' | 'error' | 'debug' | 'verbose', str: any) => Logger;

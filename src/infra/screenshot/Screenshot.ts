@@ -1,4 +1,4 @@
-import { getDominantColor } from '.';
+import { getDominantColor, getDominantColorCallback } from '.';
 import { logger } from '../../shared/Logger';
 
 interface FetchPredominantColorResult {
@@ -51,8 +51,7 @@ export default class Screenshot {
 
       const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) * 100 * factor;
       return Number(luminance.toFixed(1));
-    }
-    else {
+    } else {
       const [R8bit, G8bit, B8bit] = value;
       const RsRGB = R8bit / 255;
       const GsRGB = G8bit / 255;
@@ -75,16 +74,25 @@ export default class Screenshot {
    * @param y {number} the y-coordinate of the top-left corner of the region to capture
    * @param width {number} the width of the region to capture
    * @param height {number} the height of the region to capture
-   * @returns A Promise that resolves to an object with the predominant color and luminance of the region.
+   * @returns an object with the predominant color and luminance of the region.
    */
-  static FetchPredominantColor = (
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-  ): FetchPredominantColorResult => {
+  static FetchPredominantColor = (x: number, y: number, width: number, height: number): FetchPredominantColorResult => {
+    // const hexArr = getDominantColor(x ?? 0, y ?? 0, width, height);
     const hexArr = getDominantColor(x ?? 0, y ?? 0, width, height);
+    return Screenshot.ProcessPredominantColor(hexArr);
+  };
 
+  static FetchDominantColorHsl = () => {
+    // hsl(225.41667, 57.600002%, 49.019608%),hsl(188.07692, 53.60825%, 38.039215%),hsl(180, 54.320984%, 31.764708%)
+  }
+
+  /**
+   * Process the result of FetchPredominantColor or getDominantColorcallback
+   *
+   * @param hexArr {string[]} a array of hex colors
+   * @returns an object with the predominant color and luminance of the region.
+   */
+  static ProcessPredominantColor = (hexArr: string[]): FetchPredominantColorResult => {
     logger.debug(`Colors from rust ${hexArr}`, { label: 'image' });
     const color = hexArr[0];
     const luminance = Screenshot.GetColorLuminance(hexArr[0]);

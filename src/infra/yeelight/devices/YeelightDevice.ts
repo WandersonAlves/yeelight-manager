@@ -3,6 +3,7 @@ import { ColorFlowAction, ColorFlowExpressionMode, CommandList } from '../../enu
 import { CommandSignal } from '../../../modules/Yeelight/ReceiveCommand/ReceiveCommandInterfaces';
 import { EventEmitter } from 'events';
 import { GetValueFromString, HexToInteger } from '../../../utils';
+import { RejectFn, ResolveFn } from '../../../shared/contracts';
 import { jsonString, logger } from '../../../shared/Logger';
 import ColorFlowExpression from './ColorFlowExpression';
 import Command, {
@@ -19,9 +20,6 @@ import Command, {
 import CommandFailureException from '../../../shared/exceptions/CommandFailureException';
 import TimeoutException from '../../../shared/exceptions/TimeoutException';
 import UnsuportedCommandException from '../../../shared/exceptions/UnsuportedCommandException';
-
-type ResolveFn = (value: void | PromiseLike<void>) => void;
-type RejectFn = (e: Error) => void;
 
 export interface YeelightDeviceJSON {
   id: string;
