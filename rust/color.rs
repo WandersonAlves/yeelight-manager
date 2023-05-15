@@ -1,9 +1,6 @@
 use napi_derive::napi;
 use screenshots::Screen;
-use signal_hook::low_level::exit;
 use std::{fs, time::{Instant, Duration}, thread::sleep};
-
-static mut SHOULD_CLOSE: bool = false;
 
 macro_rules! debug {
     ($($e:expr),+) => {
@@ -78,23 +75,9 @@ fn rgb_vec_hsl(rgb: &[u8]) -> Vec<String> {
 #[napi]
 pub fn get_dominant_color_callback<T: Fn(Vec<String>) -> Result<napi::JsNull, napi::Error>>(x: i32, y: i32, width: u32, height: u32, interval: u32, callback: T) {
   loop {
-    unsafe {
-      debug!(println!("Should close? {}", SHOULD_CLOSE));
-      if SHOULD_CLOSE {
-        exit(0);
-      }
-    }
     let result = get_dominant_color(x, y, width, height);
     callback(result).unwrap();
     sleep(Duration::from_millis(u64::from(interval)));
-  }
-}
-
-#[napi]
-pub fn finish_loop() {
-  unsafe {
-    SHOULD_CLOSE = true;
-    exit(0);
   }
 }
 

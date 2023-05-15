@@ -1,28 +1,11 @@
-import { getDominantColor, getDominantColorCallback } from '.';
 import { logger } from '../../shared/Logger';
 
-interface FetchPredominantColorResult {
+export interface FetchPredominantColorResult {
   color: string;
   luminance: number;
 }
 
 export default class Screenshot {
-  /**
-   * Takes an array of three numbers representing an RGB color value and
-   * returns a string representing the equivalent hexadecimal color code.
-   *
-   * @param rgb [r,g,b] array
-   * @returns Hexadecimal color
-   */
-  private static RgbToHex = (rgb: number[]): string => {
-    return [rgb[0], rgb[1], rgb[2]]
-      .map(x => {
-        const hex = x.toString(16);
-        return hex.length === 1 ? '0' + hex : hex;
-      })
-      .join('');
-  };
-
   /**
    * Takes an array of three numbers representing an RGB color value or a string representing a HEX color and
    * returns the corresponding luminance value.
@@ -68,25 +51,6 @@ export default class Screenshot {
   };
 
   /**
-   * Fetches the predominant color and luminance of a region of the screen.
-   *
-   * @param x {number} the x-coordinate of the top-left corner of the region to capture
-   * @param y {number} the y-coordinate of the top-left corner of the region to capture
-   * @param width {number} the width of the region to capture
-   * @param height {number} the height of the region to capture
-   * @returns an object with the predominant color and luminance of the region.
-   */
-  static FetchPredominantColor = (x: number, y: number, width: number, height: number): FetchPredominantColorResult => {
-    // const hexArr = getDominantColor(x ?? 0, y ?? 0, width, height);
-    const hexArr = getDominantColor(x ?? 0, y ?? 0, width, height);
-    return Screenshot.ProcessPredominantColor(hexArr);
-  };
-
-  static FetchDominantColorHsl = () => {
-    // hsl(225.41667, 57.600002%, 49.019608%),hsl(188.07692, 53.60825%, 38.039215%),hsl(180, 54.320984%, 31.764708%)
-  }
-
-  /**
    * Process the result of FetchPredominantColor or getDominantColorcallback
    *
    * @param hexArr {string[]} a array of hex colors
@@ -95,7 +59,7 @@ export default class Screenshot {
   static ProcessPredominantColor = (hexArr: string[]): FetchPredominantColorResult => {
     logger.debug(`Colors from rust ${hexArr}`, { label: 'image' });
     const color = hexArr[0];
-    const luminance = Screenshot.GetColorLuminance(hexArr[0]);
+    const luminance = Screenshot.GetColorLuminance(hexArr[0], 0.8);
 
     logger.debug(`Color #${color} / Luminance ${luminance}`, { label: 'image' });
 
