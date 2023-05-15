@@ -8,3 +8,4 @@ localStorage/
 .yarn
 target/
 .DS_Store
+.node
