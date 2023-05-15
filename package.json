@@ -20,9 +20,9 @@
     "start:dev": "node --inspect=0.0.0.0:9229 -r ts-node/register ./src/index.ts",
     "dev": "nodemon",
     "dev:cli": "node -r ts-node/register ./src/index.ts",
+    "dev:release": "node ./lib/index.js",
     "release": "npx standard-version && yarn build && yarn publish",
-    "clean": "rm -rf dist/",
-    "build": "tsc",
+    "build": "rm -rf lib/ && tsc",
     "build:rs": "napi build --release ./src/infra/screenshot",
     "build:rs:debug": "napi build ./src/infra/screenshot"
   },
