@@ -65,7 +65,7 @@ export default class YeelightDevice {
       case CommandList.CT3:
       case CommandList.CT2:
       case CommandList.CT: {
-        return device.setColorTemperature(Number(value));
+        return device.setColorTemperature(YeelightDevice.FetchColorTemperature(value));
       }
       case CommandList.BRIGHT: {
         return device.setBright(Number(value));
@@ -78,6 +78,37 @@ export default class YeelightDevice {
       }
       default: {
         throw new UnsuportedCommandException(device.id, kind, value);
+      }
+    }
+  }
+
+  /**
+   * Returns a CT value based on input.
+   *
+   * If the value is a well-know color temperature name, it'll return the value for that temperature. Otherwise, returns the given value
+   *
+   * @param value
+   */
+  private static FetchColorTemperature(value: string) {
+    switch (value) {
+      case 'cold': {
+        return 6500;
+      }
+      case 'warm': {
+        return 1700
+      }
+      case 'mid': {
+        return 3999
+      }
+      case 'mid-warm': {
+        return 2700
+      }
+      case 'mid-cold': {
+        return 4550
+      }
+      default: {
+        logger.warn(`A invalid value (${value}) was given to color temperature. Replacing it with 3999 ct`);
+        return 3999;
       }
     }
   }
@@ -215,7 +246,7 @@ export default class YeelightDevice {
       this.log('debug', `_eventHandlers.DataReceived: ${jsonString(o)}==${jsonString(command)}`);
       // First two assertions: lightbulb response to commands
       // Last assertion (o.method), turning on musicMode
-      if (command.id === o.id && (o.result && o.result[0] === 'ok')) {
+      if (command.id === o.id && o.result && o.result[0] === 'ok') {
         this.log('info', `Command with id ${o.id} ran successfully`);
         this._commandAck = true;
         return this._resolvePromiseRef();
@@ -246,8 +277,7 @@ export default class YeelightDevice {
             reject(new TimeoutException('ack', this.name));
           }
         }, YeelightDevice.DefaultTimeoutTime);
-      }
-      else {
+      } else {
         return this._resolvePromiseRef();
       }
     },
