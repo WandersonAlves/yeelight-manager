@@ -11,8 +11,11 @@ interface WorkerParams {
 
 const Worker = (params: WorkerParams) => {
   getDominantColorCallback(params.x, params.y, params.width, params.height, params.interval, (colors: string[]) => {
-    process.stdout.write(JSON.stringify(Screenshot.ProcessPredominantColor(colors)));
-    return null;
+    try {
+      process.stdout.write(JSON.stringify(Screenshot.ProcessPredominantColor(colors)));
+      return null;
+    }
+    catch (e) { return null }
   });
 };
 
