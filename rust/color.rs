@@ -17,7 +17,7 @@ macro_rules! debug {
     };
 }
 
-fn rgb_vec_hex(rgb: &[u8]) -> Vec<String> {
+fn rgb_vec_hex(rgb: [u8; 3]) -> Vec<String> {
     rgb.chunks(3)
         .map(|chunk| {
             let hex_chars: Vec<String> = chunk
@@ -29,73 +29,23 @@ fn rgb_vec_hex(rgb: &[u8]) -> Vec<String> {
         .collect()
 }
 
-fn rgb_vec_hsl(rgb: &[u8]) -> Vec<String> {
-    let mut hsl_vec = Vec::new();
-
-    for chunk in rgb.chunks(3) {
-        let r = chunk[0] as f32 / 255.0;
-        let g = chunk[1] as f32 / 255.0;
-        let b = chunk[2] as f32 / 255.0;
-
-        let max = r.max(g).max(b);
-        let min = r.min(g).min(b);
-        let delta = max - min;
-
-        let mut h: f32;
-        let mut s: f32;
-        let l = (max + min) / 2.0;
-
-        if delta == 0.0 {
-            h = 0.0;
-            s = 0.0;
-        } else {
-            if max == r {
-                h = (g - b) / delta;
-            } else if max == g {
-                h = 2.0 + (b - r) / delta;
-            } else {
-                h = 4.0 + (r - g) / delta;
-            }
-
-            h *= 60.0;
-
-            if h < 0.0 {
-                h += 360.0;
-            }
-
-            s = delta / (1.0 - f32::abs(2.0 * l - 1.0));
-        }
-
-        hsl_vec.push(format!("hsl({}, {}%, {}%)", h, s * 100.0, l * 100.0));
-    }
-
-    hsl_vec
-}
-
 #[napi]
 pub fn get_dominant_color_callback<T: Fn(Vec<String>) -> Result<napi::JsNull, napi::Error>>(x: i32, y: i32, width: u32, height: u32, interval: u32, callback: T) {
+  let mut prev_color: (u8, u8, u8) = (0,0,0);
+  let mut curr_color: (u8, u8, u8);
   loop {
-    let result = get_dominant_color(x, y, width, height);
+    let colors = handle_dominant_color(x, y, width, height);
+    curr_color = colors;
+    let factor = calculate_factor(prev_color, curr_color);
+    let interpolated_color = interpolate_color(curr_color, prev_color, factor);
+    let result:Vec<String> = rgb_vec_hex([interpolated_color.0, interpolated_color.1, interpolated_color.2]);
     callback(result).unwrap();
+    prev_color = curr_color;
     sleep(Duration::from_millis(u64::from(interval)));
   }
 }
 
-#[napi]
-pub fn get_dominant_color(x: i32, y: i32, width: u32, height: u32) -> Vec<String> {
-  let colors = handle_dominant_color(x, y, width, height);
-  let result:Vec<String> = rgb_vec_hex(&colors);
-  return result;
-}
-
-#[napi]
-pub fn get_dominant_color_hsl(x: i32, y: i32, width: u32, height: u32) -> Vec<String> {
-  let colors = handle_dominant_color(x, y, width, height);
-  let result:Vec<String> = rgb_vec_hsl(&colors);
-  return result;
-}
-
-fn handle_dominant_color (x: i32, y: i32, width: u32, height: u32) -> Vec<u8> {
+fn handle_dominant_color (x: i32, y: i32, width: u32, height: u32) -> (u8, u8, u8) {
   let screens = Screen::all().unwrap();
   let screenshot: screenshots::Image = screens[0].capture_area(x, y, width, height).unwrap();
   let image_buffer = screenshot.buffer();
@@ -104,5 +54,28 @@ fn handle_dominant_color (x: i32, y: i32, width: u32, height: u32) -> Vec<u8> {
   let colors = dominant_color::get_colors(&dynamic_image.to_rgba8(), true);
 
   debug!(fs::write(format!("target/{}.jpg", screens[0].display_info.id), image_buffer).unwrap());
-  return colors;
+  return (colors[0], colors[1], colors[2]);
+}
+
+fn interpolate_color(color1: (u8, u8, u8), color2: (u8, u8, u8), factor: f32) -> (u8, u8, u8) {
+    let r = (color1.0 as f32 * (1.0 - factor) + color2.0 as f32 * factor) as u8;
+    let g = (color1.1 as f32 * (1.0 - factor) + color2.1 as f32 * factor) as u8;
+    let b = (color1.2 as f32 * (1.0 - factor) + color2.2 as f32 * factor) as u8;
+    (r, g, b)
+}
+
+fn calculate_factor(previous_color: (u8, u8, u8), current_color: (u8, u8, u8)) -> f32 {
+    let r_diff = (current_color.0 as f32 - previous_color.0 as f32).abs();
+    let g_diff = (current_color.1 as f32 - previous_color.1 as f32).abs();
+    let b_diff = (current_color.2 as f32 - previous_color.2 as f32).abs();
+
+    // Calculate the maximum difference between RGB channels
+    let max_diff = r_diff.max(g_diff).max(b_diff);
+
+    // Calculate the factor based on the maximum difference
+    if max_diff == 0.0 {
+        0.0
+    } else {
+        1.0 - (max_diff / 255.0)
+    }
 }

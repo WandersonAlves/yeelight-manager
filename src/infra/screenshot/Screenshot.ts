@@ -59,7 +59,7 @@ export default class Screenshot {
   static ProcessPredominantColor = (hexArr: string[]): FetchPredominantColorResult => {
     logger.debug(`Colors from rust ${hexArr}`, { label: 'image' });
     const color = hexArr[0];
-    const luminance = Screenshot.GetColorLuminance(hexArr[0], 0.8);
+    const luminance = Screenshot.GetColorLuminance(hexArr[0]);
 
     logger.debug(`Color #${color} / Luminance ${luminance}`, { label: 'image' });
 
