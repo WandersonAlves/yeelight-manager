@@ -29,20 +29,50 @@ fn rgb_vec_hex(rgb: [u8; 3]) -> Vec<String> {
         .collect()
 }
 
+#[napi(object)]
+pub struct DominantColorResponse {
+  pub color: String,
+  pub factor: f64,
+  pub luminance: f64
+}
+
 #[napi]
-pub fn get_dominant_color_callback<T: Fn(Vec<String>) -> Result<napi::JsNull, napi::Error>>(x: i32, y: i32, width: u32, height: u32, interval: u32, callback: T) {
+pub fn get_screen_dimensions() -> [u32; 2] {
+  let screens = Screen::all().unwrap();
+  let main_display = screens[0];
+  [main_display.display_info.width, main_display.display_info.height]
+}
+
+#[napi]
+pub fn get_dominant_color_callback<T: Fn(DominantColorResponse) -> Result<napi::JsNull, napi::Error>>(x: i32, y: i32, width: u32, height: u32, interval: u32, callback: T) {
   let mut prev_color: (u8, u8, u8) = (0,0,0);
   let mut curr_color: (u8, u8, u8);
   loop {
     let colors = handle_dominant_color(x, y, width, height);
     curr_color = colors;
+    // println!("curr_color: {:?}", curr_color);
     let factor = calculate_factor(prev_color, curr_color);
+    // println!("factor: {:?}", factor);
     let interpolated_color = interpolate_color(curr_color, prev_color, factor);
-    let result:Vec<String> = rgb_vec_hex([interpolated_color.0, interpolated_color.1, interpolated_color.2]);
-    callback(result).unwrap();
-    prev_color = curr_color;
+    // println!("interpolated_color: {:?}", interpolated_color);
+    let color_result:Vec<String> = rgb_vec_hex([interpolated_color.0, interpolated_color.1, interpolated_color.2]);
+    prev_color = interpolated_color;
+    callback(DominantColorResponse {
+      color: color_result[0].to_owned(),
+      factor: factor as f64,
+      luminance: calculate_luminance(interpolated_color.0, interpolated_color.1, interpolated_color.2) as f64
+    }).unwrap();
     sleep(Duration::from_millis(u64::from(interval)));
   }
+}
+
+fn calculate_luminance(red: u8, green: u8, blue: u8) -> f32 {
+    let r = red as f32 / 255.0;
+    let g = green as f32 / 255.0;
+    let b = blue as f32 / 255.0;
+
+    let luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) * 100.0;
+    luminance
 }
 
 fn handle_dominant_color (x: i32, y: i32, width: u32, height: u32) -> (u8, u8, u8) {
@@ -53,7 +83,7 @@ fn handle_dominant_color (x: i32, y: i32, width: u32, height: u32) -> (u8, u8, u
   let dynamic_image = image::load_from_memory(image_buffer).unwrap();
   let colors = dominant_color::get_colors(&dynamic_image.to_rgba8(), true);
 
-  debug!(fs::write(format!("target/{}.jpg", screens[0].display_info.id), image_buffer).unwrap());
+  // debug!(fs::write(format!("target/{}.jpg", screens[0].display_info.id), image_buffer).unwrap());
   return (colors[0], colors[1], colors[2]);
 }
 

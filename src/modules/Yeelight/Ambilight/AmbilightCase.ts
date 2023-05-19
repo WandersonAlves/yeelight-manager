@@ -1,4 +1,4 @@
-import { FetchPredominantColorResult } from '../../../infra/screenshot/Screenshot';
+import { DominantColorResponse } from '../../../infra/screenshot';
 import { UseCase } from '../../../shared/contracts';
 import { address } from 'ip';
 import { inject, injectable } from 'inversify';
@@ -32,7 +32,7 @@ export default class AmbilightCase implements UseCase<AmbilightCaseParams, void>
     const ip = address();
     const selectedDevices = await this._discoverDevices(deviceNames);
 
-    this.ListenSignals(selectedDevices, ip);
+    this._startSignalHandlers(selectedDevices, ip);
 
     await this._turnOnDevices(selectedDevices, ip);
 
@@ -81,16 +81,18 @@ export default class AmbilightCase implements UseCase<AmbilightCaseParams, void>
     childProcess.stdout.on('data', (data: string) => {
       let color: string;
       let luminance: number;
+      let factor: number;
       try {
         this.logger('debug', `Values from worker: ${data.toString()}`);
-        const result: FetchPredominantColorResult = JSON.parse(data.toString().trim());
+        const result: DominantColorResponse = JSON.parse(data.toString().trim());
         color = result.color;
         luminance = result.luminance;
+        factor = result.factor;
       } catch (e) {
         this.logger('warn', e);
         return;
       }
-      this.HandleAmbilightInterval(color, luminance, interval, selectedDevices, useLuminance, ip);
+      this._ambilightResultHandler(color, luminance, interval, factor, selectedDevices, useLuminance, ip);
     });
   }
 
@@ -100,42 +102,44 @@ export default class AmbilightCase implements UseCase<AmbilightCaseParams, void>
     await this.discovery.musicModeAll(ip, selectedDevices);
   }
 
-  private ListenSignals(selectedDevices: YeelightDevice[], ip: string) {
+  private _startSignalHandlers(selectedDevices: YeelightDevice[], ip: string) {
     this.logger('debug', 'Adding signal listeners');
     process.stdin.resume();
     process.on('SIGINT', () => {
-      this.HandleSignal(selectedDevices, ip);
+      this._signalHandler(selectedDevices, ip);
     });
     process.on('SIGQUIT', () => {
-      this.HandleSignal(selectedDevices, ip);
+      this._signalHandler(selectedDevices, ip);
     });
     process.on('SIGTERM', () => {
-      this.HandleSignal(selectedDevices, ip);
+      this._signalHandler(selectedDevices, ip);
     });
     this.logger('debug', 'Listeners added');
   }
 
-  private HandleSignal(selectedDevices: YeelightDevice[], ip: string) {
+  private _signalHandler(selectedDevices: YeelightDevice[], ip: string) {
+    console.log('\n');
     selectedDevices.forEach(d => void d.finishMusicMode(ip));
     this.logger('info', '🦄 See you soon');
     process.exit(0);
   }
 
-  private HandleAmbilightInterval(
+  private _ambilightResultHandler(
     color: string,
     luminance: number,
     interval: number,
+    factor: number,
     selectedDevices: YeelightDevice[],
     useLuminance: boolean,
     ip: string,
   ) {
     try {
-      const suddenSmooth = interval < 33 ? 'sudden' : 'smooth';
+      // const effectType: EffectTypes = factor < 0.35 ? 'sudden' : 'smooth';
       selectedDevices.forEach(async d => {
         if (useLuminance) {
-          void d.setBright(Number(luminance), suddenSmooth, interval);
+          void d.setBright(Number(luminance), 'smooth', interval);
         }
-        void d.setHex(color, 'smooth', 150);
+        void d.setHex(color, 'smooth', interval);
       });
     } catch (e) {
       const err: Error = e;

@@ -59,12 +59,12 @@ program
   .action(LoadCommandCmd);
 
 program
-  .command('ambilight <devices> <resolution> [interval]')
+  .command('ambilight <devices> <value> [interval]')
   .description('Turn ambilight for given devices')
   .addHelpText('after', "\ndevices: string - a comma separeted string with the name of devices. Example: 'Living Room,Bedroom', Bedroom")
-  .addHelpText('after', 'resolution: string - a x separeted string that represents width-height-X-Y, this is the area to scan for colors. Example: 1280x135x640x100')
+  .addHelpText('after', 'value: string - a x separeted string that represents width-height-X-Y, this is the area to scan for colors. Example: 1280x135x640x100')
   .addHelpText('after', 'interval?: number|string - the interval in miliseconds or in fps to fetch new colors. Example: 150, 60fps. Defaults to 300')
-  .usage('yee ambilight <devices> <resolution> [interval] --options')
+  .usage('yee ambilight <devices> <value> [interval] --options')
   .option('--verbose', 'Output verbose info')
   .option('--debug', 'Output debug info')
   .option('--no-luminance', 'Dont use luminance values to increase/decrease brightness')

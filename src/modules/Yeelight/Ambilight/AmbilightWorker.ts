@@ -1,5 +1,4 @@
-import { getDominantColorCallback } from '../../../infra/screenshot';
-import Screenshot from '../../../infra/screenshot/Screenshot';
+import { DominantColorResponse, getDominantColorCallback } from '../../../infra/screenshot';
 
 interface WorkerParams {
   x: number;
@@ -10,13 +9,21 @@ interface WorkerParams {
 }
 
 const Worker = (params: WorkerParams) => {
-  getDominantColorCallback(params.x, params.y, params.width, params.height, params.interval, (colors: string[]) => {
-    try {
-      process.stdout.write(JSON.stringify(Screenshot.ProcessPredominantColor(colors)));
-      return null;
-    }
-    catch (e) { return null }
-  });
+  getDominantColorCallback(
+    params.x,
+    params.y,
+    params.width,
+    params.height,
+    params.interval,
+    (response: DominantColorResponse) => {
+      try {
+        process.stdout.write(JSON.stringify(response));
+        return null;
+      } catch (e) {
+        return null;
+      }
+    },
+  );
 };
 
 const [x, y, width, height, interval] = process.argv.slice(2).map(i => Number(i));
