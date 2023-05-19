@@ -18,10 +18,7 @@ export default class ReceiveCommandCase implements UseCase<ReceiveCommandParams,
   @ExceptionHandler()
   async execute(params: ReceiveCommandParams): Promise<ReceiveCommandResponse | GenericException> {
     const { deviceNames, kind, manualConnect, bright } = params;
-    const devices = this.discovery.getDevices();
-    const selectedDevices = devices.filter(
-      d => deviceNames.includes(d.name) || deviceNames.includes(d.host) || deviceNames.includes(d.id),
-    );
+    const selectedDevices = this._getDevices(deviceNames);
     if (!selectedDevices.length) {
       logger.error("Specified devices can't be found. Try again or check if device is on the same network", {
         label: 'Discovery',
@@ -38,5 +35,13 @@ export default class ReceiveCommandCase implements UseCase<ReceiveCommandParams,
     await Promise.all(selectedDevices.map(d => YeelightDevice.ExecCommand(d, params)));
     logger.info('Command(s) Success!!!', { label: ReceiveCommandCase.name });
     return { deviceNames, kind };
+  }
+
+  private _getDevices(deviceNames: string[]) {
+    const devices = this.discovery.getDevices();
+    if (deviceNames.includes('@all')) {
+      return devices;
+    }
+    return devices.filter(d => deviceNames.includes(d.name) || deviceNames.includes(d.host) || deviceNames.includes(d.id));
   }
 }
