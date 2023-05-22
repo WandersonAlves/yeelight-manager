@@ -1,10 +1,22 @@
 # yeelight-manager
 
-A CLI to super charge your yeelight use!
+A CLI to super charge your yeelight use! Works on Linux and Mac (not tested on Windows)
 
 ## Installation
 
 `npm i -g yeelight-manager`
+
+## Requirements
+
+ - [`rust`](https://www.rust-lang.org/): Needed to build native packages to be used on ambiglight command.
+
+## How-to?
+
+The first thing after installing this tool is to run `yee list` to see the available devices on your network.
+
+Them, get the IP or ID of a device and run `yee blink <ip/id>` (or `yee toggle <ip/id>`) to identify the device. The run a `yee set <ip/id> name <name-of-device>`
+
+Do that for all of your devices
 
 ## Commands
 
