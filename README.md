@@ -12,11 +12,11 @@ A CLI to super charge your yeelight use! Works on Linux and Mac (not tested on W
 
 ## How-to?
 
-The first thing after installing this tool is to run `yee list` to see the available devices on your network.
+After installing this tool, the first thing is to run `yee list` to see the available devices on your network.
 
-Them, get the IP or ID of a device and run `yee blink <ip/id>` (or `yee toggle <ip/id>`) to identify the device. The run a `yee set <ip/id> name <name-of-device>`
+Then, get the IP or ID of a device and run `yee blink <ip/id>` (or `yee toggle <ip/id>`) to identify the device, then run `yee set <ip/id> name <name-of-device>`.
 
-Do that for all of your devices
+Repeat the process until you name all your devices
 
 ## Commands
 
