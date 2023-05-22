@@ -68,9 +68,10 @@ export default class AmbilightCmdCase implements UseCase<AmbilightCaseParams, vo
     useLuminance: boolean,
     ip: string,
   ) {
+    const isRelease = __dirname.includes("lib/modules") ? true : false;
     const childProcess = spawn(
-      'ts-node',
-      [__dirname + '/AmbilightWorker.ts', x.toString(), y.toString(), width.toString(), height.toString(), interval.toString()],
+      isRelease ? 'node' : 'ts-node',
+      [__dirname + `/AmbilightWorker${isRelease ? '.js' : '.ts'}`, x.toString(), y.toString(), width.toString(), height.toString(), interval.toString()],
       { stdio: 'pipe' },
     );
 
