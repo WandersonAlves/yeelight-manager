@@ -7,6 +7,7 @@ export interface DominantColorResponse {
   color: string
   factor: number
   luminance: number
+  isBlackShade: boolean
 }
 export function getScreenDimensions(): number[]
 export function getDominantColorCallback(x: number, y: number, width: number, height: number, interval: number, callback: (arg0: DominantColorResponse) => null): void

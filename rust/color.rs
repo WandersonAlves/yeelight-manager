@@ -17,6 +17,35 @@ macro_rules! debug {
     };
 }
 
+fn is_color_in_black_palette(color: (u8, u8, u8)) -> bool {
+    let (r, g, b) = color;
+    // Convert RGB to HSB
+    let max_value = r.max(g).max(b) as f32;
+    let min_value = r.min(g).min(b) as f32;
+    let delta = max_value - min_value;
+
+    // Calculate saturation
+    let saturation = if max_value != 0.0 {
+        delta / max_value
+    } else {
+        0.0
+    };
+
+    // Calculate brightness
+    let brightness = max_value / 255.0;
+
+    // Define the threshold for black palette
+    let saturation_threshold = 0.1;
+    let brightness_threshold = 0.2;
+
+    // Check if the color is within the black palette
+    if saturation < saturation_threshold && brightness < brightness_threshold {
+        true
+    } else {
+        false
+    }
+}
+
 fn rgb_vec_hex(rgb: [u8; 3]) -> Vec<String> {
     rgb.chunks(3)
         .map(|chunk| {
@@ -33,7 +62,8 @@ fn rgb_vec_hex(rgb: [u8; 3]) -> Vec<String> {
 pub struct DominantColorResponse {
   pub color: String,
   pub factor: f64,
-  pub luminance: f64
+  pub luminance: f64,
+  pub is_black_shade: bool
 }
 
 #[napi]
@@ -60,6 +90,7 @@ pub fn get_dominant_color_callback<T: Fn(DominantColorResponse) -> Result<napi::
     callback(DominantColorResponse {
       color: color_result[0].to_owned(),
       factor: factor as f64,
+      is_black_shade: is_color_in_black_palette(interpolated_color),
       luminance: calculate_luminance(interpolated_color.0, interpolated_color.1, interpolated_color.2) as f64
     }).unwrap();
     sleep(Duration::from_millis(u64::from(interval)));
@@ -75,7 +106,7 @@ fn calculate_luminance(red: u8, green: u8, blue: u8) -> f32 {
     luminance
 }
 
-fn handle_dominant_color (x: i32, y: i32, width: u32, height: u32) -> (u8, u8, u8) {
+fn handle_dominant_color(x: i32, y: i32, width: u32, height: u32) -> (u8, u8, u8) {
   let screens = Screen::all().unwrap();
   let screenshot: screenshots::Image = screens[0].capture_area(x, y, width, height).unwrap();
   let image_buffer = screenshot.buffer();
