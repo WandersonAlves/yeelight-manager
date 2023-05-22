@@ -20,39 +20,39 @@ export default class Screenshot {
     logger.debug(`Value received from rust: ${sWidth} x ${sHeight}`, { label: 'Screenshot.GetScreenAreaDimensions' });
     switch (value) {
       case 'top': {
-        const cWidth = sWidth / 2;
+        const cWidth = sWidth * 0.1;
         return {
-          x: cWidth / 2,
-          y: 100,
+          x: sWidth / 2,
+          y: 0,
           width: cWidth,
           height: Number((sHeight * 0.12).toFixed(0)),
         };
       }
       case 'bottom': {
-        const cWidth = sWidth / 2;
+        const cWidth = sWidth * 0.1;
         return {
-          x: cWidth / 2,
+          x: sWidth / 2,
           y: sHeight - 100,
           width: cWidth,
           height: Number((sHeight * 0.12).toFixed(0)),
         };
       }
       case 'left': {
-        const cHeight = sHeight / 2;
+        const cHeight = sHeight * 0.1;
         const cWidth = sWidth / 2;
         return {
           x: 0,
-          y: cHeight / 2,
+          y: sHeight / 2,
           width: Number((cWidth * 0.12).toFixed(0)),
           height: cHeight,
         };
       }
       case 'right': {
-        const cHeight = sHeight / 2;
+        const cHeight = sHeight * 0.1;
         const cWidth = sWidth / 2;
         return {
           x: sWidth - 100,
-          y: cHeight / 2,
+          y: sHeight / 2,
           width: Number((cWidth * 0.12).toFixed(0)),
           height: cHeight,
         };
