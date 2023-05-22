@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1-preview.3](https://github.com/WandersonAlves/yeelight-manager/compare/v0.1.1-preview.2...v0.1.1-preview.3) (2023-05-22)
+
+
+### Bug Fixes
+
+* check if is release when spawn worker ([2e251d5](https://github.com/WandersonAlves/yeelight-manager/commit/2e251d5eca2635aa72c91391df6dcf637a4c22a1))
+
 ### [0.1.1-preview.2](https://github.com/WandersonAlves/yeelight-manager/compare/v0.1.1-preview.1...v0.1.1-preview.2) (2023-05-22)
 
 
