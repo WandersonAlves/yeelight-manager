@@ -2,7 +2,7 @@
   "name": "yeelight-manager",
   "version": "0.1.1-preview.0",
   "description": "CLI to control yeelight devices!",
-  "main": "src/index.ts",
+  "main": "./lib/index.js",
   "engines": {
     "node": ">=10.22.0"
   },
@@ -10,7 +10,11 @@
     "yee": "./lib/index.js"
   },
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "rust/**/*",
+    "Cargo.toml",
+    "Cargo.lock",
+    "build.rs"
   ],
   "napi": {
     "name": "color"
