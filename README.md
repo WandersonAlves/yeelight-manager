@@ -8,79 +8,111 @@ A CLI to super charge your yeelight use!
 
 ## Commands
 
-
 1. `yee list` List all available devices. Uses SSDP method and port scanner method to retrieve devices.
-2. `yee blink <name|id|ip>` Blink a device. Useful when you have multiple devices and wanna know with id/ip belongs to a device
-3. `yee set <name|id|ip> name <name>` Sets a name for your device
-4. `yee set <name|id|ip> bright <1-100>` Change the brightness of a device. Any value below 1 will be threated as 1 and above 100 will be threated as 100;
-5. `yee set <name|id|ip> ct|temperature|color_temperature <1700~6500> [bright]` Change the color temperature of a device. Any value below 1700 will be threated as 1700 and any value above 6500 will be threated as 6500;
-6. `yee set <name|id|ip> color <hex-color> [bright]` Change the color of the device;
-7. `yee set <name|id|ip> power off|on` Explicity turn on or off a device;
-8. `yee setx "'Living Room' ct=9999 bright=100 Kitchen ct=9999 bright=100" --save 'Normal Room'` Set a custom command to later use
-9. `yee toggle <name|id|ip>` Toggles a device;
-10. `yee ambilight <name|id|ip> <resolution> [interval]` (**beta**) Using Yeelight's Music Mode, scan for predominant color on screen and change on device. Uses `node-vibrant` and `ffmpeg` under the hood. Not tested on Windows and Mac OS.
+1. `yee blink <name|id|ip>` Blink a device. Useful when you have multiple devices and wanna know with id/ip belongs to a device
+2. `yee set <name|idip> <command> <value> [options]`
+   1. `yee set <name|id|ip> name <name>` Sets a name for your device
+   2. `yee set <name|id|ip> bright <1-100>` Change the brightness of a device. Any value below 1 will be threated as 1 and above 100 will be threated as 100;
+   3. `yee set <name|id|ip> ct|temperature|color_temperature <1700~6500|default-temperatures> [bright]` Change the color temperature of a device. Any value below 1700 will be threated as 1700 and any value above 6500 will be threated as 6500;
+      - Has the following default temperatures available: `cold`, `mid-cold`, `mid`, `mid-warm` and `warm`.
+   4. `yee set <name|id|ip> color <hex-color|default-colors> [bright]` Change the color of the device;
+      - Has the following default colors available: `red`, `blue`, `green`, `cyan`, `purple`, `pink`, `orange` and `yellow`.
+   5. `yee set <name|id|ip> power <off|on>` Explicity turn on or off a device;
+3. `yee setx "'Living Room' ct=9999 bright=100 Kitchen ct=9999 bright=100" --save 'Normal Room'` Set a custom command to later use
+4. `yee toggle <name|id|ip>` Toggles a device;
+5.  `yee ambilight <name|id|ip> <resolution|default-area> <interval> [options]` (**beta**) Using Yeelight's Music Mode, scan for dominant color on screen and use that color on device. Uses `rust` and `napi-rs` under the hood. Not tested on Windows.
+    - `resolution`: Defines the area to fetch the dominant color. It's a string in format `<width>x<height>x<x>x<y>` or one of the `default-area` values.
+      - `<width>x<height>x<x>x<y>`: `<width>x<height>` are required, `x` and `y` are optional
+      - `default-area`: Can be `top`, `bottom`, `left` and `right`.
+    - `interval`: Interval for fetching new colors. It's a number representing a `ms` value. Also, it can be a `fps` value, example: `yee ambiglight Bedroom top 30fps`. Due to the way the Yeelight's Bulb changes from color to color, the recomended `interval` is `150`.
 
 ### Output Examples
 > `yee list`: List devices. Sometimes, IP scan can fail
 ```sh
-15:52:40 info:Discovery: Discovery success
-15:52:41 info:Discovery: Found 0 devices via SSDP
-15:52:41 info:Discovery: Performing IP scan to find devices
-15:52:41 info:Discovery: YeelightID: null | Name: null | IP: xxx.xxx.0.191:55443
-15:52:41 info:Discovery: Found 1 devices via IP scan
+17:38:58 info:Discovery: Discovery started...
+17:39:00 info:Discovery: Found 5 devices via SSDP.
+17:39:00 info:Discovery: Discovery finished.
+17:39:00 info:Discovery: List of devices:
+┌────────────────────┬─────────────┬─────────────────────┬─────┬──────┬───────┬────────────┐
+│ DeviceID           │ Name        │ IP                  │ On? │ Mode │ Value │ Brightness │
+├────────────────────┼─────────────┼─────────────────────┼─────┼──────┼───────┼────────────┤
+│ 0x0000000012a1c314 │ Bedroom     │ 192.168.0.191:55443 │ Yes │ CT   │ 1700  │ 50         │
+├────────────────────┼─────────────┼─────────────────────┼─────┼──────┼───────┼────────────┤
+│ 0x0000000011301fe3 │ Corridor #1 │ 192.168.0.169:55443 │ Yes │ CT   │ 1700  │ 26         │
+├────────────────────┼─────────────┼─────────────────────┼─────┼──────┼───────┼────────────┤
+│ 0x0000000012a2d4ab │ Corridor #2 │ 192.168.0.162:55443 │ Yes │ CT   │ 5244  │ 29         │
+├────────────────────┼─────────────┼─────────────────────┼─────┼──────┼───────┼────────────┤
+│ 0x00000000112c0549 │ Kitchen     │ 192.168.0.199:55443 │ Yes │ CT   │ 2001  │ 100        │
+├────────────────────┼─────────────┼─────────────────────┼─────┼──────┼───────┼────────────┤
+│ 0x0000000011301d41 │ Living Room │ 192.168.0.107:55443 │ Yes │ CT   │ 4710  │ 100        │
+└────────────────────┴─────────────┴─────────────────────┴─────┴──────┴───────┴────────────┘
 ```
-> `yee ambilight 'Kitchen,Living Room' 2560x1080 600 --debug`: Turn ambilight on for 'Kitchen' and 'Living Room' devices using 2560x1080 resolution with 600ms updates
+
+> `yee ambilight Bedroom top 500 --debug`: Turn ambilight on for `Bedroom` device using `top` area for color tracking with 500ms updates
 ```sh
-16:00:00 info:Discovery: Discovery success
-16:00:01 info:Discovery: YeelightID: 0x00000000112c0549 | Name: Kitchen | IP: xxx.xxx.0.199:55443
-16:00:01 info:Discovery: YeelightID: 0x0000000011301d41 | Name: Living Room | IP: xxx.xxx.0.107:55443
-16:00:01 info:Discovery: YeelightID: 0x0000000012a1c314 | Name: Bedroom | IP: xxx.xxx.0.191:55443
-16:00:01 info:0x00000000112c0549:Kitchen: ⚡ Trying to connect into Kitchen in xxx.xxx.0.199:55443
-16:00:01 info:0x0000000011301d41:Living Room: ⚡ Trying to connect into Living Room in xxx.xxx.0.107:55443
-16:00:01 info:0x00000000112c0549:Kitchen: 📀 Starting music mode
-16:00:01 info:0x0000000011301d41:Living Room: 📀 Starting music mode
-16:00:01 debug:0x00000000112c0549:Kitchen: Command sent: {"id":9999,"method":"set_power","params":["on","smooth",300]}
+17:40:08 debug:Screenshot.GetScreenAreaDimensions: Value received: top
+17:40:08 debug:Screenshot.GetScreenAreaDimensions: Value received from rust: 2560 x 1080
+17:40:08 debug:AmbilightCmd: Interval MS: 500; Raw interval: 500
+17:40:08 debug:ambilightCase: Received parameters
+{
+  "deviceNames": [
+    "Bedroom"
+  ],
+  "height": 130,
+  "width": 1280,
+  "x": 640,
+  "y": 100,
+  "interval": 500,
+  "useLuminance": true
+}
 
-16:00:01 debug:0x0000000011301d41:Living Room: Command sent: {"id":9999,"method":"set_power","params":["on","smooth",300]}
+17:40:10 debug:ambilightCase: Adding signal listeners
+17:40:10 debug:ambilightCase: Listeners added
+17:40:10 info:Bedroom: ⚡ Trying to connect into Bedroom in 192.168.0.191:55443
+17:40:11 info:Bedroom: 💡 Connected into Bedroom
+17:40:11 info:Bedroom: 📀 Starting music mode
+17:40:11 info:Bedroom: ⚡ Server Created!
+17:40:11 info:Bedroom: ⚡ TCP Server Info: :::61020
+17:40:11 debug:Bedroom: Command sent: {"id":9999,"method":"set_music","params":[1,"192.168.0.104",61020]}
 
-16:00:01 info:0x00000000112c0549:Kitchen: ⚡ Server Created!
-16:00:01 info:0x00000000112c0549:Kitchen: ⚡ TCP Server Info: :::44659
-16:00:01 debug:0x00000000112c0549:Kitchen: Command sent: {"id":9999,"method":"set_music","params":[1,"xxx.xxx.0.167",44659]}
+17:40:11 info:Bedroom: ⚡ Device connected to server
+17:40:11 debug:Bedroom: Result event
+{
+  "method": "props",
+  "params": {
+    "music_on": 1
+  }
+}
 
-16:00:01 info:0x0000000011301d41:Living Room: ⚡ Server Created!
-16:00:01 info:0x0000000011301d41:Living Room: ⚡ TCP Server Info: :::43379
-16:00:01 debug:0x0000000011301d41:Living Room: Command sent: {"id":9999,"method":"set_music","params":[1,"xxx.xxx.0.167",43379]}
+17:40:11 verbose:Bedroom: music_on changed to 1
+17:40:11 verbose:Bedroom: Props updated for
+{
+  "music_on": 1
+}
 
-16:00:01 info:0x00000000112c0549:Kitchen: 💡 Connected into Kitchen
-16:00:01 info:0x0000000011301d41:Living Room: 💡 Connected into Living Room
-16:00:01 info:0x00000000112c0549:Kitchen: ⚡ Device connected to server
-16:00:01 info:0x0000000011301d41:Living Room: ⚡ Device connected to server
-16:00:02 debug:main: ffmpeg proeminent color: #242c34 | brightness: 17
-16:00:02 debug:0x00000000112c0549:Kitchen: Command sent: {"id":1,"method":"set_bright","params":[17,"smooth",600]}
+17:40:11 debug:Bedroom: Result event
+{
+  "id": 9999,
+  "result": [
+    "ok"
+  ]
+}
+17:40:12 debug:ambilightCase: Values from worker: {"color":"030304","factor":0.8627451062202454,"luminance":1.2047842741012573}
+17:40:12 debug:Bedroom: Command sent: {"id":1,"method":"set_bright","params":[1.2047842741012573,"smooth",500]}
 
-16:00:02 debug:0x00000000112c0549:Kitchen: Command sent: {"id":2,"method":"set_rgb","params":[2370612,"smooth",600]}
+17:40:12 debug:Bedroom: Command sent: {"id":2,"method":"set_rgb","params":[197380,"smooth",500]}
 
-16:00:02 debug:0x0000000011301d41:Living Room: Command sent: {"id":1,"method":"set_bright","params":[17,"smooth",600]}
+17:40:12 debug:ambilightCase: Values from worker: {"color":"050507","factor":0.8784313797950745,"luminance":2.017411708831787}
+17:40:12 debug:Bedroom: Command sent: {"id":3,"method":"set_bright","params":[2.017411708831787,"smooth",500]}
 
-16:00:02 debug:0x0000000011301d41:Living Room: Command sent: {"id":2,"method":"set_rgb","params":[2370612,"smooth",600]}
+17:40:12 debug:Bedroom: Command sent: {"id":4,"method":"set_rgb","params":[328967,"smooth",500]}
 
-16:00:02 debug:main: ffmpeg proeminent color: #0c7acb | brightness: 39
-16:00:02 debug:0x00000000112c0549:Kitchen: Command sent: {"id":3,"method":"set_bright","params":[39,"smooth",600]}
+^C
 
-16:00:02 debug:0x00000000112c0549:Kitchen: Command sent: {"id":4,"method":"set_rgb","params":[817867,"smooth",600]}
+17:40:13 info:Bedroom: 📀 Finishing music mode
+17:40:13 debug:Bedroom: Command sent: {"id":9999,"method":"set_music","params":[0,"192.168.0.104",61020]}
 
-16:00:02 debug:0x0000000011301d41:Living Room: Command sent: {"id":3,"method":"set_bright","params":[39,"smooth",600]}
-
-16:00:02 debug:0x0000000011301d41:Living Room: Command sent: {"id":4,"method":"set_rgb","params":[817867,"smooth",600]}
-
-16:00:03 debug:main: ffmpeg proeminent color: #0c7acb | brightness: 39
-16:00:03 debug:0x00000000112c0549:Kitchen: Command sent: {"id":5,"method":"set_bright","params":[39,"smooth",600]}
-
-16:00:03 debug:0x00000000112c0549:Kitchen: Command sent: {"id":6,"method":"set_rgb","params":[817867,"smooth",600]}
-
-16:00:03 debug:0x0000000011301d41:Living Room: Command sent: {"id":5,"method":"set_bright","params":[39,"smooth",600]}
-
-16:00:03 debug:0x0000000011301d41:Living Room: Command sent: {"id":6,"method":"set_rgb","params":[817867,"smooth",600]}
+17:40:13 info:ambilightCase: 🦄 See you soon
 ```
 
 ### Troubleshooting

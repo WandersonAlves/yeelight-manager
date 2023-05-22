@@ -1,7 +1,7 @@
 import { ConfigureCmds, logger } from '../shared/Logger';
 import { FpsToMs } from '../utils';
 import { GetBindingFromContainer } from '../infra/container';
-import AmbilightCase from '../modules/Yeelight/Ambilight/AmbilightCase';
+import AmbilightCmdCase from '../modules/Yeelight/Ambilight/AmbilightCmdCase';
 import Screenshot from '../infra/screenshot/Screenshot';
 
 export const AmbilightCmd = async (devices: string, value: string, interval = "300", { verbose, debug, luminance }) => {
@@ -12,7 +12,7 @@ export const AmbilightCmd = async (devices: string, value: string, interval = "3
 
   logger.debug(`Interval MS: ${fetchColorsInterval}; Raw interval: ${interval}`, { label: 'AmbilightCmd' });
 
-  await GetBindingFromContainer(AmbilightCase).execute({
+  await GetBindingFromContainer(AmbilightCmdCase).execute({
     deviceNames,
     height,
     width,

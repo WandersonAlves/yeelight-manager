@@ -1,11 +1,11 @@
 import { ContainerModule } from 'inversify';
-import AmbilightCase from './Ambilight/AmbilightCase';
+import AmbilightCmdCase from './Ambilight/AmbilightCmdCase';
 import ReceiveCommandCase from './ReceiveCommand/ReceiveCommandCase';
 import SetxCommandCase from './SetxCommand/SetxCommandCase';
 
 const YeelightContainer = new ContainerModule(bind => {
   bind<ReceiveCommandCase>(ReceiveCommandCase).toSelf();
-  bind(AmbilightCase).toSelf();
+  bind(AmbilightCmdCase).toSelf();
   bind(SetxCommandCase).toSelf();
 });
 

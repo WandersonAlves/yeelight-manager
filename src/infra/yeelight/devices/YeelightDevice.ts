@@ -65,7 +65,7 @@ export default class YeelightDevice {
       case CommandList.CT3:
       case CommandList.CT2:
       case CommandList.CT: {
-        return device.setColorTemperature(YeelightDevice.FetchColorTemperature(value));
+        return device.setColorTemperature(YeelightDevice.FetchColorTemperature(value ?? ''));
       }
       case CommandList.BRIGHT: {
         return device.setBright(Number(value));
@@ -233,8 +233,8 @@ export default class YeelightDevice {
   private _events = new EventEmitter();
   private _commandId = 1;
 
-  private _resolvePromiseRef: ResolveFn = null;
-  private _rejectPromiseRef: RejectFn = null;
+  private _resolvePromiseRef: ResolveFn;
+  private _rejectPromiseRef: RejectFn;
 
   private _commandAck = false;
 
@@ -243,11 +243,10 @@ export default class YeelightDevice {
   private _eventHandlers = {
     dataReceived: (command: Command) => (o: DataReceived) => {
       this._events.removeAllListeners('data_received');
-      this.log('debug', `_eventHandlers.DataReceived: ${jsonString(o)}==${jsonString(command)}`);
       // First two assertions: lightbulb response to commands
       // Last assertion (o.method), turning on musicMode
       if (command.id === o.id && o.result && o.result[0] === 'ok') {
-        this.log('info', `Command with id ${o.id} ran successfully`);
+        this.log('info', `Command ${command.name}/${command.id} ran successfully`);
         this._commandAck = true;
         return this._resolvePromiseRef();
       } else if (o.method === 'props') {

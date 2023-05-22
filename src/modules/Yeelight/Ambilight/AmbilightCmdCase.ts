@@ -1,4 +1,5 @@
 import { DominantColorResponse } from '../../../infra/screenshot';
+import { EffectTypes } from '../../../infra/yeelight/devices/Commands';
 import { UseCase } from '../../../shared/contracts';
 import { address } from 'ip';
 import { inject, injectable } from 'inversify';
@@ -19,7 +20,7 @@ interface AmbilightCaseParams {
 }
 
 @injectable()
-export default class AmbilightCase implements UseCase<AmbilightCaseParams, void> {
+export default class AmbilightCmdCase implements UseCase<AmbilightCaseParams, void> {
   @inject(Discovery) private discovery: Discovery;
   private logger = labeledLogger('ambilightCase');
 
@@ -79,20 +80,15 @@ export default class AmbilightCase implements UseCase<AmbilightCaseParams, void>
     });
 
     childProcess.stdout.on('data', (data: string) => {
-      let color: string;
-      let luminance: number;
-      let factor: number;
+      let result: DominantColorResponse;
       try {
         this.logger('debug', `Values from worker: ${data.toString()}`);
-        const result: DominantColorResponse = JSON.parse(data.toString().trim());
-        color = result.color;
-        luminance = result.luminance;
-        factor = result.factor;
+        result = JSON.parse(data.toString().trim());
       } catch (e) {
         this.logger('warn', e);
         return;
       }
-      this._ambilightResultHandler(color, luminance, interval, factor, selectedDevices, useLuminance, ip);
+      this._ambilightResultHandler(result, interval, selectedDevices, useLuminance, ip);
     });
   }
 
@@ -125,21 +121,20 @@ export default class AmbilightCase implements UseCase<AmbilightCaseParams, void>
   }
 
   private _ambilightResultHandler(
-    color: string,
-    luminance: number,
+    obj: DominantColorResponse,
     interval: number,
-    factor: number,
     selectedDevices: YeelightDevice[],
     useLuminance: boolean,
     ip: string,
   ) {
+    const { factor, luminance, color, isBlackShade } = obj;
     try {
-      // const effectType: EffectTypes = factor < 0.35 ? 'sudden' : 'smooth';
+      const effectType: EffectTypes = factor < 0.10 ? 'sudden' : 'smooth';
       selectedDevices.forEach(async d => {
         if (useLuminance) {
-          void d.setBright(Number(luminance), 'smooth', interval);
+          void d.setBright(Number(luminance), effectType, interval);
         }
-        void d.setHex(color, 'smooth', interval);
+        void d.setHex(color, effectType, interval);
       });
     } catch (e) {
       const err: Error = e;
