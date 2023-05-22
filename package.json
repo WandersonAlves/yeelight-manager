@@ -1,6 +1,6 @@
 {
   "name": "yeelight-manager",
-  "version": "0.1.0",
+  "version": "0.1.1-preview.0",
   "description": "CLI to control yeelight devices!",
   "main": "src/index.ts",
   "engines": {
@@ -22,6 +22,7 @@
     "dev:cli": "node -r ts-node/register ./src/index.ts",
     "dev:release": "node ./lib/index.js",
     "release": "npx standard-version && yarn build && yarn publish",
+    "release:preview": "npx standard-version --prerelease preview && yarn build && yarn publish",
     "build": "rm -rf lib/ && tsc",
     "build:rs": "napi build --release ./src/infra/screenshot",
     "build:rs:debug": "napi build ./src/infra/screenshot",
