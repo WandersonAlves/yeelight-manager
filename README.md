@@ -8,7 +8,7 @@ A CLI to super charge your yeelight use! Works on Linux and Mac (not tested on W
 
 ## Requirements
 
- - [`rust`](https://www.rust-lang.org/): Needed to build native packages to be used on ambiglight command.
+ - [`rust`](https://www.rust-lang.org/): Needed to build native packages to be used on ambilight command.
 
 ## How-to?
 
@@ -36,7 +36,7 @@ Do that for all of your devices
     - `resolution`: Defines the area to fetch the dominant color. It's a string in format `<width>x<height>x<x>x<y>` or one of the `default-area` values.
       - `<width>x<height>x<x>x<y>`: `<width>x<height>` are required, `x` and `y` are optional
       - `default-area`: Can be `top`, `bottom`, `left` and `right`.
-    - `interval`: Interval for fetching new colors. It's a number representing a `ms` value. Also, it can be a `fps` value, example: `yee ambiglight Bedroom top 30fps`. Due to the way the Yeelight's Bulb changes from color to color, the recomended `interval` is `150`.
+    - `interval`: Interval for fetching new colors. It's a number representing a `ms` value. Also, it can be a `fps` value, example: `yee ambilight Bedroom top 30fps`. Due to the way the Yeelight's Bulb changes from color to color, the recomended `interval` is `150`.
 
 ### Output Examples
 > `yee list`: List devices. Sometimes, IP scan can fail
