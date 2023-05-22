@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1-preview.2](https://github.com/WandersonAlves/yeelight-manager/compare/v0.1.1-preview.1...v0.1.1-preview.2) (2023-05-22)
+
+
+### Bug Fixes
+
+* add .js to tsconfig ([67fdc5d](https://github.com/WandersonAlves/yeelight-manager/commit/67fdc5d4e592b98dfce1945a5b606a3c511e8e76))
+
 ### [0.1.1-preview.1](https://github.com/WandersonAlves/yeelight-manager/compare/v0.1.1-preview.0...v0.1.1-preview.1) (2023-05-22)
 
 
