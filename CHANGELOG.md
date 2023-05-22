@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1-preview.1](https://github.com/WandersonAlves/yeelight-manager/compare/v0.1.1-preview.0...v0.1.1-preview.1) (2023-05-22)
+
+
+### Bug Fixes
+
+* add rust files to package ([135290c](https://github.com/WandersonAlves/yeelight-manager/commit/135290c8dc1f5d80dc47e37135886be99ddc9b2f))
+
 ### [0.1.1-preview.0](https://github.com/WandersonAlves/yeelight-manager/compare/v0.0.24...v0.1.1-preview.0) (2023-05-22)
 
 
