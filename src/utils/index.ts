@@ -1,3 +1,5 @@
+import { logger } from "../shared/Logger";
+
 export const GetValueFromString = (message: string, key: string, defaultValue?: any): string => {
   if (defaultValue === void 0) {
     defaultValue = "";
@@ -13,13 +15,16 @@ export const GetValueFromString = (message: string, key: string, defaultValue?: 
 };
 
 export const HexToInteger = (hex: string): number => {
-  const hexString = hex.toUpperCase();
-  let result = 0;
-  for (let i = 1; i <= hexString.length; i++) {
-    let valueNumber = hexString.charCodeAt(i - 1);
-    valueNumber -= valueNumber >= 65 ? 55 : 48;
-    result += valueNumber * Math.pow(16, hex.length - i);
+  let copyHex = hex;
+  if (copyHex.length === 3) {
+    copyHex = copyHex
+      .split('')
+      .map(char => char + char)
+      .join('');
   }
+
+  const result = parseInt(copyHex, 16);
+  logger.debug(`Hex color: #${hex} converted to number: ${result}`, { label: `HexToInteger` });
   return result;
 };
 
