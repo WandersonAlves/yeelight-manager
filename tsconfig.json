@@ -12,6 +12,6 @@
     "lib": ["es2017", "DOM"],
     "allowJs": true
   },
-  "include": ["./src/**/*.ts"],
+  "include": ["./src/**/*.ts", "./src/**/*.js"],
   "exclude": ["node_modules"]
 }

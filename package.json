@@ -30,7 +30,7 @@
     "build": "rm -rf lib/ && tsc",
     "build:rs": "napi build --release ./src/infra/screenshot",
     "build:rs:debug": "napi build ./src/infra/screenshot",
-    "postinstall": "napi build --release ./src/infra/screenshot"
+    "postinstall": "napi build --release ./lib/infra/screenshot"
   },
   "license": "ISC",
   "devDependencies": {
