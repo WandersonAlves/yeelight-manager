@@ -31,7 +31,16 @@ export default class ReceiveCommandCase implements UseCase<ReceiveCommandParams,
     if (bright && kind !== CommandList.BRIGHT) {
       await Promise.all(selectedDevices.map(d => d.setBright(Number(bright))))
     }
-    // ExecCommand returns a array
+    if (kind !== CommandList.TOGGLE && kind !== CommandList.POWER) {
+      await Promise.all(
+        selectedDevices.map(d => {
+          if (!d.power) {
+            return d.setPower('on');
+          }
+          return Promise.resolve();
+        }),
+      );
+    }
     await Promise.all(selectedDevices.map(d => YeelightDevice.ExecCommand(d, params)));
     logger.info('Command(s) Success!!!', { label: ReceiveCommandCase.name });
     return { deviceNames, kind };
