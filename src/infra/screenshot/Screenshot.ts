@@ -22,7 +22,7 @@ export default class Screenshot {
       case 'top': {
         const cWidth = sWidth * 0.1;
         return {
-          x: sWidth / 2,
+          x: sWidth / 2 - cWidth / 2,
           y: 0,
           width: cWidth,
           height: Number((sHeight * 0.12).toFixed(0)),
@@ -31,7 +31,7 @@ export default class Screenshot {
       case 'bottom': {
         const cWidth = sWidth * 0.1;
         return {
-          x: sWidth / 2,
+          x: (sWidth / 2) - cWidth / 2,
           y: sHeight - 100,
           width: cWidth,
           height: Number((sHeight * 0.12).toFixed(0)),
@@ -42,7 +42,7 @@ export default class Screenshot {
         const cWidth = sWidth / 2;
         return {
           x: 0,
-          y: sHeight / 2,
+          y: sHeight / 2 - cHeight / 2,
           width: Number((cWidth * 0.12).toFixed(0)),
           height: cHeight,
         };
@@ -52,7 +52,7 @@ export default class Screenshot {
         const cWidth = sWidth / 2;
         return {
           x: sWidth - 100,
-          y: sHeight / 2,
+          y: sHeight / 2 - cHeight / 2,
           width: Number((cWidth * 0.12).toFixed(0)),
           height: cHeight,
         };
