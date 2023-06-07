@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import { AmbilightCmd } from './commander/AmbilightCmd';
 import { BlinkCmd } from './commander/BlinkCmd';
 import { CommandListArr } from './infra/enums';
+import { DescribeCmd } from './commander/DescribeCmd';
 import { ListCmd } from './commander/ListCmd';
 import { LoadCommandCmd } from './commander/LoadCommandCmd';
 import { SeeLogsCmd } from './commander/SeeLogsCmd';
@@ -86,6 +87,12 @@ program
   .option('--verbose', 'Output verbose info')
   .option('--debug', 'Output debug info')
   .action(BlinkCmd);
+
+program
+  .command('describe <devices>')
+  .description('Show debug info for given devices')
+  .option('-t --waitTime <value>', 'Time to wait to yeelights connect')
+  .action(DescribeCmd);
 
 program.command('logs').description('See the logs').action(SeeLogsCmd);
 

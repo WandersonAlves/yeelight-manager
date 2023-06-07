@@ -300,6 +300,25 @@ export default class YeelightDevice {
     this.name = name;
   }
 
+  describe() {
+    return {
+      id: this.id,
+      name: this.name,
+      ip: this.host,
+      port: this.port,
+      is_connected: this.isConnected,
+      model: this._model,
+      supported_commands_length: this._support.length,
+      supported_commands: this._support,
+      power: this._power,
+      bright: this._bright,
+      color_mode: this._colorMode,
+      color_temeperature: this._colorTemperatureValue,
+      rgb: this._rgb,
+      music_mode: this._musicMode
+    }
+  }
+
   /**
    * Tries to create a client connection to the lightbulb
    *
