@@ -139,7 +139,7 @@ export default class YeelightDevice {
         return '800080';
       }
       case 'pink': {
-        return 'FFC0CB';
+        return 'EA00FF';
       }
       case 'orange': {
         return 'FFA500';
