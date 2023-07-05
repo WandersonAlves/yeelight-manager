@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1-preview.4](https://github.com/WandersonAlves/yeelight-manager/compare/v0.1.1-preview.3...v0.1.1-preview.4) (2023-07-05)
+
+
+### Features
+
+* add ColorStorage and PromiseStorage ([c06fb03](https://github.com/WandersonAlves/yeelight-manager/commit/c06fb0338680163974659d6d1cef978594989e76))
+* add describe device command ([7c759e1](https://github.com/WandersonAlves/yeelight-manager/commit/7c759e168637971ebb3685a2bd97f5920dace129))
+
+
+### Bug Fixes
+
+* center screenshot area ([c237ef3](https://github.com/WandersonAlves/yeelight-manager/commit/c237ef3b3ca586aeabfea7478752b688d81bd9f3))
+* change pink color ([cca8c6d](https://github.com/WandersonAlves/yeelight-manager/commit/cca8c6d5419d71950fb63e8e7b6f68cfcd074446))
+* turn on devices when receive a cmd ([7208714](https://github.com/WandersonAlves/yeelight-manager/commit/7208714d08c78a4101ca0ecb14da0db844902de7))
+* typo ([93ab5a9](https://github.com/WandersonAlves/yeelight-manager/commit/93ab5a9240f262e65ba8b41d7bf809bb4a204877))
+
 ### [0.1.1-preview.3](https://github.com/WandersonAlves/yeelight-manager/compare/v0.1.1-preview.2...v0.1.1-preview.3) (2023-05-22)
 
 
