@@ -3,9 +3,9 @@ import { ColorFlowAction, ColorFlowExpressionMode, CommandList } from '../../enu
 import { CommandSignal } from '../../../modules/Yeelight/ReceiveCommand/ReceiveCommandInterfaces';
 import { EventEmitter } from 'events';
 import { GetValueFromString, HexToInteger } from '../../../utils';
-import { RejectFn, ResolveFn } from '../../../shared/contracts';
 import { jsonString, logger } from '../../../shared/Logger';
 import ColorFlowExpression from './ColorFlowExpression';
+import ColorStorage from '../../storage/ColorStorage';
 import Command, {
   BrightCommand,
   ColorFlowCommand,
@@ -18,6 +18,7 @@ import Command, {
   ToggleCommand,
 } from './Commands';
 import CommandFailureException from '../../../shared/exceptions/CommandFailureException';
+import PromiseStorage from '../../storage/PromiseStorage';
 import TimeoutException from '../../../shared/exceptions/TimeoutException';
 import UnsuportedCommandException from '../../../shared/exceptions/UnsuportedCommandException';
 
@@ -122,35 +123,8 @@ export default class YeelightDevice {
    */
   private static FetchColor(value: string) {
     const innerValue = value.replace('#', '');
-    switch (innerValue) {
-      case 'red': {
-        return 'FF0000';
-      }
-      case 'blue': {
-        return '0000FF';
-      }
-      case 'green': {
-        return '00FF00';
-      }
-      case 'cyan': {
-        return '00FFFF';
-      }
-      case 'purple': {
-        return '800080';
-      }
-      case 'pink': {
-        return 'EA00FF';
-      }
-      case 'orange': {
-        return 'FFA500';
-      }
-      case 'yellow': {
-        return 'FFFF00';
-      }
-      default: {
-        return innerValue;
-      }
-    }
+    const color = ColorStorage.Colors[innerValue];
+    return color ? color.replace('#', '') : innerValue;
   }
 
   /**
@@ -237,51 +211,47 @@ export default class YeelightDevice {
   private _events = new EventEmitter();
   private _commandId = 1;
 
-  private _resolvePromiseRef: ResolveFn;
-  private _rejectPromiseRef: RejectFn;
-
-  private _commandAck = false;
-
-  private _currCmd: Command;
+  private _promiseStorage = new PromiseStorage();
 
   private _eventHandlers = {
     dataReceived: (command: Command) => (o: DataReceived) => {
-      this._events.removeAllListeners('data_received');
-      // First two assertions: lightbulb response to commands
-      // Last assertion (o.method), turning on musicMode
-      if (command.id === o.id && o.result && o.result[0] === 'ok') {
-        this.log('info', `Command ${command.name}/${command.id} ran successfully`);
-        this._commandAck = true;
-        return this._resolvePromiseRef();
-      } else if (o.method === 'props') {
+      // this._events.removeAllListeners('data_received');
+      if (o.method === 'props') {
         this.log('verbose', `Props updated for ${jsonString(o.params)}`);
-        this._commandAck = true;
-        return this._resolvePromiseRef();
+        this._promiseStorage.setAck(command.id, true);
+        return this._promiseStorage.resolve(command.id);
+      } else if (this._promiseStorage.has(o.id)) {
+        if (o.result && o.result[0] === 'ok') {
+          this.log('info', `Command ${command.name}/${command.id} ran successfully`);
+          this._promiseStorage.setAck(command.id, true);
+          return this._promiseStorage.resolve(command.id);
+        }
+        else {
+          this.log('error', `Command ${command.name}/${command.id} ran with errors`);
+          this._promiseStorage.setAck(command.id, false);
+          return this._promiseStorage.reject(command.id, new CommandFailureException(this.name, o, command));
+        }
       }
-      this._commandAck = false;
       // Reject the promise if can't ACK the command sent (or is a unplanned one)
-      return this._rejectPromiseRef(new CommandFailureException(this.name, o, command));
+      return this._promiseStorage.reject(command.id, new CommandFailureException(this.name, o, command));
     },
-    clientSocketCallback: (resolve: ResolveFn, reject: RejectFn, command: Command, cmdJSON: string) => (err?: Error) => {
-      this._resolvePromiseRef = resolve;
-      this._rejectPromiseRef = reject;
-
+    clientSocketCallback: (command: Command, cmdJSON: string) => (err?: Error) => {
       if (err) {
         this._events.emit('command_sent_failure', cmdJSON);
-        return reject(err);
+        return this._promiseStorage.reject(command.id, err);
       }
       this._events.emit('command_sent_success', cmdJSON);
       // If lightbulb isn't on musicMode, resolve the promise within the `data_received` event
       if (!this._musicMode) {
         // NOTE Would be nice if all events are kept in the same place
-        this._events.on('data_received', this._eventHandlers.dataReceived(this._currCmd));
+        this._events.on('data_received', this._eventHandlers.dataReceived(command));
         setTimeout(() => {
-          if (!this._commandAck) {
-            reject(new TimeoutException('ack', this.name));
+          if (!this._promiseStorage.getAck(command.id)) {
+            return this._promiseStorage.reject(command.id, new TimeoutException('ack', this.name))
           }
         }, YeelightDevice.DefaultTimeoutTime);
       } else {
-        return this._resolvePromiseRef();
+        return this._promiseStorage.resolve(command.id);
       }
     },
   };
@@ -536,42 +506,44 @@ export default class YeelightDevice {
       return;
     }
     if (dataObj?.method === 'props') {
-      const key = Object.keys(dataObj.params)[0];
-      const value = dataObj.params[key];
-      this.log('verbose', `${key} changed to ${value}`);
-      switch (key) {
-        case 'color_mode': {
-          this._colorMode = value === 1 ? 'RGB' : value === 2 ? 'CT' : 'HSV';
-          break;
-        }
-        case 'power': {
-          this._power = value === 'on' ? true : false;
-          break;
-        }
-        case 'ct': {
-          this._colorTemperatureValue = Number(value);
-          break;
-        }
-        case 'music_on': {
-          this._musicMode = value === 1 ? true : false;
-          break;
-        }
-        case 'bright': {
-          this._bright = Number(value);
-          break;
-        }
-        case 'hue': {
-          this._hue = Number(value);
-          break;
-        }
-        default: {
-          if (!Object.hasOwnProperty.call(this, key)) {
-            this.log('warn', `Event updating unmapped ${key} key`);
+      Object.keys(dataObj.params).forEach(key => {
+        const value = dataObj.params[key];
+        this.log('verbose', `${key} changed to ${value}`);
+        switch (key) {
+          case 'color_mode': {
+            this._colorMode = value === 1 ? 'RGB' : value === 2 ? 'CT' : 'HSV';
+            break;
           }
-          this[key] = value;
-          break;
+          case 'power': {
+            this._power = value === 'on' ? true : false;
+            break;
+          }
+          case 'ct': {
+            this._colorTemperatureValue = Number(value);
+            break;
+          }
+          case 'music_on': {
+            this._musicMode = value === 1 ? true : false;
+            break;
+          }
+          case 'bright': {
+            this._bright = Number(value);
+            break;
+          }
+          case 'hue': {
+            this._hue = Number(value);
+            break;
+          }
+          // TODO: Implement 'sat' (saturation) and 'rgb' fields when Lightbulb W3 receives a color field
+          default: {
+            if (!Object.hasOwnProperty.call(this, key)) {
+              this.log('warn', `Event updating unmapped ${key} key`);
+            }
+            this[key] = value;
+            break;
+          }
         }
-      }
+      })
     } else {
       this.log('warn', `Unmapped Event: ${jsonString(dataObj)}`);
     }
@@ -580,18 +552,17 @@ export default class YeelightDevice {
   private sendCommand(command: Command): Promise<void> {
     const cmdName = command.name;
     const cmdJSON = command.toString();
-    this._currCmd = command;
-    this._commandAck = false;
 
     return new Promise((resolve, reject) => {
       if (!this._client && !this.isConnected) {
         return reject(new Error('DeviceNotConnected'));
       }
+      this._promiseStorage.add({ cmd: Object.assign({}, command, { ack: undefined }), reject, resolve });
       this.log('debug', `Command sent: ${cmdJSON}`);
       if (this._socket && cmdName !== 'set_music') {
-        return this._socket.write(cmdJSON, this._eventHandlers.clientSocketCallback(resolve, reject, command, cmdJSON));
+        return this._socket.write(cmdJSON, this._eventHandlers.clientSocketCallback(command, cmdJSON));
       }
-      return this._client?.write(cmdJSON, this._eventHandlers.clientSocketCallback(resolve, reject, command, cmdJSON));
+      return this._client?.write(cmdJSON, this._eventHandlers.clientSocketCallback(command, cmdJSON));
     });
   }
 
