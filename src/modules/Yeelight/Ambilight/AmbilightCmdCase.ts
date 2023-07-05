@@ -35,7 +35,7 @@ export default class AmbilightCmdCase implements UseCase<AmbilightCaseParams, vo
 
     this._startSignalHandlers(selectedDevices, ip);
 
-    await this._turnOnDevices(selectedDevices, ip);
+    await this._startMusicMode(selectedDevices, ip);
 
     this._spawnAmbilightWorker(x, y, width, height, interval, selectedDevices, useLuminance, ip);
     // Wait forever until user closes the application
@@ -93,7 +93,7 @@ export default class AmbilightCmdCase implements UseCase<AmbilightCaseParams, vo
     });
   }
 
-  private async _turnOnDevices(selectedDevices: YeelightDevice[], ip: string) {
+  private async _startMusicMode(selectedDevices: YeelightDevice[], ip: string) {
     await Promise.all(selectedDevices.map(d => d.connect()));
     await this.discovery.turnOnAll(selectedDevices);
     await this.discovery.musicModeAll(ip, selectedDevices);
@@ -133,7 +133,7 @@ export default class AmbilightCmdCase implements UseCase<AmbilightCaseParams, vo
       const effectType: EffectTypes = factor < 0.10 ? 'sudden' : 'smooth';
       selectedDevices.forEach(async d => {
         if (useLuminance) {
-          void d.setBright(Number(luminance), effectType, interval);
+          void d.setBright(Number(luminance), effectType, 100);
         }
         void d.setHex(color, effectType, interval);
       });

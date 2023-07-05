@@ -48,7 +48,7 @@ export default class YeelightDevice {
   static readonly YeelightDefaultPort = 55443;
   static readonly DefaultTimeoutTime = 2500;
 
-  static ExecCommand(device: YeelightDevice, { kind, value }: CommandSignal): Promise<void> {
+  static async ExecCommand(device: YeelightDevice, { kind, value }: CommandSignal): Promise<void> {
     switch (kind) {
       case CommandList.TOGGLE: {
         return device.toggle();
@@ -95,16 +95,16 @@ export default class YeelightDevice {
         return 6500;
       }
       case 'warm': {
-        return 1700
+        return 1700;
       }
       case 'mid': {
-        return 3999
+        return 3999;
       }
       case 'mid-warm': {
-        return 2700
+        return 2700;
       }
       case 'mid-cold': {
-        return 4550
+        return 4550;
       }
       default: {
         logger.warn(`A invalid value (${value}) was given to color temperature. Replacing it with 3999 ct`);
@@ -175,6 +175,7 @@ export default class YeelightDevice {
       power: GetValueFromString(message, 'power') === 'on' ? true : false,
       host: host.split(':')[0],
       port: parseInt(host.split(':')[1], 10),
+      fwVer: GetValueFromString(message, 'fw_ver'),
     });
   }
 
@@ -200,6 +201,7 @@ export default class YeelightDevice {
       power: 'unknow',
       rgbValue: 'unknow',
       support: 'unknow',
+      fwVer: 'unknow'
     });
   }
 
@@ -214,6 +216,8 @@ export default class YeelightDevice {
   private _colorTemperatureValue: number;
   private _musicMode = false;
   private _rgb: number;
+  private _hue: number;
+  private _firmwareVersion: string;
   readonly name: string;
 
   /**
@@ -286,7 +290,20 @@ export default class YeelightDevice {
     return this._power;
   }
 
-  private constructor({ id, port, host, model, support, power, bright, colorMode, colorTemperatureValue, rgbValue, name }) {
+  private constructor({
+    id,
+    port,
+    host,
+    model,
+    support,
+    power,
+    bright,
+    colorMode,
+    colorTemperatureValue,
+    rgbValue,
+    name,
+    fwVer,
+  }) {
     this.id = id;
     this.port = port;
     this.host = host;
@@ -297,6 +314,7 @@ export default class YeelightDevice {
     this._colorMode = colorMode;
     this._colorTemperatureValue = colorTemperatureValue;
     this._rgb = rgbValue;
+    this._firmwareVersion = fwVer;
     this.name = name;
   }
 
@@ -315,8 +333,9 @@ export default class YeelightDevice {
       color_mode: this._colorMode,
       color_temeperature: this._colorTemperatureValue,
       rgb: this._rgb,
-      music_mode: this._musicMode
-    }
+      music_mode: this._musicMode,
+      firmware_version: this._firmwareVersion
+    };
   }
 
   /**
@@ -539,6 +558,10 @@ export default class YeelightDevice {
         }
         case 'bright': {
           this._bright = Number(value);
+          break;
+        }
+        case 'hue': {
+          this._hue = Number(value);
           break;
         }
         default: {
