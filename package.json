@@ -4,7 +4,7 @@
   "description": "CLI to control yeelight devices!",
   "main": "./lib/index.js",
   "engines": {
-    "node": ">=10.22.0"
+    "node": ">=16.14.0"
   },
   "bin": {
     "yee": "./lib/index.js"
