@@ -23,6 +23,7 @@ program
   .command('list')
   .description('Return a list of reachable devices')
   .option('-t --waitTime <value>', 'Time to wait to yeelights connect')
+  .option('-c --colors', 'Instead of output the list of devices, show a color enum with possible prebaked colors')
   .option('--verbose', 'Output verbose info')
   .option('--debug', 'Output debug info')
   .action(ListCmd);
