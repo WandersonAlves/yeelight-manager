@@ -131,9 +131,14 @@ export default class AmbilightCmdCase implements UseCase<AmbilightCaseParams, vo
     const { factor, luminance, color, isBlackShade } = obj;
     try {
       const effectType: EffectTypes = factor < 0.10 ? 'sudden' : 'smooth';
+      let noLuminanceExecd = false;
       selectedDevices.forEach(async d => {
         if (useLuminance) {
           void d.setBright(Number(luminance), effectType, 100);
+        }
+        else if (!noLuminanceExecd) {
+            void d.setBright(Number(luminance), effectType, 1);
+            noLuminanceExecd = true;
         }
         void d.setHex(color, effectType, interval);
       });
