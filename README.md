@@ -8,6 +8,7 @@ A CLI to super charge your yeelight use! Works on Linux and Mac (not tested on W
 
 ## Requirements
 
+ - [`nodejs@16+`](https://nodejs.org/en)
  - [`rust`](https://www.rust-lang.org/): Needed to build native packages to be used on ambilight command.
 
 ## How-to?
@@ -20,23 +21,43 @@ Repeat the process until you name all your devices
 
 ## Commands
 
-1. `yee list` List all available devices. Uses SSDP method and port scanner method to retrieve devices.
-1. `yee blink <name|id|ip>` Blink a device. Useful when you have multiple devices and wanna know with id/ip belongs to a device
-2. `yee set <name|idip> <command> <value> [options]`
+> Most commands has default options.
+> - `-h, --help` Display help for command
+> - `-t, --waitTime <value>` Time to wait for yeelights connect
+> - `--verbose` Output verbose info
+> - `--debug` Output debuf info
+
+### `yee list`
+List all available devices. Uses SSDP method and port scanner method to retrieve devices.
+> options
+- `-c, --colors`: Outputs a json with all available colors
+
+### `yee blink <name|id|ip>` (**beta**)
+Blink a device. Useful when you have multiple devices and wanna know with id/ip belongs to a device
+
+### `yee set <name|idip> <command> <value> [options]`
    1. `yee set <name|id|ip> name <name>` Sets a name for your device
    2. `yee set <name|id|ip> bright <1-100>` Change the brightness of a device. Any value below 1 will be threated as 1 and above 100 will be threated as 100;
    3. `yee set <name|id|ip> ct|temperature|color_temperature <1700~6500|default-temperatures> [bright]` Change the color temperature of a device. Any value below 1700 will be threated as 1700 and any value above 6500 will be threated as 6500;
       - Has the following default temperatures available: `cold`, `mid-cold`, `mid`, `mid-warm` and `warm`.
    4. `yee set <name|id|ip> color <hex-color|default-colors> [bright]` Change the color of the device;
-      - Has the following default colors available: `red`, `blue`, `green`, `cyan`, `purple`, `pink`, `orange` and `yellow`.
+      - See the default colors available with `yee list -c`
    5. `yee set <name|id|ip> power <off|on>` Explicity turn on or off a device;
-3. `yee setx "'Living Room' ct=9999 bright=100 Kitchen ct=9999 bright=100" --save 'Normal Room'` Set a custom command to later use
-4. `yee toggle <name|id|ip>` Toggles a device;
-5.  `yee ambilight <name|id|ip> <resolution|default-area> <interval> [options]` (**beta**) Using Yeelight's Music Mode, scan for dominant color on screen and use that color on device. Uses `rust` and `napi-rs` under the hood. Not tested on Windows.
-    - `resolution`: Defines the area to fetch the dominant color. It's a string in format `<width>x<height>x<x>x<y>` or one of the `default-area` values.
-      - `<width>x<height>x<x>x<y>`: `<width>x<height>` are required, `x` and `y` are optional
-      - `default-area`: Can be `top`, `bottom`, `left` and `right`.
-    - `interval`: Interval for fetching new colors. It's a number representing a `ms` value. Also, it can be a `fps` value, example: `yee ambilight Bedroom top 30fps`. Due to the way the Yeelight's Bulb changes from color to color, the recomended `interval` is `150`.
+### `yee setx "'Living Room' ct=9999 bright=100 Kitchen ct=9999 bright=100" --save 'Normal Room'`
+Set a custom command to later use
+### `yee toggle <name|id|ip>`
+Toggles a device
+### `yee ambilight <name|id|ip> <resolution|default-area> <interval> [options]` (**beta**)
+Using Yeelight's Music Mode, scan for dominant color on screen and use that color on device.
+
+Uses `rust` and `napi-rs` under the hood. Not tested on Windows.
+> options
+- `resolution`: Defines the area to fetch the dominant color. It's a string in format `<width>x<height>x<x>x<y>` or one of the `default-area` values.
+  - `<width>x<height>x<x>x<y>`: `<width>x<height>` are required, `x` and `y` are optional
+  - `default-area`: Can be `top`, `bottom`, `left` and `right`.
+- `interval`: Interval for fetching new colors. It's a number representing a `ms` value. Also, it can be a `fps` value, example: `yee ambilight Bedroom top 30fps`. Due to the way the Yeelight's Bulb changes from color to color, the recomended `interval` is `150`. Yeelight's bulbs has a [minimum interval of 30ms](https://www.yeelight.com/download/Yeelight_Inter-Operation_Spec.pdf)
+
+> In my tests, Lightbulb 1S is far more compatible with this command than Lightbulb W3
 
 ### Output Examples
 > `yee list`: List devices. Sometimes, IP scan can fail
