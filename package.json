@@ -58,6 +58,7 @@
   },
   "dependencies": {
     "@napi-rs/cli": "^2.15.2",
+    "chalk": "^4.1.2",
     "cli-table": "^0.3.11",
     "commander": "^7.0.0",
     "http-status": "^1.4.2",

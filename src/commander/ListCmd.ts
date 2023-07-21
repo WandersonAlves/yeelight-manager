@@ -1,13 +1,14 @@
-import { ConfigureCmds, jsonString, logger } from '../shared/Logger';
+import { ConfigureCmds, logger } from '../shared/Logger';
 import { GetBindingFromContainer } from '../infra/container';
 import ColorStorage from '../infra/storage/ColorStorage';
 import DiscoverDevicesCase from '../modules/Discovery/DiscoverDevices/DiscoverDevicesCase';
+import chalk from 'chalk';
 
 export const ListCmd = async ({ verbose, debug, waitTime, colors }) => {
   ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
   if (colors) {
     logger.info('List of available colors:');
-    logger.info(`${jsonString(ColorStorage.Colors)}`);
+    Object.entries(ColorStorage.Colors).forEach(([colorName, colorCode]) => logger.info(chalk.hex(colorCode)`${colorName}`));
     process.exit(0);
   }
   await GetBindingFromContainer(DiscoverDevicesCase).execute({ waitTime, logDevices: true });
