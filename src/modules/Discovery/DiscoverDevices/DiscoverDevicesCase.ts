@@ -1,10 +1,12 @@
+import { IntegerToRgb } from '../../../utils';
 import { UseCase } from '../../../shared/contracts';
 import { inject, injectable } from 'inversify';
 import { logger } from '../../../shared/Logger';
 import Discovery from '../../../infra/yeelight/discovery/Discovery';
 import ExceptionHandler from '../../../shared/decorators/ExceptionHandler';
-import Table from 'cli-table';
+import Table from 'cli-table3';
 import YeelightDevice, { YeelightDeviceJSON } from '../../../infra/yeelight/devices/YeelightDevice';
+import chalk from 'chalk';
 
 interface DiscoverDevicesParams { waitTime?: number; logDevices?: boolean };
 
@@ -71,12 +73,19 @@ export default class DiscoverDevicesCase implements UseCase<DiscoverDevicesParam
           rgbValue,
           colorTemperatureValue,
         } = d.toObject();
-        const value = colorMode === 'RGB' ? rgbValue : colorTemperatureValue;
+        let value: string | number = colorMode === 'RGB' ? rgbValue : colorTemperatureValue;
+        if (colorMode === 'RGB') {
+          const [r, g, b] = IntegerToRgb(value);
+          value = chalk.rgb(r, g, b)`${value}`;
+        }
+        else {
+          value = colorTemperatureValue;
+        }
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        table.push([id, name, `${host}:${port}`, power ? 'Yes' : 'No', colorMode, value, bright]);
+        table.push([id, name, `${host}:${port}`, power ? `🔋` : `🪫`, colorMode, value, bright]);
       });
-    logger.info('List of devices:\n' + table.toString(), {
+    logger.info('Devices found:\n' + table.toString(), {
       label: 'Discovery',
     });
   }

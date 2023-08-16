@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 import { logger } from "../shared/Logger";
 
 export const GetValueFromString = (message: string, key: string, defaultValue?: any): string => {
@@ -13,6 +14,19 @@ export const GetValueFromString = (message: string, key: string, defaultValue?: 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return defaultValue;
 };
+
+export const IntegerToRgb = (num: number): number[] =>{
+  if (num < 0 || num > 16777215) {
+    // RGB values are in the range [0, 255]
+    throw new Error('Number out of RGB range');
+  }
+
+  const red = (num >> 16) & 255;
+  const green = (num >> 8) & 255;
+  const blue = num & 255;
+
+  return [red, green, blue];
+}
 
 export const HexToInteger = (hex: string): number => {
   let copyHex = hex;

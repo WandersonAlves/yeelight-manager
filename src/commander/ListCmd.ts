@@ -1,6 +1,7 @@
 import { ConfigureCmds, logger } from '../shared/Logger';
 import { GetBindingFromContainer } from '../infra/container';
 import ColorStorage from '../infra/storage/ColorStorage';
+import CommandStorage from '../infra/storage/CommandStorage';
 import DiscoverDevicesCase from '../modules/Discovery/DiscoverDevices/DiscoverDevicesCase';
 import chalk from 'chalk';
 
@@ -12,5 +13,6 @@ export const ListCmd = async ({ verbose, debug, waitTime, colors }) => {
     process.exit(0);
   }
   await GetBindingFromContainer(DiscoverDevicesCase).execute({ waitTime, logDevices: true });
+  CommandStorage.getAll();
   process.exit(0);
 };
