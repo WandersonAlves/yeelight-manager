@@ -15,9 +15,9 @@ import { createCommand } from 'commander';
 const program = createCommand();
 
 program
+  .version(process.env.npm_package_version, '-v, --version')
   .name('yee')
-  .description('Allow you to control yeelight bulbs from your CLI!')
-  .version(process.env.npm_package_version, '-v, --version');
+  .description('Allow you to control yeelight bulbs from your CLI!');
 
 program
   .command('list')
