@@ -21,6 +21,7 @@ program
 
 program
   .command('list')
+  .alias('ls')
   .description('Return a list of reachable devices')
   .option('-t --waitTime <value>', 'Time to wait to yeelights connect')
   .option('-c --colors', 'Instead of output the list of devices, show a color enum with possible prebaked colors')
