@@ -1,6 +1,6 @@
 {
   "name": "yeelight-manager",
-  "version": "0.1.1-preview.5",
+  "version": "0.1.1-preview.6",
   "description": "CLI to control yeelight devices!",
   "main": "./lib/index.js",
   "engines": {

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1-preview.6](https://github.com/WandersonAlves/yeelight-manager/compare/v0.1.1-preview.5...v0.1.1-preview.6) (2023-08-22)
+
+
+### Features
+
+* add support for skip postinstall script ([65cec22](https://github.com/WandersonAlves/yeelight-manager/commit/65cec221e76555f32030462752d34e744ac3dfa8))
+
 ### [0.1.1-preview.5](https://github.com/WandersonAlves/yeelight-manager/compare/v0.1.1-preview.4...v0.1.1-preview.5) (2023-08-22)
 
 
