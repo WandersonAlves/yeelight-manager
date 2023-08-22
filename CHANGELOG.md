@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1-preview.8](https://github.com/WandersonAlves/yeelight-manager/compare/v0.1.1-preview.7...v0.1.1-preview.8) (2023-08-22)
+
+
+### Features
+
+* read version directly from package.json ([84761fd](https://github.com/WandersonAlves/yeelight-manager/commit/84761fdffd6474b40f28e73ca90c84454292e0b5))
+
 ### [0.1.1-preview.7](https://github.com/WandersonAlves/yeelight-manager/compare/v0.1.1-preview.6...v0.1.1-preview.7) (2023-08-22)
 
 
