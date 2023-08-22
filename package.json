@@ -14,7 +14,8 @@
     "rust/**/*",
     "Cargo.toml",
     "Cargo.lock",
-    "build.rs"
+    "build.rs",
+    "scripts/**/*"
   ],
   "napi": {
     "name": "color"
@@ -30,7 +31,7 @@
     "build": "rm -rf lib/ && tsc",
     "build:rs": "napi build --release ./src/infra/screenshot",
     "build:rs:debug": "napi build ./src/infra/screenshot",
-    "postinstall": "napi build --release ./lib/infra/screenshot"
+    "postinstall": "node ./scripts/postinstall-skip.js || napi build --release ./lib/infra/screenshot"
   },
   "license": "ISC",
   "devDependencies": {

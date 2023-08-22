@@ -4,7 +4,11 @@ A CLI to super charge your yeelight use! Works on Linux and Mac (not tested on W
 
 ## Installation
 
-`npm i -g yeelight-manager`
+### Using `npm`
+`npm i -g yeelight-manager` or `SKIP=1 npm i -g yeelight-manager` if you wanna skip rust build
+
+### Using `yarn`
+`yarn add global yeelight-manager` or `SKIP=1 yarn add global yeelight-manager`
 
 ## Requirements
 
