@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1-preview.7](https://github.com/WandersonAlves/yeelight-manager/compare/v0.1.1-preview.6...v0.1.1-preview.7) (2023-08-22)
+
+
+### Bug Fixes
+
+* warn user when rust code is not built ([8be7376](https://github.com/WandersonAlves/yeelight-manager/commit/8be7376796124ec780672819e425af410541c3cd))
+
 ### [0.1.1-preview.6](https://github.com/WandersonAlves/yeelight-manager/compare/v0.1.1-preview.5...v0.1.1-preview.6) (2023-08-22)
 
 
