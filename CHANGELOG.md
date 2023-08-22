@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1-preview.5](https://github.com/WandersonAlves/yeelight-manager/compare/v0.1.1-preview.4...v0.1.1-preview.5) (2023-08-22)
+
+
+### Features
+
+* add --colors option on list cmd ([3e674a3](https://github.com/WandersonAlves/yeelight-manager/commit/3e674a36da7d2b0ec96c4b34ca3827747aeee546))
+* add ls alias to list command ([6484016](https://github.com/WandersonAlves/yeelight-manager/commit/6484016da631eb36b533d5964e772a4707fe2b10))
+* add screenshot area sizing factor ([359c800](https://github.com/WandersonAlves/yeelight-manager/commit/359c800558eee2a608f55b343b1eeacd769819ad))
+* output colors with chalk on list command ([cb737df](https://github.com/WandersonAlves/yeelight-manager/commit/cb737df4e3d8b94135e21eb3a2502cda105a20cc))
+* swap from cli-table to cli-table3; show rgb value on list ([b0e00c8](https://github.com/WandersonAlves/yeelight-manager/commit/b0e00c8720b0bfc66d29652a837c61f0b56976aa))
+
+
+### Bug Fixes
+
+* better list colors ([bf38374](https://github.com/WandersonAlves/yeelight-manager/commit/bf38374993f721307ea963bd7e398defe2aa864e))
+* version flag ([1f6600e](https://github.com/WandersonAlves/yeelight-manager/commit/1f6600ea1bcb7747aadd4082932c8a877000ff71))
+
 ### [0.1.1-preview.4](https://github.com/WandersonAlves/yeelight-manager/compare/v0.1.1-preview.3...v0.1.1-preview.4) (2023-07-05)
 
 
