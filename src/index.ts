@@ -4,6 +4,7 @@ import { AmbilightCmd } from './commander/AmbilightCmd';
 import { BlinkCmd } from './commander/BlinkCmd';
 import { CommandListArr } from './infra/enums';
 import { DescribeCmd } from './commander/DescribeCmd';
+import { LIB_VERSION } from './version';
 import { ListCmd } from './commander/ListCmd';
 import { LoadCommandCmd } from './commander/LoadCommandCmd';
 import { SeeLogsCmd } from './commander/SeeLogsCmd';
@@ -11,12 +12,13 @@ import { SendCommandCmd } from './commander/SendCommandCmd';
 import { SetxCommandCmd } from './commander/SetxCommandCmd';
 import { ToggleCmd } from './commander/ToggleCmd';
 import { createCommand } from 'commander';
-import { version } from '../package.json';
 
 const program = createCommand();
-const programVersion: string = version;
 
-program.version(programVersion, '-v, --version').name('yee').description('Allow you to control yeelight bulbs from your CLI!');
+program
+  .version(process.env.npm_package_version || LIB_VERSION, '-v, --version')
+  .name('yee')
+  .description('Allow you to control yeelight bulbs from your CLI!');
 
 program
   .command('list')
@@ -31,10 +33,7 @@ program
 program
   .command('set <devices> <cmd> <value> [bright]')
   .description('Send a command to a device')
-  .addHelpText(
-    'after',
-    "\ndevices: string - A comma separated string with the name of devices. Example: 'Living Room,Bedroom', Bedroom",
-  )
+  .addHelpText('after', "\ndevices: string - A comma separated string with the name of devices. Example: 'Living Room,Bedroom', Bedroom")
   .addHelpText('after', `cmd: string - The command you want to run. Possible values are: ${CommandListArr.join(', ')}`)
   .addHelpText('after', `value?: number|string - Value used by cmd. Read README.md for more details`)
   .addHelpText('after', `bright?: number - Besides running the given cmd, runs a 'bright' command with the value.`)
@@ -66,18 +65,9 @@ program
 program
   .command('ambilight <devices> <value> [interval]')
   .description('Turn ambilight for given devices')
-  .addHelpText(
-    'after',
-    "\ndevices: string - a comma separeted string with the name of devices. Example: 'Living Room,Bedroom', Bedroom",
-  )
-  .addHelpText(
-    'after',
-    'value: string - a x separeted string that represents width-height-X-Y, this is the area to scan for colors. Example: 1280x135x640x100',
-  )
-  .addHelpText(
-    'after',
-    'interval?: number|string - the interval in miliseconds or in fps to fetch new colors. Example: 150, 60fps. Defaults to 300',
-  )
+  .addHelpText('after', "\ndevices: string - a comma separeted string with the name of devices. Example: 'Living Room,Bedroom', Bedroom")
+  .addHelpText('after', 'value: string - a x separeted string that represents width-height-X-Y, this is the area to scan for colors. Example: 1280x135x640x100')
+  .addHelpText('after', 'interval?: number|string - the interval in miliseconds or in fps to fetch new colors. Example: 150, 60fps. Defaults to 300')
   .usage('yee ambilight <devices> <value> [interval] --options')
   .option('--verbose', 'Output verbose info')
   .option('--debug', 'Output debug info')
@@ -86,10 +76,7 @@ program
 
 program
   .command('toggle <devices>')
-  .addHelpText(
-    'after',
-    "\ndevices: string - A comma separated string with the name of devices. Example: 'Living Room,Bedroom', Bedroom",
-  )
+  .addHelpText('after', "\ndevices: string - A comma separated string with the name of devices. Example: 'Living Room,Bedroom', Bedroom")
   .description('Toggle a device (turn on/off)')
   .option('-t --waitTime <value>', 'Time to wait to yeelights connect')
   .option('--verbose', 'Output verbose info')

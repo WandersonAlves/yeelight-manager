@@ -9,3 +9,4 @@ localStorage/
 target/
 .DS_Store
 */**/*.node
+src/version.ts
