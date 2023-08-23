@@ -1,5 +1,6 @@
 import { CommandList } from '../../../infra/enums';
 import { DeviceCmd } from './SetxCommandInterface';
+import { Stringify, labeledLogger } from '../../../shared/Logger';
 import { UseCase } from '../../../shared/contracts';
 import { inject, injectable } from 'inversify';
 import DiscoverDevicesCase from '../../Discovery/DiscoverDevices/DiscoverDevicesCase';
@@ -14,6 +15,8 @@ export default class SetxCommandCase implements UseCase<string, null> {
   @inject(Discovery) private discovery: Discovery;
   @inject(ReceiveCommandCase) private receiveCmdCase: ReceiveCommandCase;
 
+  private logger = labeledLogger('SetxCommandCase');
+
   @ExceptionHandler()
   async execute(rawString: string): Promise<null> {
     const cmds: DeviceCmd[] = SetxCommandCase.ProcessRawString(rawString);
@@ -21,21 +24,30 @@ export default class SetxCommandCase implements UseCase<string, null> {
 
     await this.discoverDevices.execute();
     const promises: Promise<any>[] = [];
-    await Promise.all(cmds.map(cmd => this.discovery.findDevice(cmd.device).connect()));
-    cmds.forEach(cmd => {
-      cmd.signals.forEach(signal => {
-        promises.push(
-          this.receiveCmdCase.execute({
-            manualConnect: true,
-            kind: signal.kind,
-            value: signal.value,
-            deviceNames: [cmd.device],
-          }),
-        );
-      });
-    });
-
+    for (const cmd of cmds) {
+      const device = this.discovery.findDevice(cmd.device);
+      if (device) {
+        this.logger('debug',`Connecting to ${device.name}`);
+        await device.connect();
+        this.logger('debug', `Connected to ${device.name}`);
+        cmd.signals.forEach(signal => {
+          promises.push(
+            this.receiveCmdCase.execute({
+              manualConnect: true,
+              kind: signal.kind,
+              value: signal.value,
+              deviceNames: [cmd.device],
+            }),
+          );
+          this.logger('debug', `Command ${Stringify(signal)} added`);
+        });
+      } else {
+        this.logger('warn', `${cmd.device} was not found, skipping it`);
+      }
+    }
+    this.logger('debug', 'Waiting commands to ran');
     await Promise.all(promises);
+    this.logger('info', 'Finished');
     return null;
   }
 

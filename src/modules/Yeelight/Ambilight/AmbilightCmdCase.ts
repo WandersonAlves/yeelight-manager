@@ -1,9 +1,9 @@
 import { DominantColorResponse } from '../../../infra/screenshot';
 import { EffectTypes } from '../../../infra/yeelight/devices/Commands';
+import { JsonStringify, labeledLogger } from '../../../shared/Logger';
 import { UseCase } from '../../../shared/contracts';
 import { address } from 'ip';
 import { inject, injectable } from 'inversify';
-import { jsonString, labeledLogger } from '../../../shared/Logger';
 import { spawn } from 'child_process';
 import Discovery from '../../../infra/yeelight/discovery/Discovery';
 import ExceptionHandler from '../../../shared/decorators/ExceptionHandler';
@@ -28,7 +28,7 @@ export default class AmbilightCmdCase implements UseCase<AmbilightCaseParams, vo
   async execute(params: AmbilightCaseParams): Promise<void> {
     const { deviceNames, interval = 300, width, height, x, y, useLuminance } = params;
 
-    this.logger('debug', `Received parameters ${jsonString(params)}`);
+    this.logger('debug', `Received parameters ${JsonStringify(params)}`);
 
     const ip = address();
     const selectedDevices = await this._discoverDevices(deviceNames);

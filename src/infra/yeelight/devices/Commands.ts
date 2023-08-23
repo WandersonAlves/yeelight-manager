@@ -13,7 +13,7 @@ export default class Command {
    * @returns string
    */
   toString() {
-    return JSON.stringify(this) + '\r\n';
+    return JSON.stringify(this);
   }
 
   // TODO document this to avoid refactoring. `method` is used in yeelight message

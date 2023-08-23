@@ -1,6 +1,6 @@
+import { JsonStringify, logger } from "../../../shared/Logger";
 import { UseCase } from "../../../shared/contracts";
 import { inject, injectable } from "inversify";
-import { jsonString, logger } from "../../../shared/Logger";
 import DeviceNotFoundException from "../../../shared/exceptions/DeviceNotFoundException";
 import Discovery from "../../../infra/yeelight/discovery/Discovery";
 import ExceptionHandler from "../../../shared/decorators/ExceptionHandler";
@@ -21,7 +21,7 @@ export default class DescribeDeviceCommandCase implements UseCase<string[], void
       return new DeviceNotFoundException(deviceNames.join(','));
     }
     selectedDevices.forEach((d, i) => {
-      logger.info(`#${i} Name: ${d.name} - IP: ${d.host}:${d.port} ${jsonString(d.describe())}`);
+      logger.info(`#${i} Name: ${d.name} - IP: ${d.host}:${d.port} ${JsonStringify(d.describe())}`);
     });
     return null;
   }

@@ -1,6 +1,6 @@
 import { ConfigureCmds } from '../shared/Logger';
 import { GetBindingFromContainer } from '../infra/container';
-import { jsonString, logger } from '../shared/Logger';
+import { JsonStringify, logger } from '../shared/Logger';
 import CommandStorage from '../infra/storage/CommandStorage';
 import GenericException from '../shared/exceptions/GenericException';
 import SetxCommandCase from '../modules/Yeelight/SetxCommand/SetxCommandCase';
@@ -17,7 +17,7 @@ type SetxCommandFn = (rawString: string, opts: SetxCommandOptionals) => Promise<
 export const SetxCommandCmd: SetxCommandFn = async (rawString, opts) => {
   const { debug, verbose, save } = opts;
   ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
-  logger.verbose(`Received parameters: ${jsonString(opts)}`, { label: 'SetxCommandCmd' });
+  logger.verbose(`Received parameters: ${JsonStringify(opts)}`, { label: 'SetxCommandCmd' });
   const result: any = await GetBindingFromContainer(SetxCommandCase).execute(rawString);
   if (save && !(result instanceof GenericException)) {
     CommandStorage.save(save, rawString);

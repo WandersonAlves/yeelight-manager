@@ -3,7 +3,7 @@ import { ColorFlowAction, ColorFlowExpressionMode, CommandList } from '../../enu
 import { CommandSignal } from '../../../modules/Yeelight/ReceiveCommand/ReceiveCommandInterfaces';
 import { EventEmitter } from 'events';
 import { GetValueFromString, HexToInteger } from '../../../utils';
-import { jsonString, logger } from '../../../shared/Logger';
+import { JsonStringify, logger } from '../../../shared/Logger';
 import ColorFlowExpression from './ColorFlowExpression';
 import ColorStorage from '../../storage/ColorStorage';
 import Command, {
@@ -217,7 +217,7 @@ export default class YeelightDevice {
     dataReceived: (command: Command) => (o: DataReceived) => {
       // this._events.removeAllListeners('data_received');
       if (o.method === 'props') {
-        this.log('verbose', `Props updated for ${jsonString(o.params)}`);
+        this.log('verbose', `Props updated for ${JsonStringify(o.params)}`);
         this._promiseStorage.setAck(command.id, true);
         return this._promiseStorage.resolve(command.id);
       } else if (this._promiseStorage.has(o.id)) {
@@ -341,7 +341,7 @@ export default class YeelightDevice {
           responses.forEach(r => {
             if (r) {
               const parsed: DataReceived = JSON.parse(r);
-              this.log('debug', `Result event ${jsonString(parsed)}`);
+              this.log('debug', `Result event ${JsonStringify(parsed)}`);
               this.handleDataEvent(parsed);
               this._events.emit('data_received', parsed);
             }
@@ -545,7 +545,7 @@ export default class YeelightDevice {
         }
       })
     } else {
-      this.log('warn', `Unmapped Event: ${jsonString(dataObj)}`);
+      this.log('warn', `Unmapped Event: ${JsonStringify(dataObj)}`);
     }
   }
 
