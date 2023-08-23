@@ -37,8 +37,8 @@ program
   .addHelpText('after', `cmd: string - The command you want to run. Possible values are: ${CommandListArr.join(', ')}`)
   .addHelpText('after', `value?: number|string - Value used by cmd. Read README.md for more details`)
   .addHelpText('after', `bright?: number - Besides running the given cmd, runs a 'bright' command with the value.`)
-  .option('--effect', 'Apply a transition effect to the command. Can be `smooth` or `sudden`. Defaults to `smooth`', 'smooth')
-  .option('--duration', 'The duration of the transition effect. Defaults to 300', '300')
+  .option('--effect', 'Apply a transition effect to the command. Can be `smooth` or `sudden`.', 'smooth')
+  .option('--duration', 'The duration of the transition effect.', '300')
   .option('--verbose', 'Output verbose info')
   .option('--debug', 'Output debug info')
   .action(SendCommandCmd);
