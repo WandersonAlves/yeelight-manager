@@ -8,9 +8,11 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "inlineSourceMap": true,
-    "lib": ["es2017", "DOM"]
+    "lib": ["es2017", "DOM"],
+    "allowJs": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["./src/**/*.ts", "./src/**/*.js"],
   "exclude": ["node_modules"]
 }

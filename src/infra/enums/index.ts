@@ -19,9 +19,9 @@ export enum CommandList {
   CT3 = 'temp',
   BRIGHT = 'bright',
   NAME = 'name',
-  AMBILIGHT = 'ambilight',
-  CANCEL_AMBILIGHT = 'cancel_ambilight',
   BLINK = 'blink',
   POWER = 'power',
   FLOW = 'flow'
 }
+
+export const CommandListArr = Object.entries(CommandList).map(n => n[1]);

@@ -1,7 +1,7 @@
 import { LocalStorage } from 'node-localstorage';
 import { join } from 'path';
 import { logger } from '../../shared/Logger';
-import Table from 'cli-table';
+import Table from 'cli-table3';
 
 export default class CommandStorage {
   private static storageFolder = join(__dirname, '../../../localStorage');
@@ -27,6 +27,6 @@ export default class CommandStorage {
       table.push([key, this.storage.getItem(key)]);
     });
     logger.verbose(`LocalStorage are on ${CommandStorage.storageFolder}`);
-    logger.info('\n' + table.toString());
+    logger.info('Saved commands:\n' + table.toString());
   }
 }

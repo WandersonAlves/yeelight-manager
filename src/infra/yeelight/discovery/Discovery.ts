@@ -9,9 +9,9 @@ import YeelightDevice from '../devices/YeelightDevice';
 @injectable()
 export default class Discovery {
   private devices: YeelightDevice[] = [];
-  private static SSDPDiscoveryMessage = `M-SEARCH * HTTP/1.1\r\nnMAN: "ssdp:discover"\r\nST: wifi_bulb\r\n`;
-  private static SSDPPort = 1982;
-  private static SSDPHost = '239.255.255.250';
+  private static readonly SSDPDiscoveryMessage = `M-SEARCH * HTTP/1.1\r\nnMAN: "ssdp:discover"\r\nST: wifi_bulb\r\n`;
+  private static readonly SSDPPort = 1982;
+  private static readonly SSDPHost = '239.255.255.250';
 
   findDevice(idOrNameOrIp: string): YeelightDevice {
     return this.devices.find(d => d.id === idOrNameOrIp || d.name === idOrNameOrIp || d.host === idOrNameOrIp);
@@ -19,6 +19,14 @@ export default class Discovery {
 
   getDevices(): YeelightDevice[] {
     return this.devices;
+  }
+
+  async turnOnAll(devices?: YeelightDevice[]) {
+    return Promise.all((devices ?? this.devices).filter(d => !d.power).map(d => d.setPower('on')));
+  }
+
+  async musicModeAll(ipAddress: string, devices?: YeelightDevice[]) {
+    return Promise.all((devices ?? this.devices).map(d => d.startMusicMode(ipAddress)));
   }
 
   async discoverDevicesFallback() {
@@ -36,7 +44,7 @@ export default class Discovery {
     );
     const openDevices = await Promise.all(promises);
 
-    this._handleNewDevices(openDevices.filter(d => d).map(d => YeelightDevice.CreateDeviceByIp(d.ip, 55443)));
+    this._handleNewDevices(openDevices.filter(d => d).map(d => YeelightDevice.CreateDeviceByIp(d.ip)));
     return this.devices;
   }
 

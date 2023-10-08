@@ -1,5 +1,5 @@
 import { CommandList } from '../infra/enums';
-import { ConfigureCmds } from './utils';
+import { ConfigureCmds } from '../shared/Logger';
 import { GetBindingFromContainer } from '../infra/container';
 import DiscoverDevicesCase from '../modules/Discovery/DiscoverDevices/DiscoverDevicesCase';
 import ReceiveCommandCase from '../modules/Yeelight/ReceiveCommand/ReceiveCommandCase';
@@ -20,13 +20,12 @@ type SendCommandFn = (
 
 export const SendCommandCmd: SendCommandFn = async (devices, cmd, value, bright, { verbose, debug }) => {
   ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
-  const headers = {
+  await GetBindingFromContainer(DiscoverDevicesCase).execute();
+  await GetBindingFromContainer(ReceiveCommandCase).execute({
     deviceNames: devices.split(','),
     kind: cmd,
     value,
     bright,
-  };
-  await GetBindingFromContainer(DiscoverDevicesCase).execute({ headers: {} });
-  await GetBindingFromContainer(ReceiveCommandCase).execute({ headers });
+  });
   process.exit();
 };

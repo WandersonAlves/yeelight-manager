@@ -1,4 +1,4 @@
-import { ConfigureCmds } from './utils';
+import { ConfigureCmds } from '../shared/Logger';
 import { GetBindingFromContainer } from '../infra/container';
 import { unlinkSync } from 'fs';
 import DiscoverDevicesCase from '../modules/Discovery/DiscoverDevices/DiscoverDevicesCase';
@@ -10,6 +10,6 @@ export const DiscoverDevicesCmd = async ({ verbose, debug, waitTime }) => {
   finally {
     ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
     const discoveryCase = GetBindingFromContainer(DiscoverDevicesCase);
-    await discoveryCase.execute({ headers: { waitTime }});
+    await discoveryCase.execute({ waitTime });
   }
 };

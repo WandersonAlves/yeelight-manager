@@ -1,28 +1,31 @@
+import { IntegerToRgb } from '../../../utils';
 import { UseCase } from '../../../shared/contracts';
 import { inject, injectable } from 'inversify';
 import { logger } from '../../../shared/Logger';
-import Discovery from '../../../infra/yeelight/discovery';
+import Discovery from '../../../infra/yeelight/discovery/Discovery';
 import ExceptionHandler from '../../../shared/decorators/ExceptionHandler';
-import HttpResponse from '../../../shared/responses/HttpResponse';
-import Table from 'cli-table';
+import Table from 'cli-table3';
 import YeelightDevice, { YeelightDeviceJSON } from '../../../infra/yeelight/devices/YeelightDevice';
+import chalk from 'chalk';
+
+interface DiscoverDevicesParams { waitTime?: number; logDevices?: boolean };
 
 @injectable()
-export default class DiscoverDevicesCase implements UseCase<YeelightDeviceJSON[]> {
+export default class DiscoverDevicesCase implements UseCase<DiscoverDevicesParams, YeelightDeviceJSON[]> {
   @inject(Discovery) private discovery: Discovery;
 
   @ExceptionHandler()
-  async execute({ headers }: { headers: { waitTime?: number; logDevices?: boolean } }) {
+  async execute(params: DiscoverDevicesParams = {}) {
+    const { waitTime, logDevices } = params;
     logger.info('Discovery started...', { label: 'Discovery' });
-    const devices = await this._discoverDevices(headers.waitTime);
+
+    const devices = await this._discoverDevices(waitTime);
     logger.info('Discovery finished.', { label: 'Discovery' });
-    if (devices.length && headers.logDevices) {
+
+    if (devices.length && logDevices) {
       this._logDevicesTable(devices);
     }
-    return HttpResponse.success(
-      200,
-      devices.map(d => d.toObject()),
-    );
+    return devices.map(d => d.toObject());
   }
 
   private async _discoverDevices(waitTime?: number) {
@@ -34,6 +37,7 @@ export default class DiscoverDevicesCase implements UseCase<YeelightDeviceJSON[]
     if (devicesFallback.length) {
       return devicesFallback;
     }
+    return [];
   }
 
   private async _discoverDevicesFallback() {
@@ -69,10 +73,19 @@ export default class DiscoverDevicesCase implements UseCase<YeelightDeviceJSON[]
           rgbValue,
           colorTemperatureValue,
         } = d.toObject();
-        const value = colorMode === 'RGB' ? rgbValue : colorTemperatureValue;
-        table.push([id, name, `${host}:${port}`, power ? 'Yes' : 'No', colorMode, value, bright]);
+        let value: string | number = colorMode === 'RGB' ? rgbValue : colorTemperatureValue;
+        if (colorMode === 'RGB') {
+          const [r, g, b] = IntegerToRgb(value);
+          value = chalk.rgb(r, g, b)`${value}`;
+        }
+        else {
+          value = colorTemperatureValue;
+        }
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        table.push([id, name, `${host}:${port}`, power ? `🔋` : `🪫`, colorMode, value, bright]);
       });
-    logger.info('List of devices:\n' + table.toString(), {
+    logger.info('Devices found:\n' + table.toString(), {
       label: 'Discovery',
     });
   }

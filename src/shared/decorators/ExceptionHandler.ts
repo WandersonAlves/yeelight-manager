@@ -1,13 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { logger } from '../Logger';
-import GenericException from '../exceptions/GenericException';
-import HttpResponseFactory from '../responses/HttpResponse';
 
+// eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 export default function ExceptionHandler(customFn?: (e: Error) => any) {
-  return (target: object, name: string | symbol, descriptor: PropertyDescriptor) => {
+  return (target: unknown, name: unknown, descriptor: PropertyDescriptor) => {
     const original = descriptor.value;
     descriptor.value = async function (...args) {
       try {
@@ -15,18 +13,10 @@ export default function ExceptionHandler(customFn?: (e: Error) => any) {
       } catch (err) {
         logger.error(err);
         if (customFn) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           return customFn(err);
         }
-        return HttpResponseFactory.error(
-          new GenericException({
-            name: err.name,
-            message: err.message,
-            statusCode: err?.response?.status,
-            extras: {
-              data: err?.response?.data,
-            },
-          }),
-        );
+        process.exit(1);
       }
     };
     return descriptor;

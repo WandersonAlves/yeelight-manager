@@ -2,7 +2,11 @@ node_modules/
 dist/
 .env
 .build
-2560x1080.jpg
 *.log
 lib/
 localStorage/
+.yarn
+target/
+.DS_Store
+*/**/*.node
+src/version.ts
