@@ -44,12 +44,12 @@ export const HexToInteger = (hex: string): number => {
 
 export const FpsToMs = (fps: number): number => 1000 / fps;
 
-export const GetListIpAddress = (currentIp: string, from = 1, to = 254): string[] =>  {
-  const startNumber = parseInt(currentIp.split('.')[3], 10);
+export const GetListIpAddress = (ipAddress: string, from = 1, to = 254): string[] =>  {
+  const startNumber = parseInt(ipAddress.split('.')[3], 10);
   const results: string[] = [];
   let before = startNumber;
   let after = startNumber;
-  const sub = currentIp.substring(0, currentIp.lastIndexOf('.'));
+  const sub = ipAddress.substring(0, ipAddress.lastIndexOf('.'));
 
   while (before > from || after < to) {
     before--;

@@ -42,9 +42,9 @@ export default class Discovery {
           });
         }),
     );
-    const openDevices = await Promise.all(promises);
+    const openDevices = (await Promise.all(promises)).filter(d => d);
 
-    this._handleNewDevices(openDevices.filter(d => d).map(d => YeelightDevice.CreateDeviceByIp(d.ip)));
+    this._handleNewDevices(openDevices.map(d => YeelightDevice.CreateDeviceByIp(d.ip)));
     return this.devices;
   }
 

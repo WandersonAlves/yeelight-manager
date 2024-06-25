@@ -166,16 +166,16 @@ export default class YeelightDevice {
     return new YeelightDevice({
       host: ip,
       port,
-      bright: 'unknow',
-      colorMode: 'unknow',
-      colorTemperatureValue: 'unknow',
-      id: 'unknow',
-      model: 'unknow',
-      name: 'unknow',
-      power: 'unknow',
-      rgbValue: 'unknow',
-      support: 'unknow',
-      fwVer: 'unknow'
+      bright: 'unknown',
+      colorMode: 'unknown',
+      colorTemperatureValue: 'unknown',
+      id: 'unknown',
+      model: 'unknown',
+      name: 'unknown',
+      power: 'unknown',
+      rgbValue: 'unknown',
+      support: 'unknown',
+      fwVer: 'unknown'
     });
   }
 
