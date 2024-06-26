@@ -9,7 +9,7 @@ import YeelightDevice from '../devices/YeelightDevice';
 @injectable()
 export default class Discovery {
   private devices: YeelightDevice[] = [];
-  private static readonly SSDPDiscoveryMessage = `M-SEARCH * HTTP/1.1\r\nnMAN: "ssdp:discover"\r\nST: wifi_bulb\r\n`;
+  private static readonly SSDPDiscoveryMessage = `M-SEARCH * HTTP/1.1\r\n` + `MAN: "ssdp:discover"\r\n` + `ST: wifi_bulb\r\n`;
   private static readonly SSDPPort = 1982;
   private static readonly SSDPHost = '239.255.255.250';
 
@@ -53,13 +53,16 @@ export default class Discovery {
       const client = createSocket('udp4');
       const devices: YeelightDevice[] = [];
 
-      client.send(Discovery.SSDPDiscoveryMessage, Discovery.SSDPPort, Discovery.SSDPHost, error => {
-        if (error) {
-          logger.error(error.toString(), { label: 'Discovery' });
-          client.close();
-          reject(error);
-        }
+      client.bind(0, address() , () => {
+        client.send(Discovery.SSDPDiscoveryMessage, Discovery.SSDPPort, Discovery.SSDPHost, error => {
+          if (error) {
+            logger.error(error.toString(), { label: 'Discovery' });
+            client.close();
+            reject(error);
+          }
+        });
       });
+
       client.on('message', msg => {
         const str = msg.toString();
         if (str.includes('HTTP/1.1 200 OK') && str.includes('yeelight')) {
@@ -72,7 +75,7 @@ export default class Discovery {
         this._handleNewDevices(devices);
         client.close();
         resolve(this.devices);
-      }, timeToDiscover ?? 1000);
+      }, timeToDiscover ?? 100);
     });
   }
 
