@@ -1,6 +1,6 @@
-import { CommandSignal } from "../ReceiveCommand/ReceiveCommandInterfaces";
+import { CommandSignal } from '../ReceiveCommand/ReceiveCommandInterfaces';
 
 export interface DeviceCmd {
-  device: string;
-  signals?: CommandSignal[];
+    device: string;
+    signals?: CommandSignal[];
 }

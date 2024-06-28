@@ -8,85 +8,77 @@ import Table from 'cli-table3';
 import YeelightDevice, { YeelightDeviceJSON } from '../../../infra/yeelight/devices/YeelightDevice';
 import chalk from 'chalk';
 
-interface DiscoverDevicesParams { waitTime?: number; logDevices?: boolean };
+interface DiscoverDevicesParams {
+    waitTime?: number;
+    logDevices?: boolean;
+}
 
 @injectable()
 export default class DiscoverDevicesCase implements UseCase<DiscoverDevicesParams, YeelightDeviceJSON[]> {
-  @inject(Discovery) private discovery: Discovery;
+    @inject(Discovery) private discovery: Discovery;
 
-  @ExceptionHandler()
-  async execute(params: DiscoverDevicesParams = {}) {
-    const { waitTime, logDevices } = params;
-    logger.info('Discovery started...', { label: 'Discovery' });
+    @ExceptionHandler()
+    async execute(params: DiscoverDevicesParams = {}) {
+        const { waitTime, logDevices } = params;
+        logger.info('Discovery started...', { label: 'Discovery' });
 
-    const devices = await this._discoverDevices(waitTime);
-    logger.info('Discovery finished.', { label: 'Discovery' });
+        const devices = await this._discoverDevices(waitTime);
+        logger.info('Discovery finished.', { label: 'Discovery' });
 
-    if (devices.length && logDevices) {
-      this._logDevicesTable(devices);
-    }
-    return devices.map(d => d.toObject());
-  }
-
-  private async _discoverDevices(waitTime?: number) {
-    const devices: YeelightDevice[] = await this._discoverDevicesSSDP(waitTime);
-    if (devices.length) {
-      return devices;
-    }
-    const devicesFallback: YeelightDevice[] = await this._discoverDevicesFallback();
-    if (devicesFallback.length) {
-      return devicesFallback;
-    }
-    return [];
-  }
-
-  private async _discoverDevicesFallback() {
-    logger.info('Performing IP scan to find devices.', { label: 'Discovery' });
-    const devicesFallback = await this.discovery.discoverDevicesFallback();
-    logger.info(`Found ${devicesFallback.length} devices via IP scan.`, { label: 'Discovery' });
-    return devicesFallback;
-  }
-
-  private async _discoverDevicesSSDP(waitTime?: number) {
-    await this.discovery.discoverDevices(waitTime);
-    const devices = this.discovery.getDevices();
-    logger.info(`Found ${devices.length} devices via SSDP.`, { label: 'Discovery' });
-    return devices;
-  }
-
-  private _logDevicesTable(devices: YeelightDevice[]) {
-    const table = new Table({
-      head: ['DeviceID', 'Name', 'IP', 'On?', 'Mode', 'Value', 'Brightness'],
-      style: { head: ['green'] },
-    });
-    devices
-      .sort((a, b) => (a.name < b.name ? -1 : 1))
-      .forEach(d => {
-        const {
-          id,
-          name = 'UnamedYeelight',
-          host,
-          port,
-          power,
-          colorMode,
-          bright,
-          rgbValue,
-          colorTemperatureValue,
-        } = d.toObject();
-        let value: string | number = colorMode === 'RGB' ? rgbValue : colorTemperatureValue;
-        if (colorMode === 'RGB') {
-          const [r, g, b] = IntegerToRgb(value);
-          value = chalk.rgb(r, g, b)`${value}`;
+        if (devices.length && logDevices) {
+            this._logDevicesTable(devices);
         }
-        else {
-          value = colorTemperatureValue;
+        return devices.map((d) => d.toObject());
+    }
+
+    private async _discoverDevices(waitTime?: number) {
+        const devices: YeelightDevice[] = await this._discoverDevicesSSDP(waitTime);
+        if (devices.length) {
+            return devices;
         }
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        table.push([id, name, `${host}:${port}`, power ? `🔋` : `🪫`, colorMode, value, bright]);
-      });
-    logger.info('Devices found:\n' + table.toString(), {
-      label: 'Discovery',
-    });
-  }
+        const devicesFallback: YeelightDevice[] = await this._discoverDevicesFallback();
+        if (devicesFallback.length) {
+            return devicesFallback;
+        }
+        return [];
+    }
+
+    private async _discoverDevicesFallback() {
+        logger.info('Performing IP scan to find devices.', { label: 'Discovery' });
+        const devicesFallback = await this.discovery.discoverDevicesFallback();
+        logger.info(`Found ${devicesFallback.length} devices via IP scan.`, { label: 'Discovery' });
+        return devicesFallback;
+    }
+
+    private async _discoverDevicesSSDP(waitTime?: number) {
+        await this.discovery.discoverDevices(waitTime);
+        const devices = this.discovery.getDevices();
+        logger.info(`Found ${devices.length} devices via SSDP.`, { label: 'Discovery' });
+        return devices;
+    }
+
+    private _logDevicesTable(devices: YeelightDevice[]) {
+        const table = new Table({
+            head: ['DeviceID', 'Name', 'IP', 'On?', 'Mode', 'Value', 'Brightness'],
+            style: { head: ['green'] },
+        });
+        devices
+            .sort((a, b) => (a.name < b.name ? -1 : 1))
+            .forEach((d) => {
+                const { id, name = 'UnamedYeelight', host, port, power, colorMode, bright, rgbValue, colorTemperatureValue } = d.toObject();
+                let value: string | number = colorMode === 'RGB' ? rgbValue : colorTemperatureValue;
+                if (colorMode === 'RGB') {
+                    const [r, g, b] = IntegerToRgb(value);
+                    value = chalk.rgb(r, g, b)`${value}`;
+                } else {
+                    value = colorTemperatureValue;
+                }
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                table.push([id, name, `${host}:${port}`, power ? `🔋` : `🪫`, colorMode, value, bright]);
+            });
+        logger.info('Devices found:\n' + table.toString(), {
+            label: 'Discovery',
+        });
+    }
 }

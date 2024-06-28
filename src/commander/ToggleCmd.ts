@@ -5,11 +5,11 @@ import DiscoverDevicesCase from '../modules/Discovery/DiscoverDevices/DiscoverDe
 import ReceiveCommandCase from '../modules/Yeelight/ReceiveCommand/ReceiveCommandCase';
 
 export const ToggleCmd = async (devices: string, { verbose, debug, waitTime }) => {
-  ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
-  await GetBindingFromContainer(DiscoverDevicesCase).execute({ waitTime });
-  await GetBindingFromContainer(ReceiveCommandCase).execute({
-    deviceNames: devices.split(','),
-    kind: CommandList.TOGGLE,
-  });
-  process.exit(0);
+    ConfigureCmds(debug ? 'debug' : verbose ? 'verbose' : 'info');
+    await GetBindingFromContainer(DiscoverDevicesCase).execute({ waitTime });
+    await GetBindingFromContainer(ReceiveCommandCase).execute({
+        deviceNames: devices.split(','),
+        kind: CommandList.TOGGLE,
+    });
+    process.exit(0);
 };

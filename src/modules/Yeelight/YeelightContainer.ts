@@ -4,11 +4,11 @@ import DescribeDeviceCommandCase from './Describe/DescribeDeviceCommandCase';
 import ReceiveCommandCase from './ReceiveCommand/ReceiveCommandCase';
 import SetxCommandCase from './SetxCommand/SetxCommandCase';
 
-const YeelightContainer = new ContainerModule(bind => {
-  bind<ReceiveCommandCase>(ReceiveCommandCase).toSelf();
-  bind(AmbilightCmdCase).toSelf();
-  bind(SetxCommandCase).toSelf();
-  bind(DescribeDeviceCommandCase).toSelf();
+const YeelightContainer = new ContainerModule((bind) => {
+    bind<ReceiveCommandCase>(ReceiveCommandCase).toSelf();
+    bind(AmbilightCmdCase).toSelf();
+    bind(SetxCommandCase).toSelf();
+    bind(DescribeDeviceCommandCase).toSelf();
 });
 
 export default YeelightContainer;
