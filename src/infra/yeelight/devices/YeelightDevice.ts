@@ -20,7 +20,7 @@ import Command, {
 import CommandFailureException from '../../../shared/exceptions/CommandFailureException';
 import PromiseStorage from '../../storage/PromiseStorage';
 import TimeoutException from '../../../shared/exceptions/TimeoutException';
-import UnsuportedCommandException from '../../../shared/exceptions/UnsuportedCommandException';
+import UnsupportedCommandException from '../../../shared/exceptions/UnsupportedCommandException';
 
 export interface YeelightDeviceJSON {
     id: string;
@@ -78,7 +78,7 @@ export default class YeelightDevice {
                 return device.setFlow(1, ColorFlowAction.STAY, []);
             }
             default: {
-                throw new UnsuportedCommandException(device.id, kind, value);
+                throw new UnsupportedCommandException(device.id, kind, value);
             }
         }
     }
