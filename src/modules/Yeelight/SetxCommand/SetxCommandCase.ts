@@ -1,4 +1,4 @@
-import { CommandList } from '../../../infra/enums';
+import { CommandList } from '../../../shared/enums';
 import { DeviceCmd } from './SetxCommandInterface';
 import { Stringify, labeledLogger } from '../../../shared/Logger';
 import { UseCase } from '../../../shared/contracts';

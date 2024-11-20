@@ -1,4 +1,4 @@
-import { CommandList } from '../infra/enums';
+import { CommandList } from '../shared/enums';
 import { ConfigureCmds } from '../shared/Logger';
 import { GetBindingFromContainer } from '../infra/container';
 import DiscoverDevicesCase from '../modules/Discovery/DiscoverDevices/DiscoverDevicesCase';

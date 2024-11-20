@@ -10,8 +10,8 @@ export default function ExceptionHandler(customFn?: (e: Error) => any) {
         descriptor.value = async function (...args) {
             try {
                 return await original.apply(this, args);
-            } catch (err) {
-                logger.error(err);
+            } catch (err: any) {
+                logger.error(err.message as string);
                 if (customFn) {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                     return customFn(err);

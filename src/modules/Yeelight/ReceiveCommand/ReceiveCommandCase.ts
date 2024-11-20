@@ -1,4 +1,4 @@
-import { CommandList } from '../../../infra/enums';
+import { CommandList } from '../../../shared/enums';
 import { CommandSignal } from './ReceiveCommandInterfaces';
 import { UseCase } from '../../../shared/contracts';
 import { inject, injectable } from 'inversify';

@@ -2,7 +2,7 @@
 import 'reflect-metadata';
 import { AmbilightCmd } from './commander/AmbilightCmd';
 import { BlinkCmd } from './commander/BlinkCmd';
-import { CommandListArr } from './infra/enums';
+import { CommandListArr } from './shared/enums';
 import { DescribeCmd } from './commander/DescribeCmd';
 import { LIB_VERSION } from './version';
 import { ListCmd } from './commander/ListCmd';

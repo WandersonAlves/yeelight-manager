@@ -1,5 +1,5 @@
 import { AddressInfo, Socket as TCPSocket, createServer } from 'net';
-import { ColorFlowAction, ColorFlowExpressionMode, CommandList } from '../../enums';
+import { ColorFlowAction, ColorFlowExpressionMode, CommandList } from '../../../shared/enums';
 import { CommandSignal } from '../../../modules/Yeelight/ReceiveCommand/ReceiveCommandInterfaces';
 import { EventEmitter } from 'events';
 import { GetValueFromString, HexToInteger } from '../../../utils';
@@ -47,7 +47,7 @@ interface DataReceived {
 
 export default class YeelightDevice {
     static readonly YeelightDefaultPort = 55443;
-    static readonly DefaultTimeoutTime = 2500;
+    static readonly DefaultTimeoutTime = 1000;
 
     static async ExecCommand(device: YeelightDevice, { kind, value }: CommandSignal): Promise<void> {
         switch (kind) {
@@ -131,7 +131,7 @@ export default class YeelightDevice {
      * Creates a YeelightDevice object from a given string
      *
      * @param message A string from `client.on('message')`
-     * @returns new insntace of YeelightDevice
+     * @returns new instance of YeelightDevice
      */
     static CreateDevice(message: string) {
         const colorMode = parseInt(GetValueFromString(message, 'color_mode'));
@@ -160,7 +160,7 @@ export default class YeelightDevice {
      *
      * @param ip IP of the bulb
      * @param port Port of the bulb
-     * @returns new insntace of YeelightDevice
+     * @returns new instance of YeelightDevice
      */
     static CreateDeviceByIp(ip: string, port = YeelightDevice.YeelightDefaultPort) {
         return new YeelightDevice({
@@ -274,6 +274,11 @@ export default class YeelightDevice {
         this.name = name;
     }
 
+    /**
+     * Describes the yeelight device
+     *
+     * @returns a object with all properties of the device
+     */
     describe() {
         return {
             id: this.id,
@@ -287,7 +292,7 @@ export default class YeelightDevice {
             power: this._power,
             bright: this._bright,
             color_mode: this._colorMode,
-            color_temeperature: this._colorTemperatureValue,
+            color_temperature: this._colorTemperatureValue,
             rgb: this._rgb,
             music_mode: this._musicMode,
             firmware_version: this._firmwareVersion,
@@ -310,8 +315,15 @@ export default class YeelightDevice {
                     this.log('info', `💡 Connected into ${this._name}`);
                     resolve();
                 });
+
+                this._client?.on('error', hadError => console.log(hadError));
             };
 
+            /**
+             * This function handles all yeelight device events.
+             *
+             * From there, it emits `data_received` when something arrives from `data` client's event
+             */
             const _handleYeelightConnectionEvents = () => {
                 this._client?.on('error', (err) => {
                     this.log('error', err.name);
@@ -358,7 +370,7 @@ export default class YeelightDevice {
      * Creates a server connection for the lightbulb connect
      *
      * When in this mode, lightbulb receives commands without ACK them,
-     * so the bulb will not drop the connection when receving a lot of requests
+     * so the bulb will not drop the connection when receiving a lot of requests
      *
      * @param currentIpAddress Current host IP
      * @returns
@@ -379,7 +391,7 @@ export default class YeelightDevice {
 
                 this._server.on('connection', (sock) => {
                     this.log('info', '⚡ Device connected to server');
-                    // If the lightbulb connect succefully, it will be here on sock
+                    // If the lightbulb connect successfully, it will be here on sock
                     // Else it will print something like {"method":"props","params":{"music_on":0}} on client
                     this._socket = sock;
                     resolve();
@@ -413,10 +425,24 @@ export default class YeelightDevice {
         return this.sendCommand(new MusicModeCommand(false, currentIpAddress, this._localPort));
     }
 
+    /**
+     * "Toggles" the device. It means that if it's on, it'll turn off, and vice-versa
+     *
+     * @returns
+     */
     toggle() {
         return this.sendCommand(new ToggleCommand(this._commandId++));
     }
 
+    /**
+     * Send a `set_rgb` command to the lightbulb
+     *
+     * @param hex The color in hex format
+     * @param effect The effect type. Defaults to `smooth`
+     * @param duration How long the device will take to transition to this command. Defaults to 300ms
+     * @param prepare Should the device be turned on before sending the command? Defaults to false
+     * @returns
+     */
     setHex(hex: string, effect: EffectTypes = 'smooth', duration = 300, prepare = false) {
         if (prepare) {
             this.prepareDevice();
@@ -424,10 +450,29 @@ export default class YeelightDevice {
         return this.sendCommand(new RGBCommand(HexToInteger(hex), effect, duration, this._commandId++));
     }
 
+    /**
+     * Send a `start_cf` command to the lightbulb
+     *
+     * This command will start the color flow mode. It'll change the color of the lightbulb based on the given flows
+     *
+     * @param repeat How many times the flow will repeat
+     * @param action Which action the device will take when the flow finishes.
+     * @param flows An array of `ColorFlowExpression` that will be used to compose the flow
+     * @returns
+     */
     setFlow(repeat: number, action: ColorFlowAction, flows: ColorFlowExpression[]) {
         return this.sendCommand(new ColorFlowCommand(repeat, action, flows, this._commandId++));
     }
 
+    /**
+     * Send a `set_bright` command to the lightbulb
+     *
+     * @param level The amount of brightness. It goes from 1 to 100
+     * @param effect The effect type. Defaults to `smooth`
+     * @param duration How long the device will take to transition to this command. Defaults to 300ms
+     * @param prepare Should the device be turned on before sending the command? Defaults to false
+     * @returns
+     */
     setBright(level: number, effect: EffectTypes = 'smooth', duration = 300, prepare = false) {
         if (prepare) {
             this.prepareDevice();
@@ -435,10 +480,25 @@ export default class YeelightDevice {
         return this.sendCommand(new BrightCommand(level, effect, duration, this._commandId++));
     }
 
+    /**
+     * Send a `set_name` command to the lightbulb
+     *
+     * @param name The device name
+     * @returns
+     */
     setName(name: string) {
         return this.sendCommand(new NameCommand(name, this._commandId++));
     }
 
+    /**
+     * Send a `set_ct_abx` command to the lightbulb
+     *
+     * @param ct The color temperature. It goes from 1700 to 6500
+     * @param effect The effect type. Defaults to `smooth`
+     * @param duration How long the device will take to transition to this command. Defaults to 300ms
+     * @param prepare Should the device be turned on before sending the command? Defaults to false
+     * @returns
+     */
     setColorTemperature(ct: number, effect: EffectTypes = 'smooth', duration = 300, prepare = false) {
         if (prepare) {
             this.prepareDevice();
@@ -446,10 +506,23 @@ export default class YeelightDevice {
         return this.sendCommand(new ColorTemperatureCommand(ct, effect, duration, this._commandId++));
     }
 
+    /**
+     * Send a `set_power` command to the lightbulb
+     *
+     * @param power The power state. It can be `on` or `off`
+     * @param effect The effect type. Defaults to `smooth`
+     * @param duration How long the device will take to transition to this command. Defaults to 300ms
+     * @returns
+     */
     setPower(power: 'on' | 'off', effect: EffectTypes = 'smooth', duration = 300) {
         return this.sendCommand(new PowerCommand(power, effect, duration));
     }
 
+    /**
+     * Calls `YeelightDevice.setFlow` with a flow that blinks the device
+     *
+     * @returns
+     */
     blinkDevice() {
         return this.setFlow(1, ColorFlowAction.RECOVER_STATE, [
             new ColorFlowExpression(750, ColorFlowExpressionMode.TEMPERATURE, 9999, 100),
@@ -457,6 +530,11 @@ export default class YeelightDevice {
         ]);
     }
 
+    /**
+     * Converts the device to a plain json object
+     *
+     * @returns A plain json object with information from the device
+     */
     toObject(): YeelightDeviceJSON {
         return {
             id: this.id,
@@ -473,6 +551,9 @@ export default class YeelightDevice {
         };
     }
 
+    /**
+     * Turn on the device if it's not on yet
+     */
     private prepareDevice() {
         if (!this._power) {
             void this.setPower('on');
@@ -535,6 +616,12 @@ export default class YeelightDevice {
         }
     }
 
+    /**
+     * Sends a command to the device
+     *
+     * @param command A command to send to device
+     * @returns
+     */
     private sendCommand(command: Command): Promise<void> {
         const cmdName = command.name;
         const cmdJSON = command.toString();

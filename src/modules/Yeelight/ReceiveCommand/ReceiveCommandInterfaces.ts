@@ -1,4 +1,4 @@
-import { CommandList } from '../../../infra/enums';
+import { CommandList } from '../../../shared/enums';
 
 export interface CommandSignal {
     kind: CommandList;

@@ -1,4 +1,4 @@
-import { ColorFlowExpressionMode } from '../../enums';
+import { ColorFlowExpressionMode } from '../../../shared/enums';
 
 export default class ColorFlowExpression {
     constructor(
