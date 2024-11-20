@@ -30,7 +30,7 @@
         "release": "npx standard-version && yarn build && yarn publish",
         "release:preview": "npx standard-version --prerelease preview && yarn build && yarn publish",
         "prebuild": "node -p \"'export const LIB_VERSION = ' + JSON.stringify(require('./package.json').version) + ';'\" > src/version.ts",
-        "build": "rm -rf lib/ && tsc",
+        "build": "yarn prebuild && rm -rf lib/ && tsc",
         "build:rs": "napi build --release ./src/infra/screenshot",
         "build:rs:debug": "napi build ./src/infra/screenshot",
         "postinstall": "node ./scripts/postinstall-skip.js || napi build --release ./lib/infra/screenshot"
