@@ -1,2 +1,5 @@
 docs/
 swagger/
+yarn.lock
+.vscode/
+*.md

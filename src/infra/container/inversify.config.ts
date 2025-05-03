@@ -1,5 +1,5 @@
 import { Container } from 'inversify';
-import Discovery from '../yeelight/discovery';
+import Discovery from '../yeelight/discovery/Discovery';
 import DiscoveryContainer from '../../modules/Discovery/DiscoveryContainer';
 import YeelightContainer from '../../modules/Yeelight/YeelightContainer';
 // Merge container modules
